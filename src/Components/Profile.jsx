@@ -898,7 +898,7 @@ function Profile() {
     }
 
     try {
-      const token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJURVNUMSIsImVtYWlsIjoiVEVTVDFAc2hhbm11Z2EuY29tIiwibmFtZSI6IlRFU1QxLCBURVNUMSIsImFsbG93ZWQtYWN0aW9ucyI6WyJHTC1QLUFCLVJXIiwiU0QtUC1CQVItUiIsIlNELVAtQkFSLUdCQyJdLCJhbGxvd2VkLWRhdGEiOlsiR0xPQkFMIl0sImlzcyI6Imh0dHBzOi8vbGFiLnNoaW5vdmEuaW4vIiwiaWF0IjoxNzQyNjUyMDUyLCJleHAiOjIyODI2NTIwNTIsImp0aSI6IjU3NzljMDNmLTRlYWQtNGVhNC1hNWMwLTdiODlmNTcxMjRmOCJ9.D9DNnPCXpFU9q1pQBPb56avE37NK7tFmevtPq89m5zg90p8lhYH4XYg4I397IS1AMEHUqk2G6EZueAljbUOhATtEXVpy8Qun2JQVd90smmi3q-b02V9iLtuALVXQ4Iczs8AK2xT6O-rlfgGHsSPU5pO_3TsELFsUv3cWu7sK4QAKuXl8crcm1zfJLeU_kPnUBpoNeRWXRJSr0zVLK7E8s9Czaz_yIAlBKq6LGAkgMBBJlBHgeqnt4Oj_9W4qs4ZvN9se79Bk1elliurh95mw8Vfy6EIijCcjojalBoahr36Fx1y7GEsHa_CpDENd2Sf5EMlosEYFxqIfbhJCM2ZePA';
+      
       const branch_code = 'GLOBAL';
       const response = await axios.post(GlobalBaseUrl + "create_employee/", profileData, {
         headers: { "Content-Type": "application/json", "authorization":token, "branch-code":branch_code },

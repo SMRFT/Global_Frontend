@@ -23,17 +23,17 @@ const NavLink = styled(Link)`
 
 const Sidebar = () => {
   const location = useLocation();
-
+  
   return (
     <SidebarContainer>
       <h2>Global</h2>
-      <NavLink to="/" active={(location.pathname === "/Profile").toString()}>
+      <NavLink to={`${import.meta.env.BASE_URL}`} active={(location.pathname === `${import.meta.env.BASE_URL}`).toString()}>
         Profile
       </NavLink>
-      <NavLink to="/Admin" active={(location.pathname === "/Admin").toString()}>
+      <NavLink to={`${import.meta.env.BASE_URL}Admin`} active={(location.pathname === `${import.meta.env.BASE_URL}/Admin`).toString()}>
         Admin
       </NavLink>
-      <NavLink to="/EmployeeList" active={(location.pathname === "/EmployeeList").toString()}>
+      <NavLink to={`${import.meta.env.BASE_URL}EmployeeList`} active={(location.pathname === `${import.meta.env.BASE_URL}/EmployeeList`).toString()}>
         Employee List
       </NavLink>
     </SidebarContainer>
@@ -41,3 +41,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+

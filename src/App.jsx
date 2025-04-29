@@ -24,10 +24,10 @@ function App() {
       <Content>
         <Routes>
           {/* Global Routes */}
-          <Route path="/" element={<Profile />} />
+          <Route path={`${import.meta.env.BASE_URL}`} element={<Profile />} />
 
-          <Route path="/Admin" element={<Admin />} />
-          <Route path="/EmployeeList" element={<EmployeeList />} />
+          <Route path={`${import.meta.env.BASE_URL}Admin`} element={<Admin />} />
+          <Route path={`${import.meta.env.BASE_URL}EmployeeList`} element={<EmployeeList />} />
       
         </Routes>
       </Content>

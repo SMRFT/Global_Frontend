@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import styled from 'styled-components';
@@ -7,24 +6,31 @@ import Admin from './components/Admin';
 import Profile from './components/Profile';
 import EmployeeList from './components/EmployeeList';
 
+
 const Content = styled.div`
   margin-left: 200px; /* Width of Sidebar */
   padding: 20px;
   flex: 1;
 `;
 
+// Function to get token from cookie
+let accessToken = localStorage.getItem('access_token');
+console.log(accessToken)
+
 function App() {
   return (
     <Router>
-        <Sidebar />
-        <Content>
-          <Routes>
-            {/* Global */}
-            <Route path="/" element={<Profile />} />
-            <Route path="/Admin" element={<Admin />} />
-            <Route path="/EmployeeList" element={<EmployeeList />} />
-          </Routes>
-        </Content>
+      <Sidebar />
+      <Content>
+        <Routes>
+          {/* Global Routes */}
+          <Route path="/" element={<Profile />} />
+
+          <Route path="/Admin" element={<Admin />} />
+          <Route path="/EmployeeList" element={<EmployeeList />} />
+      
+        </Routes>
+      </Content>
     </Router>
   );
 }

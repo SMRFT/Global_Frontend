@@ -467,7 +467,8 @@ const EmployeeList = () => {
   const [passwordError, setPasswordError] = useState('');
   const [departments, setDepartments] = useState([]);
 
-
+  let accessToken = localStorage.getItem('access_token');
+  console.log(accessToken)
   const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL;
 
   const getAllEmployees = async () => {

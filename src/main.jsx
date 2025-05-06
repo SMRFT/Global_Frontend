@@ -3,43 +3,53 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 
-// Access the redirect URL from environment variables
-const REDIRECT_URL = import.meta.env.VITE_LOGIN_REDIRECT_URL;
+// --- Function to get token from cookies ---
+function setforlocaldev() {
+  const dev_token="eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJTSDAwOCIsImVtYWlsIjoidGVzdEBnbWFpbC5jb20iLCJuYW1lIjoidGVzdCIsImFsbG93ZWQtYWN0aW9ucyI6WyJHTC1QLUVBRC1SVyIsIkdMLVAtRVAtUlciXSwiYWxsb3dlZC1kYXRhIjpbIlNIQjAwMSJdLCJpc3MiOiJodHRwczovL2xhYi5zaGlub3ZhLmluLyIsImlhdCI6MTc0NjUyMTA4NCwiZXhwIjoxNzQ2NjA3NDg0LCJqdGkiOiIxYzg1ZTYwZC04YWY1LTRjZTctYTkyMy1mY2NlN2FmMmIwNWYifQ.Wre8XF9DARuHrJYJJ8e_CtkcIhIqytXohyeOuxRzXOK0TZOv3_ut4y-BMzB9jILHbsktsPB0i-VsXcXmSvk1NC6yEBL1lh8hICtsfNQP0HxfA62W9FPnfjuzOa7-mwDE5V1EJo4lEL897K5JVyxUFpUnyxBuum1E3uP9_I-N_8o57Dbe1IBQu3W2V8G0J4X_HxPzs45QqqWuczLajTJzZcqk2Zbib0XSv1own4COOLwrJPUdDfHM8Tq-_-sxKWl5MWMmIe33LV5aL_YPqYWt0uj-KyfSCf8aAgcmB3QW_XdDYw02gErpSGKaEhk3BQX5-zFe-BoipotOJQ25KhbSLw";
+ return dev_token;
+}
 
-// Function to get token from cookie
-function getAccessTokenFromCookie() {
-  const cookies = document.cookie.split('; ');
-  for (let cookie of cookies) {
-    const [name, value] = cookie.split('=');
-    if (name === 'access_token') {
-      return value;
+// --- Validate JWT Token Locally ---
+function validate(token) {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const now = Math.floor(Date.now() / 1000);
+    if (!payload.exp || payload.exp < now) {
+      throw new Error('Token expired');
     }
+    return payload;
+  } catch (err) {
+    throw new Error('Invalid token');
   }
-  return null;
 }
 
-// Try to get token from localStorage
+// --- Retrieve token from localStorage or cookie ---
 let accessToken = localStorage.getItem('access_token');
-
+console.log("welcome")
 if (!accessToken) {
-  // If not found in localStorage, try cookies
-  const cookieToken = getAccessTokenFromCookie();
+  console.log("not found token")
+  accessToken= setforlocaldev();
+   console.log("if end")
+}
 
-  if (cookieToken) {
-    // Save cookie token into localStorage
-    localStorage.setItem('access_token', cookieToken);
-    accessToken = cookieToken;
+// --- Validate and Render ---
+(function main() {
+  try {
+    console.log("first")
+    if (!accessToken) throw new Error('No token found');
+
+    const userPayload = validate(accessToken); // ✅ Now valid
+    localStorage.setItem('user_payload', JSON.stringify(userPayload)); // ✅ Save payload
+
+    // Token is valid, render app
+    createRoot(document.getElementById('root')).render(
+      <StrictMode>
+        <App />
+      </StrictMode>
+    );
+  } catch (err) {
+    console.error('Token validation failed:', err.message);
+    localStorage.removeItem('access_token');
+
   }
-}
-
-if (!accessToken) {
-  // Redirect if no token
-  window.location.href = REDIRECT_URL;
-} else {
-  // Token found, render the app
-  createRoot(document.getElementById('root')).render(
-    <StrictMode>
-      <App />
-    </StrictMode>
-  );
-}
+})();

@@ -1,7 +1,8 @@
-// Sidebar.js
+// Sidebar.jsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import PagePermissions from './PagePermissions';
 
 const SidebarContainer = styled.div`
   width: 200px;
@@ -18,27 +19,31 @@ const NavLink = styled(Link)`
   color: white;
   margin: 15px 0;
   text-decoration: none;
-  font-weight: ${({ active }) => (active === "true" ? "bold" : "normal")};
+  font-weight: ${({ $active }) => ($active ? 'bold' : 'normal')};
 `;
 
 const Sidebar = () => {
   const location = useLocation();
-  
+  const userPayload = JSON.parse(localStorage.getItem('user_payload'));
+  const allowedActions = userPayload?.['allowed-actions'] || [];
+
   return (
     <SidebarContainer>
       <h2>Global</h2>
-      <NavLink to={`${import.meta.env.BASE_URL}`} active={(location.pathname === `${import.meta.env.BASE_URL}`).toString()}>
-        Profile
-      </NavLink>
-      <NavLink to={`${import.meta.env.BASE_URL}Admin`} active={(location.pathname === `${import.meta.env.BASE_URL}/Admin`).toString()}>
-        Admin
-      </NavLink>
-      <NavLink to={`${import.meta.env.BASE_URL}EmployeeList`} active={(location.pathname === `${import.meta.env.BASE_URL}/EmployeeList`).toString()}>
-        Employee List
-      </NavLink>
+      {allowedActions.map((code) => {
+        const page = PagePermissions[code];
+        if (!page) return null;
+        const fullPath = `${import.meta.env.BASE_URL}${page.path}`;
+        const isActive = location.pathname === fullPath || (fullPath === `${import.meta.env.BASE_URL}` && location.pathname === '/');
+
+        return (
+          <NavLink key={code} to={fullPath} $active={isActive}>
+            {page.name}
+          </NavLink>
+        );
+      })}
     </SidebarContainer>
   );
 };
 
 export default Sidebar;
-

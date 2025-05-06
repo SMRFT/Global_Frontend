@@ -526,6 +526,8 @@ const RemoveItemButton = styled.button`
 `
 
 function Profile() {
+  const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL;
+
   const fileInputRef = useRef(null)
   const [profileImage, setProfileImage] = useState(null)
 
@@ -915,7 +917,7 @@ function Profile() {
   useEffect(() => {
     const fetchDataEntitlements = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:6553/_b_a_c_k_e_n_d/Global/data-entitlements/")
+        const response = await axios.get(`${GlobalBaseUrl}data-entitlements/`)
         setDataEntitlementOptions(response.data.dataEntitlements) // Ensure this is correctly mapped
       } catch (error) {
         console.error("Error fetching data entitlements:", error)

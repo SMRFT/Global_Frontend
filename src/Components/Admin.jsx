@@ -221,6 +221,31 @@ function Admin() {
   const [loading, setLoading] = useState({});
 
   const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL;
+    function getAccessTokenFromCookie() {
+      const cookies = document.cookie.split('; ');
+      for (let cookie of cookies) {
+        const [name, value] = cookie.split('=');
+        if (name === 'access_token') {
+          return value;
+        }
+      }
+      return null;
+    }
+    
+    // Try to get token from localStorage
+    let accessToken = localStorage.getItem('access_token');
+    console.log(accessToken)
+    if (!accessToken) {
+      // If not found in localStorage, try cookies
+      const cookieToken = getAccessTokenFromCookie();
+    
+      if (cookieToken) {
+        // Save cookie token into localStorage
+        localStorage.setItem('access_token', cookieToken);
+        accessToken = cookieToken;
+      }
+    }
+
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -281,6 +306,8 @@ function Admin() {
     }
 };
 
+
+// Read the access token
 
   const filteredDepartments = departments.filter(dept =>
     dept.department_name.toLowerCase().includes(searchTerm.toLowerCase()) ||

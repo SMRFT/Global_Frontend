@@ -901,7 +901,7 @@ function Profile() {
       
       const branch_code = 'GLOBAL';
       const response = await axios.post(GlobalBaseUrl + "create_employee/", profileData, {
-        headers: { "Content-Type": "application/json", "authorization":token, "branch-code":branch_code },
+        headers: { "Content-Type": "application/json", "Authorization":token, "branch-code":branch_code },
       })
       console.log("Profile Created:", response.data)
     } catch (error) {
@@ -909,8 +909,8 @@ function Profile() {
     }
   }
   const [dataEntitlementOptions, setDataEntitlementOptions] = useState([])
-  const [allDataEntitlements, setAllDataEntitlements] = useState([])
-  const [dataEntitlementNameKey, setDataEntitlementNameKey] = useState("")
+  // const [allDataEntitlements, setAllDataEntitlements] = useState([])
+  // const [dataEntitlementNameKey, setDataEntitlementNameKey] = useState("")
 
   useEffect(() => {
     const fetchDataEntitlements = async () => {

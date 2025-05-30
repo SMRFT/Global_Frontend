@@ -7,7 +7,7 @@ import Header from './Components/Header';
 import PagePermissions from './Components/PagePermissions';
 
 const Content = styled.div`
-  margin-left: 200px;
+  margin-left: 50px;
   padding: 20px;
   flex: 1;
 `;

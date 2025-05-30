@@ -213,6 +213,9 @@ const ToggleSlider = styled.span`
   }
 `;
 
+// API wrapper with standardized error handling
+
+
 function Admin() {
   const [activeTab, setActiveTab] = useState('departments');
   const [departments, setDepartments] = useState([]);
@@ -220,91 +223,118 @@ function Admin() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState({});
 
-  const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL;
-    function getAccessTokenFromCookie() {
-      const cookies = document.cookie.split('; ');
-      for (let cookie of cookies) {
-        const [name, value] = cookie.split('=');
-        if (name === 'access_token') {
-          return value;
-        }
-      }
-      return null;
-    }
-    
-    // Try to get token from localStorage
-    let accessToken = localStorage.getItem('access_token');
-    console.log(accessToken)
-    if (!accessToken) {
-      // If not found in localStorage, try cookies
-      const cookieToken = getAccessTokenFromCookie();
-    
-      if (cookieToken) {
-        // Save cookie token into localStorage
-        localStorage.setItem('access_token', cookieToken);
-        accessToken = cookieToken;
-      }
-    }
+  const apiRequest = async (url, method = 'GET', data = null, headers = {}) => {
+  try {
+    const branch_code = localStorage.getItem("selected_branch");
+    const token = localStorage.getItem("access_token");
 
-
-  useEffect(() => {
-    const fetchDepartments = async () => {
-      try {
-       
-        const response = await axios.get(GlobalBaseUrl + "get_data_departments/",)
-        setDepartments(response.data.departments);
-      } catch (error) {
-        console.error('Error fetching departments:', error);
-      }
+    const defaultHeaders = {
+      "Content-Type": "application/json",
+      "Authorization": token , // ✅ Fixed here
+      "branch-code": branch_code || ''
     };
 
-    const fetchDesignations = async () => {
-      try {
-        
-        const response = await axios.get(GlobalBaseUrl + "get_data_designation/",)
-        setDesignations(response.data.designations);
-      } catch (error) {
-        console.error('Error fetching designations:', error);
-      }
+    const config = {
+      method,
+      url,
+      headers: { ...defaultHeaders, ...headers },
+      validateStatus: () => true,
     };
 
-    fetchDepartments();
-    fetchDesignations();
-  }, []);
-
-  const handleStatusToggle = async (item, type) => {
-    const id = type === 'department' ? item.department_code : item.Designation_code;
-    if (loading[id]) return;
-
-    setLoading(prev => ({ ...prev, [id]: true }));
-
-    try {
-      const endpoint = type === 'department'
-        ? GlobalBaseUrl +"update_department/"+`${id}/`
-        : GlobalBaseUrl +"update_designation/"+`${id}/`;
-
-      const response = await axios.put(endpoint, {
-        is_active: !item.is_active
-      });
-
-      if (response.status === 200) {
-        const updatedStatus = response.data.new_status;  // ✅ Ensure UI matches DB
-        if (type === 'department') {
-          setDepartments(departments.map(dept =>
-            dept.department_code === id ? { ...dept, is_active: updatedStatus } : dept
-          ));
-        } else {
-          setDesignations(designations.map(desig =>
-            desig.Designation_code === id ? { ...desig, is_active: updatedStatus } : desig
-          ));
-        }
-      }
-    } catch (error) {
-      console.error('Error updating status:', error);
-    } finally {
-      setLoading(prev => ({ ...prev, [id]: false }));
+    if (data && (method === 'POST' || method === 'PUT')) {
+      config.data = data;
     }
+
+    const response = await axios(config);
+
+    if (response.status === 200) {
+      return { success: true, data: response.data };
+    } else if (response.status === 400) {
+      return { success: false, error: 'Invalid data sent to server.', status: 400, data: response.data };
+    } else if (response.status === 401) {
+      return { success: false, error: 'Session expired. Please log in again.', status: 401, data: response.data };
+    } else {
+      return { success: false, error: 'Something went wrong. Try again.', status: response.status, data: response.data };
+    }
+  } catch (error) {
+    console.error('Network or unexpected error:', error);
+    return { success: false, error: 'Network error or unexpected issue occurred.', networkError: true };
+  }
 };
+
+// console.log("Token in localStorage:", localStorage.getItem("access_token"));
+
+  const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL;
+
+    useEffect(() => {
+      const fetchDepartments = async () => {
+        const result = await apiRequest(GlobalBaseUrl + "get_data_departments/");
+        if (result.success) {
+          setDepartments(result.data.departments);
+        } else {
+          console.error('Error fetching departments:', result.error);
+        }
+      };
+    
+      const fetchDesignations = async () => {
+        const result = await apiRequest(GlobalBaseUrl + "get_data_designation/");
+        if (result.success) {
+          setDesignations(result.data.designations);
+        } else {
+          console.error('Error fetching designations:', result.error);
+        }
+      };
+    
+      fetchDepartments();
+      fetchDesignations();
+    }, []);
+    
+
+    const handleStatusToggle = async (item, type) => {
+      const id = type === 'department' ? item.department_code : item.Designation_code;
+      if (loading[id]) return;
+    
+      setLoading(prev => ({ ...prev, [id]: true }));
+    
+      try {
+        const endpoint = type === 'department'
+          ? `${GlobalBaseUrl}update_department/${id}/`
+          : `${GlobalBaseUrl}update_designation/${id}/`;
+    
+        const result = await apiRequest(endpoint, 'PUT', {
+          is_active: !item.is_active
+        });
+    
+        if (result.success) {
+          const updatedStatus = result.data.new_status;
+          if (type === 'department') {
+            setDepartments(departments.map(dept =>
+              dept.department_code === id ? { ...dept, is_active: updatedStatus } : dept
+            ));
+          } else {
+            setDesignations(designations.map(desig =>
+              desig.Designation_code === id ? { ...desig, is_active: updatedStatus } : desig
+            ));
+          }
+        } else {
+          if (result.status === 400) {
+            alert('Invalid data sent to server.');
+          } else if (result.status === 401) {
+            alert('Session expired. Please log in again.');
+            // Optional: redirect to login
+          } else {
+            alert('Something went wrong. Try again.');
+          }
+        }
+      } catch (error) {
+        console.error('Network or unexpected error:', error);
+        alert('Network error or unexpected issue occurred.');
+      } finally {
+        setLoading(prev => ({ ...prev, [id]: false }));
+      }
+    };
+    
+    
 
 
 // Read the access token

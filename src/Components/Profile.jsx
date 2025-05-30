@@ -1,4 +1,4 @@
-
+"use client"
 
 import { useState, useRef, useEffect, Fragment } from "react"
 import styled, { createGlobalStyle } from "styled-components"
@@ -6,7 +6,7 @@ import axios from "axios"
 import moment from "moment"
 import { Combobox, Transition } from "@headlessui/react"
 
-const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL;
+const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
 import {
   Save,
@@ -525,8 +525,52 @@ const RemoveItemButton = styled.button`
   }
 `
 
+// API wrapper with standardized error handling
+const apiRequest = async (url, method = "GET", data = null, headers = {}) => {
+  try {
+    const branch_code = localStorage.getItem("selected_branch")
+    const token = localStorage.getItem("access_token")
+
+    const defaultHeaders = {
+      "Content-Type": "application/json",
+      Authorization: token,
+      "branch-code": branch_code,
+    }
+
+    const config = {
+      method,
+      url,
+      headers: { ...defaultHeaders, ...headers },
+      validateStatus: () => true, // Allow all status codes to be handled in the then block
+    }
+
+    if (data && (method === "POST" || method === "PUT")) {
+      config.data = data
+    }
+
+    const response = await axios(config)
+
+    // Handle different status codes
+    if (response.status === 200) {
+      return { success: true, data: response.data }
+    } else if (response.status === 400) {
+      console.warn("Bad Request:", response.data)
+      return { success: false, error: "Invalid data sent to server.", status: 400, data: response.data }
+    } else if (response.status === 401) {
+      console.warn("Unauthorized:", response.data)
+      return { success: false, error: "Session expired. Please log in again.", status: 401, data: response.data }
+    } else {
+      console.warn("Unexpected status:", response.status, response.data)
+      return { success: false, error: "Something went wrong. Try again.", status: response.status, data: response.data }
+    }
+  } catch (error) {
+    console.error("Network or unexpected error:", error)
+    return { success: false, error: "Network error or unexpected issue occurred.", networkError: true }
+  }
+}
+
 function Profile() {
-  const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL;
+  const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
   const fileInputRef = useRef(null)
   const [profileImage, setProfileImage] = useState(null)
@@ -554,46 +598,54 @@ function Profile() {
     dataEntitlements: [],
     dataEntitlementNames: [], // Also add this for consistency
   })
- // Fetch roles from the backend
+  // Fetch roles from the backend
   // Update the roles fetch to include full role objects
   useEffect(() => {
     const fetchRoles = async () => {
-      try {
+      const result = await apiRequest(GlobalBaseUrl + "getprimaryandadditionalrole/")
 
-        const response = await axios.get(GlobalBaseUrl + "getprimaryandadditionalrole/",)
-        const roles = response.data.designations || []
-
+      if (result.success) {
+        const roles = result.data.designations || []
         // Filter active roles and keep full objects
         const activeRoles = roles.filter((role) => role.is_active === true)
         setPrimaryRoleOptions(activeRoles)
         setAdditionalRoleOptions(activeRoles)
-      } catch (error) {
-        console.error("Error fetching roles:", error)
+      } else {
+        console.error("Error fetching roles:", result.error)
+        if (result.status === 401) {
+          alert("Your session has expired. Please log in again.")
+          // Optional: redirect to login
+        }
       }
     }
 
     fetchRoles()
   }, [])
+
   // State for roles
   const [primaryRoleQuery, setPrimaryRoleQuery] = useState("")
   const [primaryRoleOptions, setPrimaryRoleOptions] = useState([])
   const [additionalRolesQuery, setAdditionalRolesQuery] = useState("")
   const [additionalRoleOptions, setAdditionalRoleOptions] = useState([])
-
+  // console.log(localStorage.getItem("selected_branch"))
   // Fetch roles from the backend
   // Update the roles fetch to include full role objects
   useEffect(() => {
     const fetchRoles = async () => {
-      try {
-        const response = await axios.get(GlobalBaseUrl + "create_employee/",)
-        const roles = response.data.designations || []
+      const result = await apiRequest(GlobalBaseUrl + "create_employee/")
 
+      if (result.success) {
+        const roles = result.data.designations || []
         // Filter active roles and keep full objects
         const activeRoles = roles.filter((role) => role.is_active === true)
         setPrimaryRoleOptions(activeRoles)
         setAdditionalRoleOptions(activeRoles)
-      } catch (error) {
-        console.error("Error fetching roles:", error)
+      } else {
+        console.error("Error fetching roles:", result.error)
+        if (result.status === 401) {
+          alert("Your session has expired. Please log in again.")
+          // Optional: redirect to login
+        }
       }
     }
 
@@ -822,16 +874,21 @@ function Profile() {
   // Update the department handling
   useEffect(() => {
     const fetchDepartments = async () => {
-      try {
-        
-        const response = await axios.get(GlobalBaseUrl + "get_data_departments/",)
-        const allDepartments = response.data.departments
+      const result = await apiRequest(GlobalBaseUrl + "get_data_departments/")
+
+      if (result.success) {
+        const allDepartments = result.data.departments
         const activeDepartments = allDepartments.filter((item) => item.is_active)
         setDepartmentsData(activeDepartments)
-      } catch (error) {
-        console.error("Error fetching departments:", error)
+      } else {
+        console.error("Error fetching departments:", result.error)
+        if (result.status === 401) {
+          alert("Your session has expired. Please log in again.")
+          // Optional: redirect to login
+        }
       }
     }
+
     fetchDepartments()
   }, [])
 
@@ -846,20 +903,26 @@ function Profile() {
   }
 
   const [designationsData, setDesignationsData] = useState([])
-//   const [designationOptions, setDesignationOptions] = useState([])
+  //   const [designationOptions, setDesignationOptions] = useState([])
 
   // Update designation handling
   useEffect(() => {
     const fetchDesignations = async () => {
-      try {
-        const response = await axios.get(GlobalBaseUrl + "get_data_designation/",)
-        const data = response.data.designations
+      const result = await apiRequest(GlobalBaseUrl + "get_data_designation/")
+
+      if (result.success) {
+        const data = result.data.designations
         const activeDesignations = data.filter((item) => item.is_active)
         setDesignationsData(activeDesignations)
-      } catch (error) {
-        console.error("Error fetching designations:", error)
+      } else {
+        console.error("Error fetching designations:", result.error)
+        if (result.status === 401) {
+          alert("Your session has expired. Please log in again.")
+          // Optional: redirect to login
+        }
       }
     }
+
     fetchDesignations()
   }, [])
 
@@ -899,15 +962,20 @@ function Profile() {
       dataEntitlements: formData.dataEntitlements,
     }
 
-    try {
-      
-      const branch_code = 'GLOBAL';
-      const response = await axios.post(GlobalBaseUrl + "create_employee/", profileData, {
-        headers: { "Content-Type": "application/json", "Authorization":token, "branch-code":branch_code },
-      })
-      console.log("Profile Created:", response.data)
-    } catch (error) {
-      console.error("Error creating profile:", error.response?.data || error.message)
+    const result = await apiRequest(GlobalBaseUrl + "create_employee/", "POST", profileData)
+
+    if (result.success) {
+      console.log("Profile Created:", result.data)
+      alert("Profile created successfully!")
+    } else {
+      if (result.status === 400) {
+        alert("Invalid profile data. Please check your inputs and try again.")
+      } else if (result.status === 401) {
+        alert("Your session has expired. Please log in again.")
+        // Optional: redirect to login
+      } else {
+        alert(`Error creating profile: ${result.error}`)
+      }
     }
   }
   const [dataEntitlementOptions, setDataEntitlementOptions] = useState([])
@@ -916,11 +984,16 @@ function Profile() {
 
   useEffect(() => {
     const fetchDataEntitlements = async () => {
-      try {
-        const response = await axios.get(`${GlobalBaseUrl}data-entitlements/`)
-        setDataEntitlementOptions(response.data.dataEntitlements) // Ensure this is correctly mapped
-      } catch (error) {
-        console.error("Error fetching data entitlements:", error)
+      const result = await apiRequest(`${GlobalBaseUrl}data-entitlements/`)
+
+      if (result.success) {
+        setDataEntitlementOptions(result.data.dataEntitlements)
+      } else {
+        console.error("Error fetching data entitlements:", result.error)
+        if (result.status === 401) {
+          alert("Your session has expired. Please log in again.")
+          // Optional: redirect to login
+        }
       }
     }
 

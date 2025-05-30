@@ -1,41 +1,48 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const HeaderWrapper = styled.div`
+const HeaderWrapper = styled.header`
   display: flex;
   justify-content: flex-end;
-  padding: 10px 20px;
-  background-color: #f5f5f5;
+  align-items: center;
+  padding: 12px 24px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   font-size: 14px;
-  border-bottom: 1px solid #ccc;
+  color: #333;
+
+  strong {
+    font-weight: 600;
+    margin-right: 4px;
+  }
 `;
 
 function Header() {
   const user = JSON.parse(localStorage.getItem('user_payload'));
-  console.log("allowedData", user["allowed-data"]);
-
   const selectedBranch = localStorage.getItem('selected_branch');
-
 
   return (
     <HeaderWrapper>
       {user ? (
-        <div>
-          <strong>ID:</strong> {user.aud} |{' '}
-          <strong>Name:</strong> {user.name} |{' '}
-          <strong>Email:</strong> {user.email}|{' '}
-          <strong>Branch:</strong> {user["allowed-data"]}
-          
-          {selectedBranch && (
-            <>
-              {' '}| <strong>Branch:</strong> {selectedBranch}
-            </>
-          )}
-        </div>
+        <UserInfo>
+          <div><strong>ID:</strong> {user.aud}</div>
+          <div><strong>Name:</strong> {user.name}</div>
+          <div><strong>Email:</strong> {user.email}</div>
+          {/* <div><strong>Branch:</strong> {user["allowed-data"]}</div> */}
+          {selectedBranch && <div><strong>Selected:</strong> {selectedBranch}</div>}
+        </UserInfo>
       ) : (
-        'Loading user info...'
+        <span>Loading user info...</span>
       )}
     </HeaderWrapper>
   );
 }
+
 export default Header;

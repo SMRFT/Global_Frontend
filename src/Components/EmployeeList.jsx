@@ -1,22 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+"use client"
+
+import { useEffect, useState } from "react"
+import axios from "axios"
 import styled, { createGlobalStyle } from "styled-components"
 // import bcrypt from 'bcryptjs';
 
-import { 
-  Search, 
-  User, 
-  Phone, 
-  Mail, 
-  Briefcase, 
-  Building, 
-  Users, 
-  Database, 
-  Lock, 
-  X, 
-  Eye, 
-  EyeOff 
-} from 'lucide-react';
+import { Search, User, Phone, Mail, Briefcase, Building, Users, Database, Lock, X, Eye, EyeOff } from "lucide-react"
 
 // Global styles
 const GlobalStyle = createGlobalStyle`
@@ -33,21 +22,21 @@ const GlobalStyle = createGlobalStyle`
 const PageContainer = styled.div`
   max-width:1200px;
   width:100%;
-`;
+`
 
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-`;
+`
 
 const Title = styled.h1`
   font-size: 1.75rem;
   font-weight: 700;
   color: #1f2937;
   margin: 0;
-`;
+`
 
 const SearchContainer = styled.div`
   display: flex;
@@ -58,12 +47,12 @@ const SearchContainer = styled.div`
   border-radius: 0.5rem;
   margin-bottom: 2rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-`;
+`
 
 const SearchGroup = styled.div`
   flex: 1;
   min-width: 200px;
-`;
+`
 
 const SearchLabel = styled.label`
   display: block;
@@ -71,13 +60,13 @@ const SearchLabel = styled.label`
   font-weight: 500;
   color: #4b5563;
   margin-bottom: 0.25rem;
-`;
+`
 
 const SearchInputWrapper = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-`;
+`
 
 const SearchIcon = styled.div`
   position: absolute;
@@ -85,7 +74,7 @@ const SearchIcon = styled.div`
   color: #9ca3af;
   display: flex;
   align-items: center;
-`;
+`
 
 const SearchInput = styled.input`
   width: 100%;
@@ -99,7 +88,7 @@ const SearchInput = styled.input`
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
   }
-`;
+`
 
 const Select = styled.select`
   width: 100%;
@@ -109,7 +98,7 @@ const Select = styled.select`
   font-size: 0.875rem;
   outline: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.5rem center;
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;
@@ -118,13 +107,13 @@ const Select = styled.select`
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
   }
-`;
+`
 
 const CardsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
-`;
+`
 
 const Card = styled.div`
   background-color: white;
@@ -137,13 +126,13 @@ const Card = styled.div`
     transform: translateY(-4px);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
-`;
+`
 
 const CardHeader = styled.div`
   background: linear-gradient(to right, #3b82f6, #2563eb);
   padding: 1.25rem;
   position: relative;
-`;
+`
 
 const CardAvatar = styled.div`
   width: 4rem;
@@ -155,24 +144,24 @@ const CardAvatar = styled.div`
   justify-content: center;
   margin-bottom: 0.75rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-`;
+`
 
 const CardTitle = styled.h3`
   color: white;
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0;
-`;
+`
 
 const CardSubtitle = styled.p`
   color: #bfdbfe;
   font-size: 0.875rem;
   margin: 0.25rem 0 0;
-`;
+`
 
 const CardBody = styled.div`
   padding: 1.25rem;
-`;
+`
 
 const CardInfo = styled.div`
   display: flex;
@@ -182,20 +171,20 @@ const CardInfo = styled.div`
   &:last-child {
     margin-bottom: 0;
   }
-`;
+`
 
 const CardInfoIcon = styled.div`
   color: #4b5563;
   margin-right: 0.75rem;
   display: flex;
   align-items: center;
-`;
+`
 
 const CardInfoText = styled.p`
   color: #4b5563;
   font-size: 0.875rem;
   margin: 0;
-`;
+`
 
 const CardFooter = styled.div`
   padding: 1rem 1.25rem;
@@ -203,7 +192,7 @@ const CardFooter = styled.div`
   border-top: 1px solid #e5e7eb;
   display: flex;
   justify-content: flex-end;
-`;
+`
 
 const CardButton = styled.button`
   background-color: #eff6ff;
@@ -225,13 +214,13 @@ const CardButton = styled.button`
     outline: none;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
   }
-`;
+`
 
 const ButtonIcon = styled.span`
   margin-right: 0.5rem;
   display: flex;
   align-items: center;
-`;
+`
 
 const NoResults = styled.div`
   text-align: center;
@@ -239,7 +228,7 @@ const NoResults = styled.div`
   color: #6b7280;
   font-size: 1rem;
   grid-column: 1 / -1;
-`;
+`
 
 // Modal components
 const ModalOverlay = styled.div`
@@ -253,7 +242,7 @@ const ModalOverlay = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 50;
-`;
+`
 
 const ModalContainer = styled.div`
   background-color: white;
@@ -262,7 +251,7 @@ const ModalContainer = styled.div`
   max-width: 28rem;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   overflow: hidden;
-`;
+`
 
 const ModalHeader = styled.div`
   display: flex;
@@ -270,14 +259,14 @@ const ModalHeader = styled.div`
   align-items: center;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #e5e7eb;
-`;
+`
 
 const ModalTitle = styled.h3`
   font-size: 1.125rem;
   font-weight: 600;
   color: #1f2937;
   margin: 0;
-`;
+`
 
 const CloseButton = styled.button`
   background: none;
@@ -295,18 +284,18 @@ const CloseButton = styled.button`
   &:focus {
     outline: none;
   }
-`;
+`
 
 const ModalBody = styled.div`
   padding: 1.5rem;
-`;
+`
 
 const ModalInfo = styled.div`
   margin-bottom: 1.5rem;
   padding: 1rem;
   background-color: #f3f4f6;
   border-radius: 0.375rem;
-`;
+`
 
 const ModalInfoItem = styled.div`
   display: flex;
@@ -315,21 +304,21 @@ const ModalInfoItem = styled.div`
   &:last-child {
     margin-bottom: 0;
   }
-`;
+`
 
 const ModalInfoLabel = styled.span`
   font-weight: 500;
   color: #4b5563;
   width: 8rem;
-`;
+`
 
 const ModalInfoValue = styled.span`
   color: #1f2937;
-`;
+`
 
 const FormGroup = styled.div`
   margin-bottom: 1.25rem;
-`;
+`
 
 const FormLabel = styled.label`
   display: block;
@@ -337,11 +326,11 @@ const FormLabel = styled.label`
   font-weight: 500;
   color: #374151;
   margin-bottom: 0.375rem;
-`;
+`
 
 const PasswordInputWrapper = styled.div`
   position: relative;
-`;
+`
 
 const PasswordInput = styled.input`
   width: 100%;
@@ -356,7 +345,7 @@ const PasswordInput = styled.input`
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
     outline: none;
   }
-`;
+`
 
 const PasswordToggle = styled.button`
   position: absolute;
@@ -373,13 +362,13 @@ const PasswordToggle = styled.button`
   &:focus {
     outline: none;
   }
-`;
+`
 
 const ErrorMessage = styled.p`
   color: #ef4444;
   font-size: 0.75rem;
   margin: 0.25rem 0 0;
-`;
+`
 
 const ModalFooter = styled.div`
   display: flex;
@@ -387,7 +376,7 @@ const ModalFooter = styled.div`
   padding: 1rem 1.5rem;
   border-top: 1px solid #e5e7eb;
   gap: 0.75rem;
-`;
+`
 
 const CancelButton = styled.button`
   background-color: white;
@@ -407,7 +396,7 @@ const CancelButton = styled.button`
     outline: none;
     box-shadow: 0 0 0 3px rgba(209, 213, 219, 0.5);
   }
-`;
+`
 
 const SaveButton = styled.button`
   background-color: #3b82f6;
@@ -432,7 +421,7 @@ const SaveButton = styled.button`
     background-color: #93c5fd;
     cursor: not-allowed;
   }
-`;
+`
 
 const Badge = styled.span`
   display: inline-flex;
@@ -445,133 +434,187 @@ const Badge = styled.span`
   border-radius: 9999px;
   margin-right: 0.5rem;
   margin-bottom: 0.25rem;
-`;
+`
 
 const BadgeContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   margin-top: 0.25rem;
-`;
+`
+
+// API wrapper with standardized error handling
+const apiRequest = async (url, method = "GET", data = null, headers = {}) => {
+  try {
+    const branch_code = localStorage.getItem("selected_branch")
+    const token = localStorage.getItem("access_token")
+
+    const defaultHeaders = {
+      "Content-Type": "application/json",
+      Authorization: token,
+      "branch-code": branch_code,
+    }
+
+    const config = {
+      method,
+      url,
+      headers: { ...defaultHeaders, ...headers },
+      validateStatus: () => true, // Allow all status codes to be handled in the then block
+    }
+
+    if (data && (method === "POST" || method === "PUT")) {
+      config.data = data
+    }
+
+    const response = await axios(config)
+
+    // Handle different status codes
+    if (response.status === 200) {
+      return { success: true, data: response.data }
+    } else if (response.status === 400) {
+      console.warn("Bad Request:", response.data)
+      return { success: false, error: "Invalid data sent to server.", status: 400, data: response.data }
+    } else if (response.status === 401) {
+      console.warn("Unauthorized:", response.data)
+      return { success: false, error: "Session expired. Please log in again.", status: 401, data: response.data }
+    } else {
+      console.warn("Unexpected status:", response.status, response.data)
+      return { success: false, error: "Something went wrong. Try again.", status: response.status, data: response.data }
+    }
+  } catch (error) {
+    console.error("Network or unexpected error:", error)
+    return { success: false, error: "Network error or unexpected issue occurred.", networkError: true }
+  }
+}
 
 const EmployeeList = () => {
-  const [employees, setEmployees] = useState([]);
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [departmentFilter, setDepartmentFilter] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState('');
-  const [departments, setDepartments] = useState([]);
+  const [employees, setEmployees] = useState([])
+  const [filteredEmployees, setFilteredEmployees] = useState([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [departmentFilter, setDepartmentFilter] = useState("")
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedEmployee, setSelectedEmployee] = useState(null)
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [passwordError, setPasswordError] = useState("")
+  const [departments, setDepartments] = useState([])
 
-  let accessToken = localStorage.getItem('access_token');
-  console.log(accessToken)
-  const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL;
+  const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
   const getAllEmployees = async () => {
-    try {
-      const response = await axios.get(GlobalBaseUrl + "create_employee/",)
-      const employeeData = response.data.employees || [];
-      setEmployees(employeeData);
-      setFilteredEmployees(employeeData);
-      
+    const result = await apiRequest(GlobalBaseUrl + "create_employee/")
+
+    if (result.success) {
+      const employeeData = result.data.employees || []
+      setEmployees(employeeData)
+      setFilteredEmployees(employeeData)
+
       // Extract unique departments for filter
-      const uniqueDepartments = [...new Set(employeeData.map(emp => emp.department))].filter(Boolean);
-      setDepartments(uniqueDepartments);
-    } catch (error) {
-      console.error('Error fetching employees:', error.response?.data || error.message);
+      const uniqueDepartments = [...new Set(employeeData.map((emp) => emp.department))].filter(Boolean)
+      setDepartments(uniqueDepartments)
+    } else {
+      if (result.status === 401) {
+        alert("Your session has expired. Please log in again.")
+        // Optional: redirect to login page
+      } else {
+        alert(`Error fetching employees: ${result.error}`)
+      }
     }
-  };
+  }
 
   useEffect(() => {
-    getAllEmployees();
-  }, []);
+    getAllEmployees()
+  }, [])
 
   useEffect(() => {
-    filterEmployees();
-  }, [searchTerm, departmentFilter, employees]);
+    filterEmployees()
+  }, [searchTerm, departmentFilter, employees])
 
   const filterEmployees = () => {
-    let filtered = [...employees];
-    
+    let filtered = [...employees]
+
     // Filter by search term (name, mobile, or department)
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(emp => 
-        (emp.employeeName && emp.employeeName.toLowerCase().includes(term)) ||
-        (emp.mobileNumber && emp.mobileNumber.toLowerCase().includes(term)) ||
-        (emp.department && emp.department.toLowerCase().includes(term))
-      );
+      const term = searchTerm.toLowerCase()
+      filtered = filtered.filter(
+        (emp) =>
+          (emp.employeeName && emp.employeeName.toLowerCase().includes(term)) ||
+          (emp.mobileNumber && emp.mobileNumber.toLowerCase().includes(term)) ||
+          (emp.department && emp.department.toLowerCase().includes(term)),
+      )
     }
-    
+
     // Filter by department
     if (departmentFilter) {
-      filtered = filtered.filter(emp => emp.department === departmentFilter);
+      filtered = filtered.filter((emp) => emp.department === departmentFilter)
     }
-    
-    setFilteredEmployees(filtered);
-  };
+
+    setFilteredEmployees(filtered)
+  }
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
+    setSearchTerm(e.target.value)
+  }
 
   const handleDepartmentChange = (e) => {
-    setDepartmentFilter(e.target.value);
-  };
+    setDepartmentFilter(e.target.value)
+  }
 
   const openCredentialsModal = (employee) => {
-    setSelectedEmployee(employee);
-    setPassword('');
-    setConfirmPassword('');
-    setPasswordError('');
-    setIsModalOpen(true);
-  };
+    setSelectedEmployee(employee)
+    setPassword("")
+    setConfirmPassword("")
+    setPasswordError("")
+    setIsModalOpen(true)
+  }
 
   const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedEmployee(null);
-  };
+    setIsModalOpen(false)
+    setSelectedEmployee(null)
+  }
 
   const validatePasswords = () => {
     if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters');
-      return false;
+      setPasswordError("Password must be at least 6 characters")
+      return false
     }
-    
+
     if (password !== confirmPassword) {
-      setPasswordError('Passwords do not match');
-      return false;
+      setPasswordError("Passwords do not match")
+      return false
     }
-    
-    setPasswordError('');
-    return true;
-  };
+
+    setPasswordError("")
+    return true
+  }
 
   const handleSaveCredentials = async () => {
-    if (!validatePasswords()) return;
-    
-    try {
+    if (!validatePasswords()) return
 
-   
-      await axios.post (GlobalBaseUrl + "set_employee_password/", {
-        employeeId: selectedEmployee.employeeId,
-        employeeName: selectedEmployee.employeeName,
-        department: selectedEmployee.department,
-        designation: selectedEmployee.designation,
-        password: password  // Send plain password instead of hashed password
-      });
-      
-      alert('Password set successfully!');
-      closeModal();
-    } catch (error) {
-      console.error('Error setting password:', error.response?.data || error.message);
-      setPasswordError('Failed to set password. Please try again.');
+    const result = await apiRequest(GlobalBaseUrl + "set_employee_password/", "POST", {
+      employeeId: selectedEmployee.employeeId,
+      employeeName: selectedEmployee.employeeName,
+      department: selectedEmployee.department,
+      designation: selectedEmployee.designation,
+      password: password,
+    })
+
+    if (result.success) {
+      alert("Password set successfully!")
+      closeModal()
+    } else {
+      if (result.status === 400) {
+        setPasswordError("Invalid password format or data.")
+      } else if (result.status === 401) {
+        setPasswordError("Your session has expired. Please log in again.")
+        // Optional: redirect to login
+      } else {
+        setPasswordError("Failed to set password. Please try again.")
+      }
     }
-  };
+  }
+
   // const formatArrayToString = (arr) => {
   //   if (!arr || arr.length === 0) return 'None';
   //   return arr.join(', ');
@@ -579,227 +622,214 @@ const EmployeeList = () => {
 
   return (
     <>
-    <GlobalStyle />
-    <PageContainer>
-      <Header>
-        <Title>Employee Directory</Title>
-      </Header>
-      
-      <SearchContainer>
-        <SearchGroup>
-          <SearchLabel>Search</SearchLabel>
-          <SearchInputWrapper>
-            <SearchIcon>
-              <Search size={18} />
-            </SearchIcon>
-            <SearchInput
-              type="text"
-              placeholder="Search by name, mobile, or department"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-          </SearchInputWrapper>
-        </SearchGroup>
-        
-        <SearchGroup>
-          <SearchLabel>Department</SearchLabel>
-          <SearchInputWrapper>
-            <SearchIcon>
-              <Building size={18} />
-            </SearchIcon>
-            <Select
-              value={departmentFilter}
-              onChange={handleDepartmentChange}
-            >
-              <option value="">All Departments</option>
-              {departments.map((dept, index) => (
-                <option key={index} value={dept}>{dept}</option>
-              ))}
-            </Select>
-          </SearchInputWrapper>
-        </SearchGroup>
-      </SearchContainer>
-      
-      <CardsGrid>
-        {filteredEmployees.length > 0 ? (
-          filteredEmployees.map((employee) => (
-            <Card key={employee.employeeId}>
-              <CardHeader>
-                <CardAvatar>
-                  <User size={32} color="#4b5563" />
-                </CardAvatar>
-                <CardTitle>{employee.employeeName || 'N/A'}</CardTitle>
-                <CardSubtitle>{employee.designation || 'No Designation'}</CardSubtitle>
-              </CardHeader>
-              
-              <CardBody>
-                <CardInfo>
-                  <CardInfoIcon>
-                    <Briefcase size={18} />
-                  </CardInfoIcon>
-                  <CardInfoText>{employee.department || 'No Department'}</CardInfoText>
-                </CardInfo>
-                
-                <CardInfo>
-                  <CardInfoIcon>
-                    <Phone size={18} />
-                  </CardInfoIcon>
-                  <CardInfoText>{employee.mobileNumber || 'No Phone'}</CardInfoText>
-                </CardInfo>
-                
-                <CardInfo>
-                  <CardInfoIcon>
-                    <Mail size={18} />
-                  </CardInfoIcon>
-                  <CardInfoText>{employee.email || 'No Email'}</CardInfoText>
-                </CardInfo>
-                
-                <CardInfo>
-                  <CardInfoIcon>
-                    <User size={18} />
-                  </CardInfoIcon>
-                  <CardInfoText>
-                    Primary Role: {employee.primaryRole || 'None'}
-                  </CardInfoText>
-                </CardInfo>
-                
-                {employee.additionalRoles && employee.additionalRoles.length > 0 && (
-                  <CardInfo>
-                    <CardInfoIcon>
-                      <Users size={18} />
-                    </CardInfoIcon>
-                    <div>
-                      <CardInfoText>Additional Roles:</CardInfoText>
-                      <BadgeContainer>
-                        {employee.additionalRoles.map((role, index) => (
-                          <Badge key={index}>{role}</Badge>
-                        ))}
-                      </BadgeContainer>
-                    </div>
-                  </CardInfo>
-                )}
-                
-                {employee.dataEntitlements && employee.dataEntitlements.length > 0 && (
-                  <CardInfo>
-                    <CardInfoIcon>
-                      <Database size={18} />
-                    </CardInfoIcon>
-                    <div>
-                      <CardInfoText>Data Entitlements:</CardInfoText>
-                      <BadgeContainer>
-                        {employee.dataEntitlements.map((entitlement, index) => (
-                          <Badge key={index}>{entitlement}</Badge>
-                        ))}
-                      </BadgeContainer>
-                    </div>
-                  </CardInfo>
-                )}
-              </CardBody>
-              
-              <CardFooter>
-                <CardButton onClick={() => openCredentialsModal(employee)}>
-                  <ButtonIcon>
-                    <Lock size={16} />
-                  </ButtonIcon>
-                  Login Credentials
-                </CardButton>
-              </CardFooter>
-            </Card>
-          ))
-        ) : (
-          <NoResults>
-            <p>No employees found matching your search criteria.</p>
-          </NoResults>
-        )}
-      </CardsGrid>
-      
-      {/* Credentials Modal */}
-      {isModalOpen && selectedEmployee && (
-        <ModalOverlay>
-          <ModalContainer>
-            <ModalHeader>
-              <ModalTitle>Set Login Credentials</ModalTitle>
-              <CloseButton onClick={closeModal}>
-                <X size={20} />
-              </CloseButton>
-            </ModalHeader>
-            
-            <ModalBody>
-              <ModalInfo>
-                <ModalInfoItem>
-                  <ModalInfoLabel>Employee ID:</ModalInfoLabel>
-                  <ModalInfoValue>{selectedEmployee.employeeId}</ModalInfoValue>
-                </ModalInfoItem>
-                <ModalInfoItem>
-                  <ModalInfoLabel>Name:</ModalInfoLabel>
-                  <ModalInfoValue>{selectedEmployee.employeeName}</ModalInfoValue>
-                </ModalInfoItem>
-                <ModalInfoItem>
-                  <ModalInfoLabel>Department:</ModalInfoLabel>
-                  <ModalInfoValue>{selectedEmployee.department || 'N/A'}</ModalInfoValue>
-                </ModalInfoItem>
-                <ModalInfoItem>
-                  <ModalInfoLabel>Designation:</ModalInfoLabel>
-                  <ModalInfoValue>{selectedEmployee.designation || 'N/A'}</ModalInfoValue>
-                </ModalInfoItem>
-              </ModalInfo>
-              
-              <FormGroup>
-                <FormLabel htmlFor="password">Password</FormLabel>
-                <PasswordInputWrapper>
-                  <PasswordInput
-                    type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                  />
-                  <PasswordToggle
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </PasswordToggle>
-                </PasswordInputWrapper>
-              </FormGroup>
-              
-              <FormGroup>
-                <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
-                <PasswordInputWrapper>
-                  <PasswordInput
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    id="confirmPassword"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm password"
-                  />
-                  <PasswordToggle
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </PasswordToggle>
-                </PasswordInputWrapper>
-                {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
-                
-              </FormGroup>
-            </ModalBody>
-            
-            <ModalFooter>
-              <CancelButton onClick={closeModal}>Cancel</CancelButton>
-              <SaveButton 
-                onClick={handleSaveCredentials}
-                disabled={!password || !confirmPassword}
-              >
-                Save Credentials
-              </SaveButton>
-            </ModalFooter>
-          </ModalContainer>
-        </ModalOverlay>
-      )}
-    </PageContainer>
-    </>
-  );
-};
+      <GlobalStyle />
+      <PageContainer>
+        <Header>
+          <Title>Employee Directory</Title>
+        </Header>
 
-export default EmployeeList;
+        <SearchContainer>
+          <SearchGroup>
+            <SearchLabel>Search</SearchLabel>
+            <SearchInputWrapper>
+              <SearchIcon>
+                <Search size={18} />
+              </SearchIcon>
+              <SearchInput
+                type="text"
+                placeholder="Search by name, mobile, or department"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </SearchInputWrapper>
+          </SearchGroup>
+
+          <SearchGroup>
+            <SearchLabel>Department</SearchLabel>
+            <SearchInputWrapper>
+              <SearchIcon>
+                <Building size={18} />
+              </SearchIcon>
+              <Select value={departmentFilter} onChange={handleDepartmentChange}>
+                <option value="">All Departments</option>
+                {departments.map((dept, index) => (
+                  <option key={index} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </Select>
+            </SearchInputWrapper>
+          </SearchGroup>
+        </SearchContainer>
+
+        <CardsGrid>
+          {filteredEmployees.length > 0 ? (
+            filteredEmployees.map((employee) => (
+              <Card key={employee.employeeId}>
+                <CardHeader>
+                  <CardAvatar>
+                    <User size={32} color="#4b5563" />
+                  </CardAvatar>
+                  <CardTitle>{employee.employeeName || "N/A"}</CardTitle>
+                  <CardSubtitle>{employee.designation || "No Designation"}</CardSubtitle>
+                </CardHeader>
+
+                <CardBody>
+                  <CardInfo>
+                    <CardInfoIcon>
+                      <Briefcase size={18} />
+                    </CardInfoIcon>
+                    <CardInfoText>{employee.department || "No Department"}</CardInfoText>
+                  </CardInfo>
+
+                  <CardInfo>
+                    <CardInfoIcon>
+                      <Phone size={18} />
+                    </CardInfoIcon>
+                    <CardInfoText>{employee.mobileNumber || "No Phone"}</CardInfoText>
+                  </CardInfo>
+
+                  <CardInfo>
+                    <CardInfoIcon>
+                      <Mail size={18} />
+                    </CardInfoIcon>
+                    <CardInfoText>{employee.email || "No Email"}</CardInfoText>
+                  </CardInfo>
+
+                  <CardInfo>
+                    <CardInfoIcon>
+                      <User size={18} />
+                    </CardInfoIcon>
+                    <CardInfoText>Primary Role: {employee.primaryRole || "None"}</CardInfoText>
+                  </CardInfo>
+
+                  {employee.additionalRoles && employee.additionalRoles.length > 0 && (
+                    <CardInfo>
+                      <CardInfoIcon>
+                        <Users size={18} />
+                      </CardInfoIcon>
+                      <div>
+                        <CardInfoText>Additional Roles:</CardInfoText>
+                        <BadgeContainer>
+                          {employee.additionalRoles.map((role, index) => (
+                            <Badge key={index}>{role}</Badge>
+                          ))}
+                        </BadgeContainer>
+                      </div>
+                    </CardInfo>
+                  )}
+
+                  {employee.dataEntitlements && employee.dataEntitlements.length > 0 && (
+                    <CardInfo>
+                      <CardInfoIcon>
+                        <Database size={18} />
+                      </CardInfoIcon>
+                      <div>
+                        <CardInfoText>Data Entitlements:</CardInfoText>
+                        <BadgeContainer>
+                          {employee.dataEntitlements.map((entitlement, index) => (
+                            <Badge key={index}>{entitlement}</Badge>
+                          ))}
+                        </BadgeContainer>
+                      </div>
+                    </CardInfo>
+                  )}
+                </CardBody>
+
+                <CardFooter>
+                  <CardButton onClick={() => openCredentialsModal(employee)}>
+                    <ButtonIcon>
+                      <Lock size={16} />
+                    </ButtonIcon>
+                    Login Credentials
+                  </CardButton>
+                </CardFooter>
+              </Card>
+            ))
+          ) : (
+            <NoResults>
+              <p>No employees found matching your search criteria.</p>
+            </NoResults>
+          )}
+        </CardsGrid>
+
+        {/* Credentials Modal */}
+        {isModalOpen && selectedEmployee && (
+          <ModalOverlay>
+            <ModalContainer>
+              <ModalHeader>
+                <ModalTitle>Set Login Credentials</ModalTitle>
+                <CloseButton onClick={closeModal}>
+                  <X size={20} />
+                </CloseButton>
+              </ModalHeader>
+
+              <ModalBody>
+                <ModalInfo>
+                  <ModalInfoItem>
+                    <ModalInfoLabel>Employee ID:</ModalInfoLabel>
+                    <ModalInfoValue>{selectedEmployee.employeeId}</ModalInfoValue>
+                  </ModalInfoItem>
+                  <ModalInfoItem>
+                    <ModalInfoLabel>Name:</ModalInfoLabel>
+                    <ModalInfoValue>{selectedEmployee.employeeName}</ModalInfoValue>
+                  </ModalInfoItem>
+                  <ModalInfoItem>
+                    <ModalInfoLabel>Department:</ModalInfoLabel>
+                    <ModalInfoValue>{selectedEmployee.department || "N/A"}</ModalInfoValue>
+                  </ModalInfoItem>
+                  <ModalInfoItem>
+                    <ModalInfoLabel>Designation:</ModalInfoLabel>
+                    <ModalInfoValue>{selectedEmployee.designation || "N/A"}</ModalInfoValue>
+                  </ModalInfoItem>
+                </ModalInfo>
+
+                <FormGroup>
+                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <PasswordInputWrapper>
+                    <PasswordInput
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter password"
+                    />
+                    <PasswordToggle type="button" onClick={() => setShowPassword(!showPassword)}>
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </PasswordToggle>
+                  </PasswordInputWrapper>
+                </FormGroup>
+
+                <FormGroup>
+                  <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
+                  <PasswordInputWrapper>
+                    <PasswordInput
+                      type={showConfirmPassword ? "text" : "password"}
+                      id="confirmPassword"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm password"
+                    />
+                    <PasswordToggle type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </PasswordToggle>
+                  </PasswordInputWrapper>
+                  {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
+                </FormGroup>
+              </ModalBody>
+
+              <ModalFooter>
+                <CancelButton onClick={closeModal}>Cancel</CancelButton>
+                <SaveButton onClick={handleSaveCredentials} disabled={!password || !confirmPassword}>
+                  Save Credentials
+                </SaveButton>
+              </ModalFooter>
+            </ModalContainer>
+          </ModalOverlay>
+        )}
+      </PageContainer>
+    </>
+  )
+}
+
+export default EmployeeList

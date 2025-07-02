@@ -58,7 +58,7 @@ if (!accessToken) {
     localStorage.removeItem('user_payload');
 
     // 🔁 Redirect to login page
-    // window.location.href = import.meta.env.VITE_LOGIN_REDIRECT_URL;
+    window.location.href = import.meta.env.VITE_LOGIN_REDIRECT_URL;
   }
 })();
 

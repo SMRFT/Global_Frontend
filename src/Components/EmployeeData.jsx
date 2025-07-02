@@ -722,67 +722,105 @@ const EmployeeManagement = () => {
   const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
   // Fetch employees data
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch(GlobalBaseUrl + "get_employees_with_labels/")
-        const data = await response.json()
-        if (!response.ok) {
-          throw new Error(data.message || "Something went wrong.")
-        }
-        setEmployees(data.employees || [])
-        setError(null)
-      } catch (err) {
-        setError("Failed to fetch employee data. Please try again.")
-        console.error("Fetch error:", err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchEmployees()
-  }, [])
-
-  // Fetch individual employee data by ID
-  const fetchEmployeeById = async (employeeId) => {
+useEffect(() => {
+  const fetchEmployees = async () => {
     try {
-      setFetchingEmployee(true)
-      const response = await fetch(`${GlobalBaseUrl}get_employee_by_id/${employeeId}/`)
-      const data = await response.json()
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to fetch employee details.")
-      }
-      return data.employee
-    } catch (err) {
-      console.error("Fetch employee by ID error:", err)
-      setError("Failed to fetch employee details. Please try again.")
-      return null
-    } finally {
-      setFetchingEmployee(false)
-    }
-  }
+      setLoading(true)
 
-  // Update employee data
-  const updateEmployee = async (employeeId, formData) => {
-    try {
-      
-      setSaving(true)
-      const response = await fetch(`${GlobalBaseUrl}update_employee/${employeeId}/`, {
-        method: "PUT",
-        body: formData,
+      const token = localStorage.getItem("access_token") // Or sessionStorage
+      const branchCode = localStorage.getItem("selected_branch")
+
+      const response = await fetch(GlobalBaseUrl + "get_employees_with_labels/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+          "Branch-Code": branchCode,
+        },
       })
+
       const data = await response.json()
       if (!response.ok) {
-        throw new Error(data.message || "Failed to update employee.")
+        throw new Error(data.message || "Something went wrong.")
       }
-      return data
+
+      setEmployees(data.employees || [])
+      setError(null)
     } catch (err) {
-      console.error("Update employee error:", err)
-      throw new Error(err.message || "Failed to update employee.")
+      setError("Failed to fetch employee data. Please try again.")
+      console.error("Fetch error:", err)
     } finally {
-      setSaving(false)
+      setLoading(false)
     }
   }
+
+  fetchEmployees()
+}, [])
+
+
+  // Fetch individual employee data by ID
+const fetchEmployeeById = async (employeeId) => {
+  try {
+    setFetchingEmployee(true)
+
+    const token = localStorage.getItem("access_token")
+    const branchCode = localStorage.getItem("selected_branch")
+
+    const response = await fetch(`${GlobalBaseUrl}get_employee_by_id/${employeeId}/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+        "Branch-Code": branchCode,
+      },
+    })
+
+    const data = await response.json()
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Failed to fetch employee details.")
+    }
+
+    return data.employee
+  } catch (err) {
+    console.error("Fetch employee by ID error:", err)
+    setError("Failed to fetch employee details. Please try again.")
+    return null
+  } finally {
+    setFetchingEmployee(false)
+  }
+}
+
+
+  // Update employee data
+const updateEmployee = async (employeeId, formData) => {
+  try {
+    setSaving(true)
+
+    const token = localStorage.getItem("access_token")
+    const branchCode = localStorage.getItem("selected_branch")
+
+    const response = await fetch(`${GlobalBaseUrl}update_employee/${employeeId}/`, {
+      method: "PUT",
+      headers: {
+        Authorization: token,
+        "Branch-Code": branchCode,
+      },
+      body: formData, // Do NOT set Content-Type here manually
+    })
+
+    const data = await response.json()
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to update employee.")
+    }
+    return data
+  } catch (err) {
+    console.error("Update employee error:", err)
+    throw new Error(err.message || "Failed to update employee.")
+  } finally {
+    setSaving(false)
+  }
+}
+
 
   // Get unique departments for filter
   const departments = useMemo(() => {

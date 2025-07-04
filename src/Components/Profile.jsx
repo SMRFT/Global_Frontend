@@ -40,16 +40,13 @@ const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
   .react-datepicker-wrapper {
     width: 100%;
   }
-  
   .react-datepicker__input-container {
     width: 100%;
   }
@@ -67,11 +64,9 @@ const ContentWrapper = styled.div`
   max-width: 1600px;
   margin: 0 auto;
   padding: 1rem;
-  
   @media (min-width: 640px) {
     padding: 1.5rem;
   }
-  
   @media (min-width: 768px) {
     padding: 2rem;
   }
@@ -92,7 +87,6 @@ const CardHeader = styled.div`
   background: ${theme.colors.primary.gradient};
   padding: 1.5rem 2rem;
   flex-shrink: 0;
-  
   @media (max-width: 640px) {
     padding: 1rem 1.5rem;
   }
@@ -105,7 +99,6 @@ const CardTitle = styled.h1`
   margin: 0;
   letter-spacing: -0.025em;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  
   @media (min-width: 640px) {
     font-size: 1.75rem;
   }
@@ -125,15 +118,12 @@ const TabsContainer = styled.div`
   background-color: ${theme.colors.secondary.light};
   scrollbar-width: thin;
   flex-shrink: 0;
-  
   &::-webkit-scrollbar {
     height: 4px;
   }
-  
   &::-webkit-scrollbar-track {
     background: ${theme.colors.secondary.light};
   }
-  
   &::-webkit-scrollbar-thumb {
     background: ${theme.colors.primary.light};
     border-radius: 2px;
@@ -155,7 +145,6 @@ const TabButton = styled.button`
   border-right: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  
   &:hover {
     color: ${(props) => (props.active ? theme.colors.primary.dark : theme.colors.primary.main)};
     background-color: ${(props) => (props.active ? "white" : theme.colors.secondary.main)};
@@ -174,7 +163,6 @@ const FormContainer = styled.form`
   overflow-y: auto;
   padding: 1.5rem;
   background: linear-gradient(to bottom, white, ${theme.colors.secondary.light});
-  
   @media (max-width: 640px) {
     padding: 1rem;
   }
@@ -206,12 +194,10 @@ const FormGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
-  
   @media (min-width: 640px) {
     grid-template-columns: 1fr 1fr;
     gap: 1.75rem;
   }
-  
   @media (min-width: 1024px) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 2rem;
@@ -241,17 +227,14 @@ const Input = styled.input`
   transition: all 0.3s ease;
   font-size: 0.875rem;
   background-color: white;
-  
   &:focus {
     border-color: ${theme.colors.primary.light};
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
     transform: translateY(-1px);
   }
-  
   &:hover {
     border-color: ${theme.colors.primary.light};
   }
-  
   &.error {
     border-color: ${theme.colors.error.main};
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
@@ -269,19 +252,16 @@ const Textarea = styled.textarea`
   transition: all 0.3s ease;
   font-size: 0.875rem;
   background-color: white;
-  
   &:focus {
     border-color: ${theme.colors.primary.light};
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
     transform: translateY(-1px);
   }
-  
   &:hover {
     border-color: ${theme.colors.primary.light};
   }
 `
 
-// Normal styled select dropdown
 const Select = styled.select`
   width: 100%;
   padding: 0.75rem 1rem;
@@ -297,17 +277,14 @@ const Select = styled.select`
   background-repeat: no-repeat;
   background-size: 1.25em 1.25em;
   cursor: pointer;
-  
   &:focus {
     border-color: ${theme.colors.primary.light};
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
     transform: translateY(-1px);
   }
-  
   &:hover {
     border-color: ${theme.colors.primary.light};
   }
-  
   option {
     padding: 0.5rem;
     background-color: white;
@@ -315,7 +292,6 @@ const Select = styled.select`
   }
 `
 
-// Multi-select dropdown container
 const MultiSelectContainer = styled.div`
   position: relative;
 `
@@ -339,13 +315,11 @@ const MultiSelectButton = styled.button`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  
   &:focus {
     border-color: ${theme.colors.primary.light};
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
     transform: translateY(-1px);
   }
-  
   &:hover {
     border-color: ${theme.colors.primary.light};
   }
@@ -364,15 +338,12 @@ const MultiSelectOptions = styled.div`
   max-height: 200px;
   overflow-y: auto;
   box-shadow: ${theme.shadows.lg};
-  
   &::-webkit-scrollbar {
     width: 4px;
   }
-  
   &::-webkit-scrollbar-track {
     background: ${theme.colors.secondary.light};
   }
-  
   &::-webkit-scrollbar-thumb {
     background: ${theme.colors.primary.light};
     border-radius: 2px;
@@ -386,11 +357,9 @@ const MultiSelectOption = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  
   &:hover {
     background-color: ${theme.colors.secondary.light};
   }
-  
   &.selected {
     background-color: ${theme.colors.primary.light};
     color: white;
@@ -403,13 +372,11 @@ const InputGroup = styled.div`
   overflow: hidden;
   border: 2px solid ${theme.colors.secondary.main};
   transition: all 0.3s ease;
-  
   &:focus-within {
     border-color: ${theme.colors.primary.light};
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
     transform: translateY(-1px);
   }
-  
   &:hover {
     border-color: ${theme.colors.primary.light};
   }
@@ -429,7 +396,6 @@ const InputAddon = styled.span`
 const InputWithAddon = styled(Input)`
   border: none;
   border-radius: 0;
-  
   &:focus {
     box-shadow: none;
     transform: none;
@@ -445,13 +411,11 @@ const StyledDatePicker = styled(DatePicker)`
   transition: all 0.3s ease;
   font-size: 0.875rem;
   background-color: white;
-  
   &:focus {
     border-color: ${theme.colors.primary.light};
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
     transform: translateY(-1px);
   }
-  
   &:hover {
     border-color: ${theme.colors.primary.light};
   }
@@ -460,7 +424,6 @@ const StyledDatePicker = styled(DatePicker)`
 const DatePickerWithAddon = styled(StyledDatePicker)`
   border: none;
   border-radius: 0;
-  
   &:focus {
     box-shadow: none;
     transform: none;
@@ -482,7 +445,6 @@ const RadioLabel = styled.label`
   border-radius: 0.5rem;
   transition: all 0.2s ease;
   border: 2px solid transparent;
-  
   &:hover {
     background-color: ${theme.colors.secondary.light};
     border-color: ${theme.colors.secondary.main};
@@ -494,7 +456,6 @@ const RadioInput = styled.input`
   width: 1.25rem;
   accent-color: ${theme.colors.primary.main};
   cursor: pointer;
-  
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
@@ -508,7 +469,6 @@ const RadioText = styled.span`
   font-weight: 500;
 `
 
-// Compact qualification cards for better space usage
 const QualificationCard = styled.div`
   padding: 1.5rem;
   border: 2px solid ${theme.colors.secondary.main};
@@ -517,13 +477,11 @@ const QualificationCard = styled.div`
   margin-bottom: 1.5rem;
   box-shadow: ${theme.shadows.md};
   transition: all 0.3s ease;
-  
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.lg};
     border-color: ${theme.colors.primary.light};
   }
-  
   @media (max-width: 640px) {
     padding: 1rem;
   }
@@ -555,7 +513,6 @@ const RemoveButton = styled.button`
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
-  
   &:hover {
     color: white;
     background-color: ${theme.colors.error.main};
@@ -576,12 +533,10 @@ const AddButton = styled.button`
   transition: all 0.3s ease;
   font-size: 0.875rem;
   box-shadow: ${theme.shadows.sm};
-  
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.md};
   }
-  
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.3);
@@ -605,7 +560,6 @@ const UploadButton = styled.label`
   transition: all 0.3s ease;
   font-size: 0.875rem;
   font-weight: 500;
-  
   &:hover {
     background: linear-gradient(135deg, ${theme.colors.secondary.light}, ${theme.colors.secondary.main});
     border-color: ${theme.colors.primary.light};
@@ -640,7 +594,6 @@ const SubmitButtonContainer = styled.div`
   display: flex;
   justify-content: center;
   gap: 1rem;
-  
   @media (min-width: 640px) {
     justify-content: flex-end;
   }
@@ -659,17 +612,14 @@ const SubmitButton = styled.button`
   transition: all 0.3s ease;
   font-size: 1rem;
   box-shadow: ${theme.shadows.md};
-  
   &:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.xl};
   }
-  
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.3);
   }
-  
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -713,14 +663,12 @@ const RemoveItemButton = styled.button`
   cursor: pointer;
   border-radius: 0.25rem;
   transition: all 0.2s ease;
-  
   &:hover {
     color: ${theme.colors.error.main};
     background-color: rgba(239, 68, 68, 0.1);
   }
 `
 
-// Error and Success message components
 const MessageContainer = styled.div`
   position: fixed;
   top: 1rem;
@@ -737,19 +685,16 @@ const Message = styled.div`
   margin-bottom: 0.5rem;
   box-shadow: ${theme.shadows.lg};
   animation: slideIn 0.3s ease-out;
-  
   &.success {
     background-color: ${theme.colors.success.light};
     border: 1px solid ${theme.colors.success.main};
     color: ${theme.colors.success.dark};
   }
-  
   &.error {
     background-color: ${theme.colors.error.light};
     border: 1px solid ${theme.colors.error.main};
     color: ${theme.colors.error.dark};
   }
-  
   @keyframes slideIn {
     from {
       transform: translateX(100%);
@@ -781,13 +726,11 @@ const CloseButton = styled.button`
   padding: 0.25rem;
   border-radius: 0.25rem;
   transition: all 0.2s ease;
-  
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
 `
 
-// Loading spinner
 const LoadingSpinner = styled.div`
   display: inline-block;
   width: 16px;
@@ -796,7 +739,6 @@ const LoadingSpinner = styled.div`
   border-top: 2px solid currentColor;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -808,26 +750,21 @@ const apiRequest = async (url, method = "GET", data = null, headers = {}) => {
   try {
     const branch_code = localStorage.getItem("selected_branch")
     const token = localStorage.getItem("access_token")
-
     const defaultHeaders = {
       "Content-Type": "application/json",
       Authorization: token,
       "branch-code": branch_code,
     }
-
     const config = {
       method,
       url,
       headers: { ...defaultHeaders, ...headers },
       validateStatus: () => true,
     }
-
     if (data && (method === "POST" || method === "PUT")) {
       config.data = data
     }
-
     const response = await axios(config)
-
     if (response.status === 200 || response.status === 201) {
       return { success: true, data: response.data }
     } else if (response.status === 400) {
@@ -852,11 +789,9 @@ const uploadToGridFS = async (file, fileType = "document") => {
     const formData = new FormData()
     formData.append("file", file)
     formData.append("fileType", fileType)
-
     const result = await apiRequest(`${GlobalBaseUrl}upload-gridfs/`, "POST", formData, {
       "Content-Type": "multipart/form-data",
     })
-
     if (result.success) {
       return { success: true, fileId: result.data.fileId, filename: result.data.filename }
     } else {
@@ -892,7 +827,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
   const [messages, setMessages] = useState([])
   const [hasChanges, setHasChanges] = useState(false)
 
-  // Enhanced file ID storage - this is the key fix
+  // Enhanced file ID storage - FIXED: Don't reset after successful save in edit mode
   const [uploadedFileIds, setUploadedFileIds] = useState({
     profileImage: null,
     aadhaar: null,
@@ -929,17 +864,20 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     validityDate: null,
   })
 
-  // KYC Details with GridFS file IDs
+  // FIXED: KYC Details with UAN number added
   const [kycDetails, setKycDetails] = useState({
     aadhaarNumber: "",
     panNumber: "",
     panType: "",
+    uanNumber: "", // ADDED UAN NUMBER
   })
 
-  // Enhanced family details with GridFS file IDs
+  // FIXED: Enhanced family details with name fields added
   const [familyDetails, setFamilyDetails] = useState({
+    fatherName: "", // ADDED NAME FIELD
     fatherAadhaar: "",
     fatherDob: null,
+    motherName: "", // ADDED NAME FIELD
     motherAadhaar: "",
     motherDob: null,
     spouseName: "",
@@ -970,7 +908,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
   const [showAdditionalRoles, setShowAdditionalRoles] = useState(false)
   const [showDataEntitlements, setShowDataEntitlements] = useState(false)
 
-  // Updated qualifications with GridFS file IDs
   const [qualifications, setQualifications] = useState([
     {
       id: 1,
@@ -1003,7 +940,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
 
   const [activeTab, setActiveTab] = useState("personal")
 
-  // NEW: Pre-populate form data when editing
+  // FIXED: Pre-populate form data when editing - including file IDs and profile image
   useEffect(() => {
     if (isEditing && employeeData) {
       try {
@@ -1034,24 +971,27 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
           validityDate: employeeData.validityDate ? moment(employeeData.validityDate).format("YYYY-MM-DD") : null,
         })
 
-        // Set KYC details
+        // FIXED: Set KYC details with UAN number
         if (employeeData.kycDetails) {
           setKycDetails({
             aadhaarNumber: employeeData.kycDetails.aadhaarNumber || "",
             panNumber: employeeData.kycDetails.panNumber || "",
             panType: employeeData.kycDetails.panType || "",
+            uanNumber: employeeData.kycDetails.uanNumber || "", // ADDED UAN NUMBER
           })
         }
 
-        // Set family details
+        // FIXED: Set family details with name fields
         if (employeeData.familyDetails) {
           setFamilyDetails({
+            fatherName: employeeData.familyDetails.fatherName || "", // ADDED NAME FIELD
             fatherAadhaar: employeeData.familyDetails.fatherAadhaar || "",
             fatherDob: employeeData.familyDetails.fatherDob
               ? moment(employeeData.familyDetails.fatherDob).isValid()
                 ? moment(employeeData.familyDetails.fatherDob).toDate()
                 : null
               : null,
+            motherName: employeeData.familyDetails.motherName || "", // ADDED NAME FIELD
             motherAadhaar: employeeData.familyDetails.motherAadhaar || "",
             motherDob: employeeData.familyDetails.motherDob
               ? moment(employeeData.familyDetails.motherDob).isValid()
@@ -1127,9 +1067,24 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
           setExperiences(formattedExperiences)
         }
 
-        // Set profile image if available
+        // FIXED: Set profile image and file IDs from existing data
         if (employeeData.profileImage) {
           setProfileImage(employeeData.profileImage)
+        }
+
+        // FIXED: Pre-populate file IDs from existing employee data
+        if (employeeData.fileIds) {
+          setUploadedFileIds({
+            profileImage: employeeData.fileIds.profileImage || null,
+            aadhaar: employeeData.fileIds.aadhaar || null,
+            pan: employeeData.fileIds.pan || null,
+            fatherAadhaar: employeeData.fileIds.fatherAadhaar || null,
+            motherAadhaar: employeeData.fileIds.motherAadhaar || null,
+            spouseAadhaar: employeeData.fileIds.spouseAadhaar || null,
+            qualifications: employeeData.fileIds.qualifications || {},
+            experiences: employeeData.fileIds.experiences || {},
+            kidsAadhaar: employeeData.fileIds.kidsAadhaar || {},
+          })
         }
 
         // Reset changes flag
@@ -1153,15 +1108,12 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     const fetchRoles = async () => {
       const cacheKey = "roles_data"
       const cachedRoles = getCachedData(cacheKey)
-
       if (cachedRoles) {
         setPrimaryRoleOptions(cachedRoles)
         setAdditionalRoleOptions(cachedRoles)
         return
       }
-
       const result = await apiRequest(GlobalBaseUrl + "getprimaryandadditionalrole/")
-
       if (result.success) {
         const roles = result.data.designations || []
         const activeRoles = roles.filter((role) => role.is_active === true)
@@ -1175,7 +1127,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         }
       }
     }
-
     fetchRoles()
   }, [])
 
@@ -1184,7 +1135,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     const id = Date.now()
     const newMessage = { id, text, type }
     setMessages((prev) => [...prev, newMessage])
-
     setTimeout(() => {
       setMessages((prev) => prev.filter((msg) => msg.id !== id))
     }, 5000)
@@ -1268,7 +1218,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     trackChanges()
   }
 
-  // Enhanced KYC Details handlers with GridFS
+  // FIXED: Enhanced KYC Details handlers with UAN number
   const handleKycChange = (e) => {
     const { name, value } = e.target
     setKycDetails((prev) => ({
@@ -1278,15 +1228,14 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     trackChanges()
   }
 
-  // Fixed KYC file upload with proper file ID caching
+  // FIXED: KYC file upload with proper file ID caching
   const handleKycFileUpload = async (e, fileType) => {
     const file = e.target.files?.[0]
     if (file) {
       setLoading(true)
       const uploadResult = await uploadToGridFS(file, `kyc_${fileType}`)
-
       if (uploadResult.success) {
-        // Store file ID in the uploadedFileIds state
+        // Store file ID in the uploadedFileIds state - FIXED
         setUploadedFileIds((prev) => ({
           ...prev,
           [fileType]: uploadResult.fileId,
@@ -1300,7 +1249,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     }
   }
 
-  // Enhanced Family Details handlers with GridFS
+  // FIXED: Enhanced Family Details handlers with name fields
   const handleFamilyChange = (e) => {
     const { name, value } = e.target
     setFamilyDetails((prev) => ({
@@ -1318,15 +1267,14 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     trackChanges()
   }
 
-  // Fixed family member Aadhaar uploads with proper file ID caching
+  // FIXED: Family member Aadhaar uploads with proper file ID caching
   const handleFamilyAadhaarUpload = async (e, memberType) => {
     const file = e.target.files?.[0]
     if (file) {
       setLoading(true)
       const uploadResult = await uploadToGridFS(file, `family_${memberType}_aadhaar`)
-
       if (uploadResult.success) {
-        // Store file ID in the uploadedFileIds state
+        // Store file ID in the uploadedFileIds state - FIXED
         setUploadedFileIds((prev) => ({
           ...prev,
           [`${memberType}Aadhaar`]: uploadResult.fileId,
@@ -1348,15 +1296,14 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     trackChanges()
   }
 
-  // Fixed kids Aadhaar uploads with proper file ID caching
+  // FIXED: Kids Aadhaar uploads with proper file ID caching
   const handleKidsAadhaarUpload = async (e, index) => {
     const file = e.target.files?.[0]
     if (file) {
       setLoading(true)
       const uploadResult = await uploadToGridFS(file, `family_kid_${index}_aadhaar`)
-
       if (uploadResult.success) {
-        // Store file ID in the uploadedFileIds state
+        // Store file ID in the uploadedFileIds state - FIXED
         setUploadedFileIds((prev) => ({
           ...prev,
           kidsAadhaar: {
@@ -1394,7 +1341,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         ...prev,
         kidsDetails: prev.kidsDetails.filter((_, i) => i !== index),
       }))
-
       // Remove the file ID from cache as well
       setUploadedFileIds((prev) => {
         const newKidsAadhaar = { ...prev.kidsAadhaar }
@@ -1442,15 +1388,14 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     trackChanges()
   }
 
-  // Fixed qualification file upload with proper file ID caching
+  // FIXED: Qualification file upload with proper file ID caching
   const handleQualificationFileUpload = async (e, id) => {
     const file = e.target.files?.[0]
     if (file) {
       setLoading(true)
       const uploadResult = await uploadToGridFS(file, `qualification_certificate`)
-
       if (uploadResult.success) {
-        // Store file ID in the uploadedFileIds state
+        // Store file ID in the uploadedFileIds state - FIXED
         setUploadedFileIds((prev) => ({
           ...prev,
           qualifications: {
@@ -1469,7 +1414,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
 
   const addQualification = () => {
     const newId = qualifications.length > 0 ? Math.max(...qualifications.map((q) => q.id)) + 1 : 1
-
     setQualifications([
       ...qualifications,
       {
@@ -1488,7 +1432,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
   const removeQualification = (id) => {
     if (qualifications.length > 1) {
       setQualifications(qualifications.filter((qual) => qual.id !== id))
-
       // Remove the file ID from cache as well
       setUploadedFileIds((prev) => {
         const newQualifications = { ...prev.qualifications }
@@ -1516,7 +1459,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
 
   const addExperience = () => {
     const newId = experiences.length > 0 ? Math.max(...experiences.map((e) => e.id)) + 1 : 1
-
     setExperiences([
       ...experiences,
       {
@@ -1534,7 +1476,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
   const removeExperience = (id) => {
     if (experiences.length > 1) {
       setExperiences(experiences.filter((exp) => exp.id !== id))
-
       // Remove the file ID from cache as well
       setUploadedFileIds((prev) => {
         const newExperiences = { ...prev.experiences }
@@ -1548,15 +1489,14 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     }
   }
 
-  // Fixed experience certificate upload with proper file ID caching
+  // FIXED: Experience certificate upload with proper file ID caching
   const handleCertificateUpload = async (e, id) => {
     const file = e.target.files?.[0]
     if (file) {
       setLoading(true)
       const uploadResult = await uploadToGridFS(file, `experience_certificate`)
-
       if (uploadResult.success) {
-        // Store file ID in the uploadedFileIds state
+        // Store file ID in the uploadedFileIds state - FIXED
         setUploadedFileIds((prev) => ({
           ...prev,
           experiences: {
@@ -1573,21 +1513,19 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     }
   }
 
-  // Fixed profile image upload with proper file ID caching
+  // FIXED: Profile image upload with proper file ID caching
   const handleProfileImageUpload = async (e) => {
     const file = e.target.files?.[0]
     if (file) {
       setLoading(true)
       const uploadResult = await uploadToGridFS(file, "profile_image")
-
       if (uploadResult.success) {
         const reader = new FileReader()
         reader.onloadend = () => {
           setProfileImage(reader.result)
         }
         reader.readAsDataURL(file)
-
-        // Store file ID in the uploadedFileIds state
+        // Store file ID in the uploadedFileIds state - FIXED
         setUploadedFileIds((prev) => ({
           ...prev,
           profileImage: uploadResult.fileId,
@@ -1613,14 +1551,11 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     const fetchDataEntitlements = async () => {
       const cacheKey = "data_entitlements"
       const cachedEntitlements = getCachedData(cacheKey)
-
       if (cachedEntitlements) {
         setDataEntitlementOptions(cachedEntitlements)
         return
       }
-
       const result = await apiRequest(`${GlobalBaseUrl}data-entitlements/`)
-
       if (result.success) {
         setDataEntitlementOptions(result.data.dataEntitlements)
         setCachedData(cacheKey, result.data.dataEntitlements)
@@ -1631,7 +1566,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         }
       }
     }
-
     fetchDataEntitlements()
   }, [])
 
@@ -1676,14 +1610,11 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     const fetchDepartments = async () => {
       const cacheKey = "departments_data"
       const cachedDepartments = getCachedData(cacheKey)
-
       if (cachedDepartments) {
         setDepartmentsData(cachedDepartments)
         return
       }
-
       const result = await apiRequest(GlobalBaseUrl + "get_data_departments/")
-
       if (result.success) {
         const allDepartments = result.data.departments
         const activeDepartments = allDepartments.filter((item) => item.is_active)
@@ -1696,7 +1627,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         }
       }
     }
-
     fetchDepartments()
   }, [])
 
@@ -1718,14 +1648,11 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     const fetchDesignations = async () => {
       const cacheKey = "designations_data"
       const cachedDesignations = getCachedData(cacheKey)
-
       if (cachedDesignations) {
         setDesignationsData(cachedDesignations)
         return
       }
-
       const result = await apiRequest(GlobalBaseUrl + "get_data_designation/")
-
       if (result.success) {
         const data = result.data.designations
         const activeDesignations = data.filter((item) => item.is_active)
@@ -1738,7 +1665,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         }
       }
     }
-
     fetchDesignations()
   }, [])
 
@@ -1758,12 +1684,10 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     // Prevent default form submission - only save on button click
   }
 
-  // ENHANCED: Submit profile with proper edit/create handling
+  // FIXED: Submit profile with proper edit/create handling and file ID persistence
   const submitProfile = async () => {
     if (loading || saving) return
-
     setLoading(true)
-
     try {
       // Validate required fields
       const requiredFields = [
@@ -1777,7 +1701,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         "designation",
       ]
       const missingFields = requiredFields.filter((field) => !formData[field])
-
       if (missingFields.length > 0) {
         showMessage(`Please fill in required fields: ${missingFields.join(", ")}`, "error")
         setLoading(false)
@@ -1829,38 +1752,39 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         employmentStatus: formData.employmentStatus,
         registrationNumber: formData.registrationNumber,
         validityDate: formData.validityDate,
-
         // Profile image file ID
         profileImage: uploadedFileIds.profileImage,
-
-        // KYC details with proper field names
+        // FIXED: KYC details with UAN number and proper field names
         kyc_aadhaarNumber: kycDetails.aadhaarNumber,
         kyc_panNumber: kycDetails.panNumber,
         kyc_panType: kycDetails.panType,
-
-        // Family details with proper field names
+        kyc_uanNumber: kycDetails.uanNumber, // ADDED UAN NUMBER
+        kyc_aadhaarFileId: uploadedFileIds.aadhaar, // FIXED: File ID persistence
+        kyc_panFileId: uploadedFileIds.pan, // FIXED: File ID persistence
+        // FIXED: Family details with name fields and proper field names
+        family_fatherName: familyDetails.fatherName, // ADDED NAME FIELD
         family_fatherAadhaar: familyDetails.fatherAadhaar,
         family_fatherDob: familyDetails.fatherDob ? moment(familyDetails.fatherDob).format("YYYY-MM-DD") : null,
+        family_fatherAadhaarFileId: uploadedFileIds.fatherAadhaar, // FIXED: File ID persistence
+        family_motherName: familyDetails.motherName, // ADDED NAME FIELD
         family_motherAadhaar: familyDetails.motherAadhaar,
         family_motherDob: familyDetails.motherDob ? moment(familyDetails.motherDob).format("YYYY-MM-DD") : null,
+        family_motherAadhaarFileId: uploadedFileIds.motherAadhaar, // FIXED: File ID persistence
         family_spouseName: familyDetails.spouseName,
         family_spouseAadhaar: familyDetails.spouseAadhaar,
         family_spouseDob: familyDetails.spouseDob ? moment(familyDetails.spouseDob).format("YYYY-MM-DD") : null,
-
+        family_spouseAadhaarFileId: uploadedFileIds.spouseAadhaar, // FIXED: File ID persistence
         // Bank details with proper field names
         bank_bankName: bankDetails.bankName,
         bank_ifscCode: bankDetails.ifscCode,
         bank_accountNumber: bankDetails.accountNumber,
         bank_branch: bankDetails.branch,
-
         // Salary details with proper field names
         salary_netSalary: salaryDetails.netSalary,
         salary_grossSalary: salaryDetails.grossSalary,
         salary_ctc: salaryDetails.ctc,
-
         // FNF status with proper field names
         fnf_remarks: fnfStatus.remarks,
-
         // JSON fields as strings (backend will parse them)
         qualifications: JSON.stringify(qualificationsWithFileIds),
         experiences: JSON.stringify(experiencesWithFileIds),
@@ -1879,7 +1803,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
             formDataForUpdate.append(key, profileData[key])
           }
         })
-
         result = await updateEmployee(formData.employeeId, formDataForUpdate)
       } else {
         // Create new employee
@@ -1889,22 +1812,24 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
       if (result.success || (result.data && result.data.success)) {
         const successMessage = isEditing ? "Profile updated successfully!" : "Profile created successfully!"
         showMessage(successMessage, "success")
-
         // Reset changes flag
         setHasChanges(false)
 
-        // Clear file IDs after successful submission
-        setUploadedFileIds({
-          profileImage: null,
-          aadhaar: null,
-          pan: null,
-          fatherAadhaar: null,
-          motherAadhaar: null,
-          spouseAadhaar: null,
-          qualifications: {},
-          experiences: {},
-          kidsAadhaar: {},
-        })
+        // FIXED: Don't clear file IDs after successful submission in edit mode
+        if (!isEditing) {
+          // Only clear file IDs for new profile creation
+          setUploadedFileIds({
+            profileImage: null,
+            aadhaar: null,
+            pan: null,
+            fatherAadhaar: null,
+            motherAadhaar: null,
+            spouseAadhaar: null,
+            qualifications: {},
+            experiences: {},
+            kidsAadhaar: {},
+          })
+        }
 
         // Call success callback
         if (onSaveSuccess) {
@@ -1988,12 +1913,15 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                 </TabIcon>
                 Bank Details
               </TabButton>
-              <TabButton active={activeTab === "fnf"} onClick={() => setActiveTab("fnf")}>
-                <TabIcon>
-                  <FileText size={16} />
-                </TabIcon>
-                FNF Status
-              </TabButton>
+              {/* FIXED: Show FNF Status tab only in edit mode */}
+              {isEditing && (
+                <TabButton active={activeTab === "fnf"} onClick={() => setActiveTab("fnf")}>
+                  <TabIcon>
+                    <FileText size={16} />
+                  </TabIcon>
+                  FNF Status
+                </TabButton>
+              )}
             </TabsContainer>
 
             {/* Form */}
@@ -2007,68 +1935,68 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     </SectionIcon>
                     Personal Information
                   </SectionTitle>
-                    <FormGroup style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "2rem" }}>
-                      <Label>Profile Image</Label>
-                      <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
-                        <div style={{ position: "relative" }}>
-                          <div
-                            onClick={triggerFileInput}
-                            style={{
-                              width: "120px",
-                              height: "120px",
-                              borderRadius: "50%",
-                              background: theme.colors.primary.gradient,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              overflow: "hidden",
-                              border: "4px solid white",
-                              boxShadow: theme.shadows.lg,
-                              cursor: "pointer",
-                              transition: "transform 0.3s ease",
-                            }}
-                            onMouseEnter={(e) => (e.target.style.transform = "scale(1.05)")}
-                            onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
-                          >
-                            {profileImage ? (
-                              <img
-                                src={profileImage || "/placeholder.svg"}
-                                alt="Profile"
-                                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                              />
-                            ) : (
-                              <Camera size={32} color="white" />
-                            )}
-                          </div>
-                          <div
-                            onClick={triggerFileInput}
-                            style={{
-                              position: "absolute",
-                              bottom: "8px",
-                              right: "8px",
-                              background: theme.colors.primary.gradient,
-                              borderRadius: "50%",
-                              padding: "8px",
-                              cursor: "pointer",
-                              boxShadow: theme.shadows.md,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              border: "3px solid white",
-                            }}
-                          >
-                            <Camera size={14} color="white" />
-                          </div>
-                          <input
-                            type="file"
-                            ref={fileInputRef}
-                            style={{ display: "none" }}
-                            accept="image/*"
-                            onChange={handleProfileImageUpload}
-                          />
+                  <FormGroup style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "2rem" }}>
+                    <Label>Profile Image</Label>
+                    <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
+                      <div style={{ position: "relative" }}>
+                        <div
+                          onClick={triggerFileInput}
+                          style={{
+                            width: "120px",
+                            height: "120px",
+                            borderRadius: "50%",
+                            background: theme.colors.primary.gradient,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            overflow: "hidden",
+                            border: "4px solid white",
+                            boxShadow: theme.shadows.lg,
+                            cursor: "pointer",
+                            transition: "transform 0.3s ease",
+                          }}
+                          onMouseEnter={(e) => (e.target.style.transform = "scale(1.05)")}
+                          onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+                        >
+                          {profileImage ? (
+                            <img
+                              src={profileImage || "/placeholder.svg"}
+                              alt="Profile"
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            />
+                          ) : (
+                            <Camera size={32} color="white" />
+                          )}
                         </div>
+                        <div
+                          onClick={triggerFileInput}
+                          style={{
+                            position: "absolute",
+                            bottom: "8px",
+                            right: "8px",
+                            background: theme.colors.primary.gradient,
+                            borderRadius: "50%",
+                            padding: "8px",
+                            cursor: "pointer",
+                            boxShadow: theme.shadows.md,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            border: "3px solid white",
+                          }}
+                        >
+                          <Camera size={14} color="white" />
+                        </div>
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          style={{ display: "none" }}
+                          accept="image/*"
+                          onChange={handleProfileImageUpload}
+                        />
                       </div>
-                    </FormGroup>
+                    </div>
+                  </FormGroup>
                   <FormGrid>
                     <FormGroup>
                       <Label htmlFor="employeeId">Employee ID*</Label>
@@ -2083,7 +2011,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         disabled={isEditing} // Disable editing employee ID
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="employeeName">Employee Name*</Label>
                       <Input
@@ -2096,7 +2023,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         placeholder="Enter full name"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="email">Email ID*</Label>
                       <InputGroup>
@@ -2114,7 +2040,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         />
                       </InputGroup>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="dateOfBirth">Date of Birth*</Label>
                       <InputGroup>
@@ -2132,7 +2057,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         />
                       </InputGroup>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="fatherName">Father's Name*</Label>
                       <Input
@@ -2145,7 +2069,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         placeholder="Enter father's name"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="motherName">Mother's Name*</Label>
                       <Input
@@ -2158,7 +2081,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         placeholder="Enter mother's name"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label>Gender*</Label>
                       <RadioGroup>
@@ -2194,7 +2116,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         </RadioLabel>
                       </RadioGroup>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="mobileNumber">Mobile Number*</Label>
                       <InputGroup>
@@ -2212,7 +2133,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         />
                       </InputGroup>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="department">Department*</Label>
                       <InputGroup>
@@ -2236,7 +2156,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         </Select>
                       </InputGroup>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="designation">Designation*</Label>
                       <InputGroup>
@@ -2260,7 +2179,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         </Select>
                       </InputGroup>
                     </FormGroup>
-
                     {/* Primary Role Normal Select */}
                     <FormGroup>
                       <Label htmlFor="primaryRole">Primary Role*</Label>
@@ -2285,7 +2203,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         </Select>
                       </InputGroup>
                     </FormGroup>
-
                     {/* Additional Roles Multi-select */}
                     <FormGroup>
                       <Label htmlFor="additionalRoles">Additional Roles</Label>
@@ -2315,7 +2232,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           )}
                         </MultiSelectDropdown>
                       </MultiSelectContainer>
-
                       {formData.additionalRoleNames.length > 0 && (
                         <SelectedItemsContainer>
                           {formData.additionalRoleNames.map((role) => (
@@ -2329,7 +2245,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         </SelectedItemsContainer>
                       )}
                     </FormGroup>
-
                     {/* Data Entitlements Multi-select */}
                     <FormGroup>
                       <Label htmlFor="dataEntitlements">Business Unit</Label>
@@ -2371,7 +2286,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           )}
                         </MultiSelectDropdown>
                       </MultiSelectContainer>
-
                       {formData.dataEntitlementNames.length > 0 && (
                         <SelectedItemsContainer>
                           {formData.dataEntitlementNames.map((entitlement) => (
@@ -2385,7 +2299,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         </SelectedItemsContainer>
                       )}
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="employmentStatus">Employment Status*</Label>
                       <Select
@@ -2404,7 +2317,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         <option value="internship">Internship</option>
                       </Select>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="registrationNumber">Registration Number</Label>
                       <Input
@@ -2416,7 +2328,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         placeholder="Enter registration number"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="validityDate">RNM Validity Date</Label>
                       <StyledDatePicker
@@ -2426,7 +2337,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         placeholderText="Select validity date"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="bloodGroup">Blood Group</Label>
                       <InputGroup>
@@ -2452,7 +2362,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         </Select>
                       </InputGroup>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="maritalStatus">Marital Status</Label>
                       <Select
@@ -2468,7 +2377,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         <option value="widowed">Widowed</option>
                       </Select>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="guardianNumber">Guardian Number/Emergency Number</Label>
                       <InputGroup>
@@ -2485,9 +2393,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         />
                       </InputGroup>
                     </FormGroup>
-
-                    {/* Profile Image Upload - moved to end for better layout */}
-
                   </FormGrid>
                 </>
               )}
@@ -2501,7 +2406,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     </SectionIcon>
                     Qualification Details
                   </SectionTitle>
-
                   {qualifications.map((qualification, index) => (
                     <QualificationCard key={qualification.id}>
                       <QualificationHeader>
@@ -2512,7 +2416,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           </RemoveButton>
                         )}
                       </QualificationHeader>
-
                       <FormGrid>
                         <FormGroup>
                           <Label>Degree/Certification*</Label>
@@ -2524,7 +2427,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             placeholder="E.g., B.Tech, MBA, etc."
                           />
                         </FormGroup>
-
                         <FormGroup>
                           <Label>Institution/University*</Label>
                           <Input
@@ -2535,7 +2437,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             placeholder="Name of institution"
                           />
                         </FormGroup>
-
                         <FormGroup>
                           <Label>Passed Out Year*</Label>
                           <Input
@@ -2546,7 +2447,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             placeholder="Year of completion"
                           />
                         </FormGroup>
-
                         <FormGroup>
                           <Label>Percentage/CGPA</Label>
                           <Input
@@ -2556,7 +2456,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             placeholder="E.g., 85% or 8.5 CGPA"
                           />
                         </FormGroup>
-
                         <FormGroup>
                           <Label>From Date</Label>
                           <StyledDatePicker
@@ -2567,7 +2466,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             placeholderText="Start date"
                           />
                         </FormGroup>
-
                         <FormGroup>
                           <Label>To Date</Label>
                           <StyledDatePicker
@@ -2578,7 +2476,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             placeholderText="End date"
                           />
                         </FormGroup>
-
                         <FormGroup style={{ gridColumn: "1 / -1" }}>
                           <Label>Qualification Certificate</Label>
                           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -2602,7 +2499,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                       </FormGrid>
                     </QualificationCard>
                   ))}
-
                   <div style={{ display: "flex", justifyContent: "center" }}>
                     <AddButton type="button" onClick={addQualification}>
                       <AddButtonIcon>
@@ -2623,7 +2519,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     </SectionIcon>
                     Experience Details
                   </SectionTitle>
-
                   {experiences.map((experience, index) => (
                     <QualificationCard key={experience.id}>
                       <QualificationHeader>
@@ -2634,7 +2529,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           </RemoveButton>
                         )}
                       </QualificationHeader>
-
                       <FormGrid>
                         <FormGroup>
                           <Label>Company Name*</Label>
@@ -2646,7 +2540,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             placeholder="Name of company"
                           />
                         </FormGroup>
-
                         <FormGroup>
                           <Label>Position*</Label>
                           <Input
@@ -2657,7 +2550,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             placeholder="Your job title"
                           />
                         </FormGroup>
-
                         <FormGroup>
                           <Label>Years of Experience*</Label>
                           <Input
@@ -2668,7 +2560,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             placeholder="E.g., 2.5 years"
                           />
                         </FormGroup>
-
                         <FormGroup>
                           <Label>From Date*</Label>
                           <StyledDatePicker
@@ -2680,7 +2571,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             required
                           />
                         </FormGroup>
-
                         <FormGroup>
                           <Label>To Date</Label>
                           <StyledDatePicker
@@ -2691,7 +2581,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             placeholderText="End date or present"
                           />
                         </FormGroup>
-
                         <FormGroup style={{ gridColumn: "1 / -1" }}>
                           <Label>Experience Certificate</Label>
                           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -2713,7 +2602,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                       </FormGrid>
                     </QualificationCard>
                   ))}
-
                   <div style={{ display: "flex", justifyContent: "center" }}>
                     <AddButton type="button" onClick={addExperience}>
                       <AddButtonIcon>
@@ -2725,7 +2613,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                 </>
               )}
 
-              {/* KYC Details Tab */}
+              {/* FIXED: KYC Details Tab with UAN number */}
               {activeTab === "kyc" && (
                 <>
                   <SectionTitle>
@@ -2734,7 +2622,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     </SectionIcon>
                     KYC Details
                   </SectionTitle>
-
                   <FormGrid>
                     <FormGroup>
                       <Label htmlFor="aadhaarNumber">Aadhaar Number*</Label>
@@ -2749,7 +2636,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         maxLength={12}
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="panNumber">PAN Number</Label>
                       <Input
@@ -2762,7 +2648,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         maxLength={10}
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="panType">PAN Type</Label>
                       <Select id="panType" name="panType" value={kycDetails.panType} onChange={handleKycChange}>
@@ -2774,7 +2659,19 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         <option value="huf">HUF</option>
                       </Select>
                     </FormGroup>
-
+                    {/* ADDED: UAN Number field */}
+                    <FormGroup>
+                      <Label htmlFor="uanNumber">UAN Number</Label>
+                      <Input
+                        type="text"
+                        id="uanNumber"
+                        name="uanNumber"
+                        value={kycDetails.uanNumber}
+                        onChange={handleKycChange}
+                        placeholder="Enter UAN number"
+                        maxLength={12}
+                      />
+                    </FormGroup>
                     <FormGroup>
                       <Label>Aadhaar Upload*</Label>
                       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -2793,7 +2690,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         {uploadedFileIds.aadhaar && <FileName>Aadhaar uploaded</FileName>}
                       </div>
                     </FormGroup>
-
                     <FormGroup>
                       <Label>PAN Upload</Label>
                       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -2816,7 +2712,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                 </>
               )}
 
-              {/* Family Details Tab */}
+              {/* FIXED: Family Details Tab with name fields */}
               {activeTab === "family" && (
                 <>
                   <SectionTitle>
@@ -2825,8 +2721,19 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     </SectionIcon>
                     Family Details
                   </SectionTitle>
-
                   <FormGrid>
+                    {/* ADDED: Father's Name field */}
+                    <FormGroup>
+                      <Label htmlFor="fatherName">Father's Name</Label>
+                      <Input
+                        type="text"
+                        id="fatherName"
+                        name="fatherName"
+                        value={familyDetails.fatherName}
+                        onChange={handleFamilyChange}
+                        placeholder="Enter father's name"
+                      />
+                    </FormGroup>
                     <FormGroup>
                       <Label htmlFor="fatherAadhaar">Father's Aadhaar</Label>
                       <Input
@@ -2839,7 +2746,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         maxLength={12}
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="fatherDob">Father's Date of Birth</Label>
                       <StyledDatePicker
@@ -2851,7 +2757,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         dropdownMode="select"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label>Father's Aadhaar Upload</Label>
                       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -2870,7 +2775,18 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         {uploadedFileIds.fatherAadhaar && <FileName>Father's Aadhaar uploaded</FileName>}
                       </div>
                     </FormGroup>
-
+                    {/* ADDED: Mother's Name field */}
+                    <FormGroup>
+                      <Label htmlFor="motherName">Mother's Name</Label>
+                      <Input
+                        type="text"
+                        id="motherName"
+                        name="motherName"
+                        value={familyDetails.motherName}
+                        onChange={handleFamilyChange}
+                        placeholder="Enter mother's name"
+                      />
+                    </FormGroup>
                     <FormGroup>
                       <Label htmlFor="motherAadhaar">Mother's Aadhaar</Label>
                       <Input
@@ -2883,7 +2799,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         maxLength={12}
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="motherDob">Mother's Date of Birth</Label>
                       <StyledDatePicker
@@ -2895,7 +2810,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         dropdownMode="select"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label>Mother's Aadhaar Upload</Label>
                       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -2914,7 +2828,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         {uploadedFileIds.motherAadhaar && <FileName>Mother's Aadhaar uploaded</FileName>}
                       </div>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="spouseName">Spouse Name</Label>
                       <Input
@@ -2926,7 +2839,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         placeholder="Enter spouse name"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="spouseAadhaar">Spouse Aadhaar</Label>
                       <Input
@@ -2939,7 +2851,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         maxLength={12}
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="spouseDob">Spouse Date of Birth</Label>
                       <StyledDatePicker
@@ -2951,7 +2862,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         dropdownMode="select"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label>Spouse Aadhaar Upload</Label>
                       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -2971,7 +2881,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                       </div>
                     </FormGroup>
                   </FormGrid>
-
                   {/* Children Details Section */}
                   <div style={{ marginTop: "2rem" }}>
                     <h3
@@ -2987,7 +2896,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                       <Users size={18} style={{ marginRight: "0.5rem", color: theme.colors.primary.main }} />
                       Children Details
                     </h3>
-
                     {familyDetails.kidsDetails.map((kid, index) => (
                       <QualificationCard key={index}>
                         <QualificationHeader>
@@ -2998,7 +2906,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             </RemoveButton>
                           )}
                         </QualificationHeader>
-
                         <FormGrid>
                           <FormGroup>
                             <Label>Child Name</Label>
@@ -3009,7 +2916,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                               placeholder="Enter child name"
                             />
                           </FormGroup>
-
                           <FormGroup>
                             <Label>Child Aadhaar</Label>
                             <Input
@@ -3020,7 +2926,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                               maxLength={12}
                             />
                           </FormGroup>
-
                           <FormGroup>
                             <Label>Child Date of Birth</Label>
                             <StyledDatePicker
@@ -3032,7 +2937,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                               dropdownMode="select"
                             />
                           </FormGroup>
-
                           <FormGroup>
                             <Label>Child Aadhaar Upload</Label>
                             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -3054,7 +2958,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         </FormGrid>
                       </QualificationCard>
                     ))}
-
                     <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
                       <AddButton type="button" onClick={addKid}>
                         <AddButtonIcon>
@@ -3076,7 +2979,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     </SectionIcon>
                     Salary Details
                   </SectionTitle>
-
                   <FormGrid>
                     <FormGroup>
                       <Label htmlFor="netSalary">Net Salary</Label>
@@ -3092,7 +2994,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         />
                       </InputGroup>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="grossSalary">Gross Salary</Label>
                       <InputGroup>
@@ -3107,7 +3008,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         />
                       </InputGroup>
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="ctc">CTC (Cost to Company)</Label>
                       <InputGroup>
@@ -3135,7 +3035,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     </SectionIcon>
                     Bank Account Details
                   </SectionTitle>
-
                   <FormGrid>
                     <FormGroup>
                       <Label htmlFor="bankName">Bank Name*</Label>
@@ -3149,7 +3048,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         placeholder="Enter bank name"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="ifscCode">IFSC Code*</Label>
                       <Input
@@ -3162,7 +3060,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         placeholder="Enter IFSC code"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="accountNumber">Account Number*</Label>
                       <Input
@@ -3175,7 +3072,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         placeholder="Enter account number"
                       />
                     </FormGroup>
-
                     <FormGroup>
                       <Label htmlFor="branch">Branch Name</Label>
                       <Input
@@ -3191,8 +3087,8 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                 </>
               )}
 
-              {/* FNF Status Tab */}
-              {activeTab === "fnf" && (
+              {/* FIXED: FNF Status Tab - only show in edit mode */}
+              {activeTab === "fnf" && isEditing && (
                 <>
                   <SectionTitle>
                     <SectionIcon>
@@ -3200,7 +3096,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     </SectionIcon>
                     Full and Final Settlement Status
                   </SectionTitle>
-
                   <FormGroup>
                     <Label htmlFor="remarks">Remarks</Label>
                     <Textarea

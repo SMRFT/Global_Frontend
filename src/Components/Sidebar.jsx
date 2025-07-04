@@ -376,14 +376,19 @@ const Sidebar = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  const handleLogout = () => {
-    if (typeof Storage !== "undefined") {
-      localStorage.removeItem("user_payload")
-      localStorage.removeItem("selected_branch")
-    }
-    const redirectURL = import.meta.env.VITE_LOGIN_REDIRECT_URL || "/login"
-    navigate(redirectURL)
+const handleLogout = () => {
+  if (typeof Storage !== "undefined") {
+    localStorage.removeItem("user_payload");
+    localStorage.removeItem("selected_branch");
+    localStorage.removeItem("access_token"); // also clear token if used
   }
+
+  const redirectURL = import.meta.env.VITE_LOGIN_REDIRECT_URL;
+
+  // Clear page cache and redirect
+  window.location.href = redirectURL; // More reliable than navigate()
+};
+
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed)

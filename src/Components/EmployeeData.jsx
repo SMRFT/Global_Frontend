@@ -794,10 +794,10 @@ const fetchEmployeeById = async (employeeId) => {
   // Update employee data
 const updateEmployee = async (employeeId, formData) => {
   try {
-    setSaving(true)
+    setSaving(true);
 
-    const token = localStorage.getItem("access_token")
-    const branchCode = localStorage.getItem("selected_branch")
+    const token = localStorage.getItem("access_token");
+    const branchCode = localStorage.getItem("selected_branch");
 
     const response = await fetch(`${GlobalBaseUrl}update_employee/${employeeId}/`, {
       method: "PUT",
@@ -805,21 +805,30 @@ const updateEmployee = async (employeeId, formData) => {
         Authorization: token,
         "Branch-Code": branchCode,
       },
-      body: formData, // Do NOT set Content-Type here manually
-    })
+      body: formData, // Do NOT set Content-Type when using FormData
+    });
 
-    const data = await response.json()
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error(data.message || "Failed to update employee.")
+      throw new Error(data.message || "Failed to update employee.");
     }
-    return data
+
+    // ✅ Show alert, then refresh on OK
+    alert("Employee updated successfully!");
+    window.location.reload(); // Will refresh after clicking "OK" on alert
+
+    return data;
   } catch (err) {
-    console.error("Update employee error:", err)
-    throw new Error(err.message || "Failed to update employee.")
+    console.error("Update employee error:", err);
+    alert(err.message || "Failed to update employee.");
+    throw new Error(err.message || "Failed to update employee.");
   } finally {
-    setSaving(false)
+    setSaving(false);
   }
-}
+};
+
+
 
 
   // Get unique departments for filter

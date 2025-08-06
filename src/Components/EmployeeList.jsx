@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import styled, { createGlobalStyle } from "styled-components"
-// import bcrypt from 'bcryptjs';
+import { theme } from "./Colors"
 
-import { Search, User, Phone, Mail, Briefcase, Building, Users, Database, Lock, X, Eye, EyeOff } from "lucide-react"
+import { Search, User, Phone, Mail, Briefcase, Building, Users, Database, Lock, X, Eye, EyeOff, Filter } from 'lucide-react'
 
 // Global styles
 const GlobalStyle = createGlobalStyle`
@@ -20,8 +20,10 @@ const GlobalStyle = createGlobalStyle`
 `
 // Styled components
 const PageContainer = styled.div`
-  max-width:1200px;
-  width:100%;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.5rem;
 `
 
 const Header = styled.div`
@@ -29,37 +31,54 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  position: relative;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -1rem;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: ${theme.colors.primary.gradient};
+    border-radius: 3px;
+  }
 `
 
 const Title = styled.h1`
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 700;
-  color: #1f2937;
+  color: ${theme.colors.primary.main};
   margin: 0;
+  background: ${theme.colors.primary.gradient};
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 `
 
 const SearchContainer = styled.div`
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
-  background-color: #f9fafb;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, ${theme.colors.secondary.light}, ${theme.colors.white});
+  padding: 1.5rem;
+  border-radius: 1rem;
+  margin-bottom: 2.5rem;
+  box-shadow: ${theme.shadows.md};
+  border: 1px solid rgba(243, 135, 90, 0.1);
 `
 
 const SearchGroup = styled.div`
   flex: 1;
-  min-width: 200px;
+  min-width: 240px;
 `
 
 const SearchLabel = styled.label`
   display: block;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #4b5563;
-  margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: ${theme.colors.primary.dark};
+  margin-bottom: 0.5rem;
 `
 
 const SearchInputWrapper = styled.div`
@@ -71,102 +90,119 @@ const SearchInputWrapper = styled.div`
 const SearchIcon = styled.div`
   position: absolute;
   left: 0.75rem;
-  color: #9ca3af;
+  color: ${theme.colors.primary.light};
   display: flex;
   align-items: center;
 `
 
 const SearchInput = styled.input`
   width: 100%;
-  padding: 0.625rem 0.75rem 0.625rem 2.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  border: 2px solid ${theme.colors.secondary.main};
+  border-radius: 0.75rem;
   font-size: 0.875rem;
   outline: none;
+  transition: all 0.3s ease;
   
   &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    border-color: ${theme.colors.primary.light};
+    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
+    transform: translateY(-1px);
+  }
+  
+  &:hover {
+    border-color: ${theme.colors.primary.light};
   }
 `
 
 const Select = styled.select`
   width: 100%;
-  padding: 0.625rem 0.75rem 0.625rem 2.5rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  border: 2px solid ${theme.colors.secondary.main};
+  border-radius: 0.75rem;
   font-size: 0.875rem;
   outline: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.5rem center;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23F3875A' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;
+  transition: all 0.3s ease;
   
   &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    border-color: ${theme.colors.primary.light};
+    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
+    transform: translateY(-1px);
+  }
+  
+  &:hover {
+    border-color: ${theme.colors.primary.light};
   }
 `
 
 const CardsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
 `
 
 const Card = styled.div`
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 1rem;
+  box-shadow: ${theme.shadows.md};
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s ease;
+  border: 1px solid ${theme.colors.secondary.main};
   
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-8px);
+    box-shadow: ${theme.shadows.lg};
+    border-color: ${theme.colors.primary.light};
   }
 `
 
 const CardHeader = styled.div`
-  background: linear-gradient(to right, #3b82f6, #2563eb);
-  padding: 1.25rem;
+  background: ${theme.colors.primary.gradient};
+  padding: 1.5rem;
   position: relative;
 `
 
 const CardAvatar = styled.div`
-  width: 4rem;
-  height: 4rem;
+  width: 5rem;
+  height: 5rem;
   background-color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+  box-shadow: ${theme.shadows.md};
+  border: 3px solid rgba(255, 255, 255, 0.8);
 `
 
 const CardTitle = styled.h3`
   color: white;
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
   margin: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 `
 
 const CardSubtitle = styled.p`
-  color: #bfdbfe;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.875rem;
-  margin: 0.25rem 0 0;
+  margin: 0.5rem 0 0;
+  font-weight: 500;
 `
 
 const CardBody = styled.div`
-  padding: 1.25rem;
+  padding: 1.5rem;
 `
 
 const CardInfo = styled.div`
   display: flex;
-  align-items: center;
-  margin-bottom: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
   
   &:last-child {
     margin-bottom: 0;
@@ -174,60 +210,68 @@ const CardInfo = styled.div`
 `
 
 const CardInfoIcon = styled.div`
-  color: #4b5563;
-  margin-right: 0.75rem;
+  color: ${theme.colors.primary.main};
+  margin-right: 1rem;
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 `
 
 const CardInfoText = styled.p`
-  color: #4b5563;
+  color: ${theme.colors.neutral[700]};
   font-size: 0.875rem;
   margin: 0;
+  line-height: 1.5;
 `
 
 const CardFooter = styled.div`
-  padding: 1rem 1.25rem;
-  background-color: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  padding: 1.25rem 1.5rem;
+  background-color: ${theme.colors.secondary.light};
+  border-top: 1px solid ${theme.colors.secondary.main};
   display: flex;
   justify-content: flex-end;
 `
 
 const CardButton = styled.button`
-  background-color: #eff6ff;
-  color: #3b82f6;
+  background: ${theme.colors.primary.gradient};
+  color: white;
   font-size: 0.875rem;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
   cursor: pointer;
   display: flex;
   align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: ${theme.shadows.sm};
   
   &:hover {
-    background-color: #dbeafe;
+    transform: translateY(-2px);
+    box-shadow: ${theme.shadows.md};
   }
   
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.3);
   }
 `
 
 const ButtonIcon = styled.span`
-  margin-right: 0.5rem;
+  margin-right: 0.75rem;
   display: flex;
   align-items: center;
 `
 
 const NoResults = styled.div`
   text-align: center;
-  padding: 3rem 0;
-  color: #6b7280;
-  font-size: 1rem;
+  padding: 4rem 0;
+  color: ${theme.colors.neutral[500]};
+  font-size: 1.125rem;
   grid-column: 1 / -1;
+  background: ${theme.colors.secondary.light};
+  border-radius: 1rem;
+  border: 2px dashed ${theme.colors.secondary.main};
 `
 
 // Modal components
@@ -237,69 +281,89 @@ const ModalOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 50;
+  animation: fadeIn 0.2s ease-out;
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 `
 
 const ModalContainer = styled.div`
   background-color: white;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   width: 100%;
-  max-width: 28rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 32rem;
+  box-shadow: ${theme.shadows.xl};
   overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+  border: 1px solid ${theme.colors.secondary.main};
+  
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
 `
 
 const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid ${theme.colors.secondary.main};
+  background: linear-gradient(to right, ${theme.colors.secondary.light}, white);
 `
 
 const ModalTitle = styled.h3`
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: ${theme.colors.primary.dark};
   margin: 0;
 `
 
 const CloseButton = styled.button`
   background: none;
   border: none;
-  color: #6b7280;
+  color: ${theme.colors.neutral[500]};
   cursor: pointer;
   display: flex;
   align-items: center;
-  padding: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
   
   &:hover {
-    color: #1f2937;
+    color: ${theme.colors.primary.dark};
+    background-color: ${theme.colors.secondary.main};
   }
   
   &:focus {
     outline: none;
+    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
   }
 `
 
 const ModalBody = styled.div`
-  padding: 1.5rem;
+  padding: 1.75rem;
 `
 
 const ModalInfo = styled.div`
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background-color: #f3f4f6;
-  border-radius: 0.375rem;
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  background-color: ${theme.colors.secondary.light};
+  border-radius: 0.75rem;
+  border: 1px solid ${theme.colors.secondary.main};
 `
 
 const ModalInfoItem = styled.div`
   display: flex;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   
   &:last-child {
     margin-bottom: 0;
@@ -307,25 +371,26 @@ const ModalInfoItem = styled.div`
 `
 
 const ModalInfoLabel = styled.span`
-  font-weight: 500;
-  color: #4b5563;
+  font-weight: 600;
+  color: ${theme.colors.primary.dark};
   width: 8rem;
 `
 
 const ModalInfoValue = styled.span`
-  color: #1f2937;
+  color: ${theme.colors.neutral[800]};
+  font-weight: 500;
 `
 
 const FormGroup = styled.div`
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 `
 
 const FormLabel = styled.label`
   display: block;
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.375rem;
+  font-weight: 600;
+  color: ${theme.colors.primary.dark};
+  margin-bottom: 0.5rem;
 `
 
 const PasswordInputWrapper = styled.div`
@@ -334,16 +399,22 @@ const PasswordInputWrapper = styled.div`
 
 const PasswordInput = styled.input`
   width: 100%;
-  padding: 0.625rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid ${theme.colors.secondary.main};
+  border-radius: 0.75rem;
   font-size: 0.875rem;
-  padding-right: 2.5rem;
+  padding-right: 2.75rem;
+  transition: all 0.3s ease;
   
   &:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    border-color: ${theme.colors.primary.light};
+    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
     outline: none;
+    transform: translateY(-1px);
+  }
+  
+  &:hover {
+    border-color: ${theme.colors.primary.light};
   }
 `
 
@@ -354,92 +425,130 @@ const PasswordToggle = styled.button`
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: #6b7280;
+  color: ${theme.colors.primary.light};
   cursor: pointer;
   display: flex;
   align-items: center;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  
+  &:hover {
+    color: ${theme.colors.primary.dark};
+    background-color: ${theme.colors.secondary.light};
+  }
   
   &:focus {
     outline: none;
+    box-shadow: 0 0 0 2px rgba(243, 135, 90, 0.2);
   }
 `
 
 const ErrorMessage = styled.p`
-  color: #ef4444;
-  font-size: 0.75rem;
-  margin: 0.25rem 0 0;
+  color: ${theme.colors.error.main};
+  font-size: 0.875rem;
+  margin: 0.5rem 0 0;
+  font-weight: 500;
 `
 
 const ModalFooter = styled.div`
   display: flex;
   justify-content: flex-end;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid ${theme.colors.secondary.main};
+  gap: 1rem;
+  background: linear-gradient(to right, white, ${theme.colors.secondary.light});
 `
 
 const CancelButton = styled.button`
   background-color: white;
-  color: #4b5563;
+  color: ${theme.colors.neutral[700]};
   font-size: 0.875rem;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid ${theme.colors.secondary.main};
+  border-radius: 0.75rem;
   cursor: pointer;
+  transition: all 0.2s ease;
   
   &:hover {
-    background-color: #f9fafb;
+    background-color: ${theme.colors.secondary.light};
+    border-color: ${theme.colors.primary.light};
   }
   
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(209, 213, 219, 0.5);
+    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
   }
 `
 
 const SaveButton = styled.button`
-  background-color: #3b82f6;
+  background: ${theme.colors.primary.gradient};
   color: white;
   font-size: 0.875rem;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 0.75rem;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: ${theme.shadows.sm};
   
   &:hover {
-    background-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: ${theme.shadows.md};
   }
   
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.3);
   }
   
   &:disabled {
-    background-color: #93c5fd;
+    background: linear-gradient(135deg, #f3875a80, #f0575280, #ec444f80);
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 `
 
 const Badge = styled.span`
   display: inline-flex;
   align-items: center;
-  padding: 0.125rem 0.5rem;
-  background-color: #dbeafe;
-  color: #1e40af;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, ${theme.colors.secondary.light}, ${theme.colors.secondary.main});
+  color: ${theme.colors.primary.dark};
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 9999px;
   margin-right: 0.5rem;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid ${theme.colors.secondary.main};
 `
 
 const BadgeContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
+`
+
+const FilterButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: ${theme.colors.primary.gradient};
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: ${theme.shadows.sm};
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${theme.shadows.md};
+  }
 `
 
 // API wrapper with standardized error handling
@@ -468,7 +577,7 @@ const apiRequest = async (url, method = "GET", data = null, headers = {}) => {
     const response = await axios(config)
 
     // Handle different status codes
-    if (response.status === 200) {
+    if (response.status === 201 || response.status === 200) {
       return { success: true, data: response.data }
     } else if (response.status === 400) {
       console.warn("Bad Request:", response.data)
@@ -499,29 +608,49 @@ const EmployeeList = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordError, setPasswordError] = useState("")
   const [departments, setDepartments] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
-  const getAllEmployees = async () => {
-    const result = await apiRequest(GlobalBaseUrl + "create_employee/")
+const getAllEmployees = async () => {
+  setIsLoading(true);
+  const result = await apiRequest(GlobalBaseUrl + "get_employees_with_labels/");
 
-    if (result.success) {
-      const employeeData = result.data.employees || []
-      setEmployees(employeeData)
-      setFilteredEmployees(employeeData)
+  if (result.success) {
+    const employeeData = (result.data.employees || []).map((emp) => ({
+      ...emp,
+      additionalRoles: safeParseJSON(emp.additionalRoles, []),
+      dataEntitlements: safeParseJSON(emp.dataEntitlements, []),
+      qualifications: safeParseJSON(emp.qualifications, []),
+      experiences: safeParseJSON(emp.experiences, []),
+      bankDetails: safeParseJSON(emp.bankDetails, {}),
+    }));
 
-      // Extract unique departments for filter
-      const uniqueDepartments = [...new Set(employeeData.map((emp) => emp.department))].filter(Boolean)
-      setDepartments(uniqueDepartments)
+    setEmployees(employeeData);
+    setFilteredEmployees(employeeData);
+
+    const uniqueDepartments = [...new Set(employeeData.map((emp) => emp.department_name))].filter(Boolean);
+    setDepartments(uniqueDepartments);
+  } else {
+    if (result.status === 401) {
+      alert("Your session has expired. Please log in again.");
     } else {
-      if (result.status === 401) {
-        alert("Your session has expired. Please log in again.")
-        // Optional: redirect to login page
-      } else {
-        alert(`Error fetching employees: ${result.error}`)
-      }
+      alert(`Error fetching employees: ${result.error}`);
     }
   }
+
+  setIsLoading(false);
+};
+
+// Helper to parse JSON with fallback
+const safeParseJSON = (input, fallback) => {
+  try {
+    return typeof input === "string" ? JSON.parse(input) : input || fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 
   useEffect(() => {
     getAllEmployees()
@@ -547,7 +676,7 @@ const EmployeeList = () => {
 
     // Filter by department
     if (departmentFilter) {
-      filtered = filtered.filter((emp) => emp.department === departmentFilter)
+      filtered = filtered.filter((emp) => emp.department_name === departmentFilter)
     }
 
     setFilteredEmployees(filtered)
@@ -589,36 +718,43 @@ const EmployeeList = () => {
     return true
   }
 
-  const handleSaveCredentials = async () => {
-    if (!validatePasswords()) return
+const handleSaveCredentials = async () => {
+  if (!validatePasswords()) return;
 
-    const result = await apiRequest(GlobalBaseUrl + "set_employee_password/", "POST", {
+  try {
+    const response = await apiRequest(GlobalBaseUrl + "set_employee_password/", "POST", {
       employeeId: selectedEmployee.employeeId,
       employeeName: selectedEmployee.employeeName,
       department: selectedEmployee.department,
       designation: selectedEmployee.designation,
       password: password,
-    })
+    });
 
-    if (result.success) {
-      alert("Password set successfully!")
-      closeModal()
+    if (response?.success) {
+      alert(response.message || "Password set successfully.");
+      closeModal();
     } else {
-      if (result.status === 400) {
-        setPasswordError("Invalid password format or data.")
-      } else if (result.status === 401) {
-        setPasswordError("Your session has expired. Please log in again.")
-        // Optional: redirect to login
+      if (response?.message) {
+        setPasswordError(response.message);
       } else {
-        setPasswordError("Failed to set password. Please try again.")
+        setPasswordError("Something went wrong. Please try again.");
       }
     }
+  } catch (error) {
+    // Handle HTTP error responses or connection failures
+    if (error?.response?.status === 400) {
+      setPasswordError("Invalid input. Please check your data.");
+    } else if (error?.response?.status === 401) {
+      setPasswordError("Unauthorized. Your session has expired.");
+      // Optional: redirect to login
+    } else if (error?.response?.status === 500) {
+      setPasswordError("Server error. Please try again later.");
+    } else {
+      setPasswordError("Unknown error occurred.");
+    }
   }
+};
 
-  // const formatArrayToString = (arr) => {
-  //   if (!arr || arr.length === 0) return 'None';
-  //   return arr.join(', ');
-  // };
 
   return (
     <>
@@ -630,7 +766,7 @@ const EmployeeList = () => {
 
         <SearchContainer>
           <SearchGroup>
-            <SearchLabel>Search</SearchLabel>
+            <SearchLabel>Search Employees</SearchLabel>
             <SearchInputWrapper>
               <SearchIcon>
                 <Search size={18} />
@@ -668,10 +804,10 @@ const EmployeeList = () => {
               <Card key={employee.employeeId}>
                 <CardHeader>
                   <CardAvatar>
-                    <User size={32} color="#4b5563" />
+                    <User size={32} color={theme.colors.primary.dark} />
                   </CardAvatar>
                   <CardTitle>{employee.employeeName || "N/A"}</CardTitle>
-                  <CardSubtitle>{employee.designation || "No Designation"}</CardSubtitle>
+                  <CardSubtitle>{employee.designation_name || "No Designation"}</CardSubtitle>
                 </CardHeader>
 
                 <CardBody>
@@ -679,7 +815,7 @@ const EmployeeList = () => {
                     <CardInfoIcon>
                       <Briefcase size={18} />
                     </CardInfoIcon>
-                    <CardInfoText>{employee.department || "No Department"}</CardInfoText>
+                    <CardInfoText>{employee.department_name|| "No Department"}</CardInfoText>
                   </CardInfo>
 
                   <CardInfo>
@@ -700,7 +836,7 @@ const EmployeeList = () => {
                     <CardInfoIcon>
                       <User size={18} />
                     </CardInfoIcon>
-                    <CardInfoText>Primary Role: {employee.primaryRole || "None"}</CardInfoText>
+                    <CardInfoText>Primary Role: {employee.primary_role_name || "None"}</CardInfoText>
                   </CardInfo>
 
                   {employee.additionalRoles && employee.additionalRoles.length > 0 && (
@@ -776,11 +912,11 @@ const EmployeeList = () => {
                   </ModalInfoItem>
                   <ModalInfoItem>
                     <ModalInfoLabel>Department:</ModalInfoLabel>
-                    <ModalInfoValue>{selectedEmployee.department || "N/A"}</ModalInfoValue>
+                    <ModalInfoValue>{selectedEmployee.department_name || "N/A"}</ModalInfoValue>
                   </ModalInfoItem>
                   <ModalInfoItem>
                     <ModalInfoLabel>Designation:</ModalInfoLabel>
-                    <ModalInfoValue>{selectedEmployee.designation || "N/A"}</ModalInfoValue>
+                    <ModalInfoValue>{selectedEmployee.designation_name || "N/A"}</ModalInfoValue>
                   </ModalInfoItem>
                 </ModalInfo>
 

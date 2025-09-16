@@ -13,6 +13,8 @@ import Profile from "./Components/Profile"
 import EmployeeList from "./Components/EmployeeList"
 import Performance from "./Components/Performance"
 import EmployeeData from "./Components/EmployeeData"
+import EmployeeBirthdayPage from './Components/EmployeeBirthdayPage'
+
 
 // Global styles with gradient theme
 const GlobalStyle = createGlobalStyle`
@@ -123,10 +125,13 @@ function App() {
               <Route path="/" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/employee-list" element={<EmployeeList />} />
+              <Route path="/EmployeeList" element={<EmployeeList />} />
               <Route path="/employee-data" element={<EmployeeData />} />
+              <Route path="/EmployeeData" element={<EmployeeData />} />
               <Route path="/performance" element={<Performance />} />
               <Route path="/reports" element={<DefaultPage pageName="Reports" />} />
               <Route path="/dashboard" element={<DefaultPage pageName="Dashboard" />} />
+              <Route path="/birthdays" element={<EmployeeBirthdayPage />} />
               
               {/* Handle base URL routes if needed */}
               <Route path={`${import.meta.env.BASE_URL || ""}/`} element={<Profile />} />
@@ -134,7 +139,7 @@ function App() {
               <Route path={`${import.meta.env.BASE_URL || ""}/EmployeeList`} element={<EmployeeList />} />
               <Route path={`${import.meta.env.BASE_URL || ""}/EmployeeData`} element={<EmployeeData />} />
               <Route path={`${import.meta.env.BASE_URL || ""}/performance`} element={<Performance />} />
-
+              <Route path={`${import.meta.env.BASE_URL || ""}/birthdays`} element={<EmployeeBirthdayPage />} />
             </Routes>
           </MainContent>
         </Content>

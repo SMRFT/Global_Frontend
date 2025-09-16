@@ -806,7 +806,8 @@ function Admin() {
                                 {desig.is_active ? "Active" : "Inactive"}
                               </StatusBadge>
                             </Td>
-                            <Td>{desig.decription}</Td>
+                            <Td>{desig.description}</Td>
+
                             <Td>
                               <ActionButtons>
                                 <ToggleWrapper>

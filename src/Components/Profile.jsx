@@ -1,12 +1,11 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import styled, { createGlobalStyle } from "styled-components"
-import axios from "axios"
-import moment from "moment"
-import { theme } from "./colors"
+import { useState, useRef, useEffect } from "react";
+import styled, { createGlobalStyle } from "styled-components";
+import axios from "axios";
+import moment from "moment";
+import { theme } from "./colors";
 
-const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
 import {
   Save,
@@ -31,9 +30,10 @@ import {
   Shield,
   AlertCircle,
   CheckCircle,
-} from "lucide-react"
-import DatePicker from "react-datepicker"
-import "react-datepicker/dist/react-datepicker.css"
+  CloudCog,
+} from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 // Global styles
 const GlobalStyle = createGlobalStyle`
@@ -50,15 +50,69 @@ const GlobalStyle = createGlobalStyle`
   .react-datepicker__input-container {
     width: 100%;
   }
-`
+`;
 
-// Enhanced Container for 4-row layout
+// Modal components
+const Modal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: ${theme.shadows.lg};
+`;
+
+const ModalTitle = styled.h2`
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: ${theme.colors.primary.dark};
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+`;
+
+const ModalIcon = styled.span`
+  margin-right: 0.75rem;
+  color: ${theme.colors.primary.main};
+`;
+
+const CloseModalButton = styled.button`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${theme.colors.neutral[600]};
+`;
+
+const ErrorMessage = styled.div`
+  color: ${theme.colors.error.main};
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+`;
+
+// Existing styled components (unchanged)
 const Container = styled.div`
   max-width: 1600px;
   width: 100%;
   margin: 0 auto;
   min-height: 100vh;
-`
+`;
 
 const ContentWrapper = styled.div`
   max-width: 1600px;
@@ -70,7 +124,7 @@ const ContentWrapper = styled.div`
   @media (min-width: 768px) {
     padding: 2rem;
   }
-`
+`;
 
 const Card = styled.div`
   background-color: white;
@@ -81,7 +135,7 @@ const Card = styled.div`
   height: calc(100vh - 4rem);
   display: flex;
   flex-direction: column;
-`
+`;
 
 const CardHeader = styled.div`
   background: ${theme.colors.primary.gradient};
@@ -90,7 +144,7 @@ const CardHeader = styled.div`
   @media (max-width: 640px) {
     padding: 1rem 1.5rem;
   }
-`
+`;
 
 const CardTitle = styled.h1`
   color: white;
@@ -102,14 +156,14 @@ const CardTitle = styled.h1`
   @media (min-width: 640px) {
     font-size: 1.75rem;
   }
-`
+`;
 
 const CardSubtitle = styled.p`
   color: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
   margin: 0.5rem 0 0;
   font-weight: 400;
-`
+`;
 
 const TabsContainer = styled.div`
   display: flex;
@@ -128,7 +182,7 @@ const TabsContainer = styled.div`
     background: ${theme.colors.primary.light};
     border-radius: 2px;
   }
-`
+`;
 
 const TabButton = styled.button`
   padding: 0.75rem 1.25rem;
@@ -149,14 +203,14 @@ const TabButton = styled.button`
     color: ${(props) => (props.active ? theme.colors.primary.dark : theme.colors.primary.main)};
     background-color: ${(props) => (props.active ? "white" : theme.colors.secondary.main)};
   }
-`
+`;
 
 const TabIcon = styled.span`
   margin-right: 0.5rem;
   display: flex;
   align-items: center;
   color: ${theme.colors.primary.main};
-`
+`;
 
 const FormContainer = styled.form`
   flex: 1;
@@ -166,7 +220,7 @@ const FormContainer = styled.form`
   @media (max-width: 640px) {
     padding: 1rem;
   }
-`
+`;
 
 const SectionTitle = styled.h2`
   font-size: 1.25rem;
@@ -176,7 +230,7 @@ const SectionTitle = styled.h2`
   align-items: center;
   margin: 0 0 1.5rem 0;
   letter-spacing: -0.025em;
-`
+`;
 
 const SectionIcon = styled.span`
   margin-right: 0.75rem;
@@ -187,9 +241,8 @@ const SectionIcon = styled.span`
   padding: 0.5rem;
   border-radius: 0.5rem;
   box-shadow: ${theme.shadows.sm};
-`
+`;
 
-// Optimized 4-column grid for better space utilization
 const FormGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
@@ -202,12 +255,12 @@ const FormGrid = styled.div`
     grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 2rem;
   }
-`
+`;
 
 const FormGroup = styled.div`
   margin-bottom: 0;
   position: relative;
-`
+`;
 
 const Label = styled.label`
   display: block;
@@ -216,7 +269,7 @@ const Label = styled.label`
   color: ${theme.colors.primary.dark};
   margin-bottom: 0.5rem;
   letter-spacing: 0.025em;
-`
+`;
 
 const Input = styled.input`
   width: 100%;
@@ -239,7 +292,7 @@ const Input = styled.input`
     border-color: ${theme.colors.error.main};
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
   }
-`
+`;
 
 const Textarea = styled.textarea`
   width: 100%;
@@ -260,7 +313,7 @@ const Textarea = styled.textarea`
   &:hover {
     border-color: ${theme.colors.primary.light};
   }
-`
+`;
 
 const Select = styled.select`
   width: 100%;
@@ -290,16 +343,16 @@ const Select = styled.select`
     background-color: white;
     color: ${theme.colors.neutral[800]};
   }
-`
+`;
 
 const MultiSelectContainer = styled.div`
   position: relative;
-`
+`;
 
 const MultiSelectDropdown = styled.div`
   position: relative;
   width: 100%;
-`
+`;
 
 const MultiSelectButton = styled.button`
   width: 100%;
@@ -323,7 +376,7 @@ const MultiSelectButton = styled.button`
   &:hover {
     border-color: ${theme.colors.primary.light};
   }
-`
+`;
 
 const MultiSelectOptions = styled.div`
   position: absolute;
@@ -348,7 +401,7 @@ const MultiSelectOptions = styled.div`
     background: ${theme.colors.primary.light};
     border-radius: 2px;
   }
-`
+`;
 
 const MultiSelectOption = styled.div`
   padding: 0.75rem 1rem;
@@ -364,7 +417,7 @@ const MultiSelectOption = styled.div`
     background-color: ${theme.colors.primary.light};
     color: white;
   }
-`
+`;
 
 const InputGroup = styled.div`
   display: flex;
@@ -380,7 +433,7 @@ const InputGroup = styled.div`
   &:hover {
     border-color: ${theme.colors.primary.light};
   }
-`
+`;
 
 const InputAddon = styled.span`
   display: inline-flex;
@@ -391,7 +444,7 @@ const InputAddon = styled.span`
   border: none;
   font-size: 0.875rem;
   font-weight: 500;
-`
+`;
 
 const InputWithAddon = styled(Input)`
   border: none;
@@ -400,7 +453,7 @@ const InputWithAddon = styled(Input)`
     box-shadow: none;
     transform: none;
   }
-`
+`;
 
 const StyledDatePicker = styled(DatePicker)`
   width: 100%;
@@ -419,7 +472,7 @@ const StyledDatePicker = styled(DatePicker)`
   &:hover {
     border-color: ${theme.colors.primary.light};
   }
-`
+`;
 
 const DatePickerWithAddon = styled(StyledDatePicker)`
   border: none;
@@ -428,14 +481,14 @@ const DatePickerWithAddon = styled(StyledDatePicker)`
     box-shadow: none;
     transform: none;
   }
-`
+`;
 
 const RadioGroup = styled.div`
   display: flex;
   gap: 1rem;
   margin-top: 0.5rem;
   flex-wrap: wrap;
-`
+`;
 
 const RadioLabel = styled.label`
   display: inline-flex;
@@ -449,7 +502,7 @@ const RadioLabel = styled.label`
     background-color: ${theme.colors.secondary.light};
     border-color: ${theme.colors.secondary.main};
   }
-`
+`;
 
 const RadioInput = styled.input`
   height: 1.25rem;
@@ -460,14 +513,14 @@ const RadioInput = styled.input`
     outline: none;
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
   }
-`
+`;
 
 const RadioText = styled.span`
   margin-left: 0.5rem;
   color: ${theme.colors.neutral[800]};
   font-size: 0.875rem;
   font-weight: 500;
-`
+`;
 
 const QualificationCard = styled.div`
   padding: 1.5rem;
@@ -485,7 +538,7 @@ const QualificationCard = styled.div`
   @media (max-width: 640px) {
     padding: 1rem;
   }
-`
+`;
 
 const QualificationHeader = styled.div`
   display: flex;
@@ -494,14 +547,14 @@ const QualificationHeader = styled.div`
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid ${theme.colors.secondary.main};
-`
+`;
 
 const QualificationTitle = styled.h3`
   font-weight: 700;
   color: ${theme.colors.primary.dark};
   margin: 0;
   font-size: 1.125rem;
-`
+`;
 
 const RemoveButton = styled.button`
   color: ${theme.colors.error.main};
@@ -518,7 +571,7 @@ const RemoveButton = styled.button`
     background-color: ${theme.colors.error.main};
     transform: scale(1.05);
   }
-`
+`;
 
 const AddButton = styled.button`
   display: flex;
@@ -541,13 +594,13 @@ const AddButton = styled.button`
     outline: none;
     box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.3);
   }
-`
+`;
 
 const AddButtonIcon = styled.span`
   margin-right: 0.5rem;
   display: flex;
   align-items: center;
-`
+`;
 
 const UploadButton = styled.label`
   display: flex;
@@ -565,18 +618,18 @@ const UploadButton = styled.label`
     border-color: ${theme.colors.primary.light};
     transform: translateY(-1px);
   }
-`
+`;
 
 const UploadIcon = styled.span`
   margin-right: 0.5rem;
   color: ${theme.colors.primary.main};
   display: flex;
   align-items: center;
-`
+`;
 
 const UploadText = styled.span`
   color: ${theme.colors.neutral[700]};
-`
+`;
 
 const FileName = styled.span`
   margin-left: 0.75rem;
@@ -587,7 +640,7 @@ const FileName = styled.span`
   background-color: ${theme.colors.success.light};
   border-radius: 0.375rem;
   border: 1px solid ${theme.colors.success.main};
-`
+`;
 
 const SubmitButtonContainer = styled.div`
   margin-top: 2rem;
@@ -597,7 +650,7 @@ const SubmitButtonContainer = styled.div`
   @media (min-width: 640px) {
     justify-content: flex-end;
   }
-`
+`;
 
 const SubmitButton = styled.button`
   padding: 1rem 2rem;
@@ -624,20 +677,20 @@ const SubmitButton = styled.button`
     opacity: 0.6;
     cursor: not-allowed;
   }
-`
+`;
 
 const SubmitButtonIcon = styled.span`
   margin-right: 0.75rem;
   display: flex;
   align-items: center;
-`
+`;
 
 const SelectedItemsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.75rem;
-`
+`;
 
 const SelectedItem = styled.div`
   display: flex;
@@ -650,7 +703,7 @@ const SelectedItem = styled.div`
   font-weight: 600;
   border: 1px solid ${theme.colors.secondary.main};
   box-shadow: ${theme.shadows.sm};
-`
+`;
 
 const RemoveItemButton = styled.button`
   display: flex;
@@ -667,7 +720,7 @@ const RemoveItemButton = styled.button`
     color: ${theme.colors.error.main};
     background-color: rgba(239, 68, 68, 0.1);
   }
-`
+`;
 
 const MessageContainer = styled.div`
   position: fixed;
@@ -675,7 +728,7 @@ const MessageContainer = styled.div`
   right: 1rem;
   z-index: 1000;
   max-width: 400px;
-`
+`;
 
 const Message = styled.div`
   display: flex;
@@ -705,18 +758,18 @@ const Message = styled.div`
       opacity: 1;
     }
   }
-`
+`;
 
 const MessageIcon = styled.span`
   margin-right: 0.75rem;
   display: flex;
   align-items: center;
-`
+`;
 
 const MessageText = styled.span`
   flex: 1;
   font-weight: 500;
-`
+`;
 
 const CloseButton = styled.button`
   margin-left: 0.75rem;
@@ -729,7 +782,7 @@ const CloseButton = styled.button`
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
-`
+`;
 
 const LoadingSpinner = styled.div`
   display: inline-block;
@@ -743,91 +796,95 @@ const LoadingSpinner = styled.div`
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-`
+`;
 
 // Enhanced API wrapper with GridFS support and caching
+const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL;
+
 const apiRequest = async (url, method = "GET", data = null, headers = {}) => {
   try {
-    const branch_code = localStorage.getItem("selected_branch")
-    const token = localStorage.getItem("access_token")
+    const branch_code = localStorage.getItem("selected_branch");
+    const token = localStorage.getItem("access_token");
     const defaultHeaders = {
       "Content-Type": "application/json",
       Authorization: token,
       "branch-code": branch_code,
-    }
+    };
     const config = {
       method,
       url,
       headers: { ...defaultHeaders, ...headers },
       validateStatus: () => true,
-    }
+    };
     if (data && (method === "POST" || method === "PUT")) {
-      config.data = data
+      config.data = data;
     }
-    const response = await axios(config)
+    const response = await axios(config);
     if (response.status === 200 || response.status === 201) {
-      return { success: true, data: response.data }
+      return { success: true, data: response.data };
     } else if (response.status === 400) {
-      console.warn("Bad Request:", response.data)
-      return { success: false, error: "Invalid data sent to server.", status: 400, data: response.data }
+      console.warn("Bad Request:", response.data);
+      return { success: false, error: "Invalid data sent to server.", status: 400, data: response.data };
     } else if (response.status === 401) {
-      console.warn("Unauthorized:", response.data)
-      return { success: false, error: "Session expired. Please log in again.", status: 401, data: response.data }
+      console.warn("Unauthorized:", response.data);
+      return { success: false, error: "Session expired. Please log in again.", status: 401, data: response.data };
     } else {
-      console.warn("Unexpected status:", response.status, response.data)
-      return { success: false, error: "Something went wrong. Try again.", status: response.status, data: response.data }
+      console.warn("Unexpected status:", response.status, response.data);
+      return { success: false, error: "Something went wrong. Try again.", status: response.status, data: response.data };
     }
   } catch (error) {
-    console.error("Network or unexpected error:", error)
-    return { success: false, error: "Network error or unexpected issue occurred.", networkError: true }
+    console.error("Network or unexpected error:", error);
+    return { success: false, error: "Network error or unexpected issue occurred.", networkError: true };
   }
-}
+};
 
 // GridFS file upload function
 const uploadToGridFS = async (file, fileType = "document") => {
   try {
-    const formData = new FormData()
-    formData.append("file", file)
-    formData.append("fileType", fileType)
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("fileType", fileType);
     const result = await apiRequest(`${GlobalBaseUrl}upload-gridfs/`, "POST", formData, {
       "Content-Type": "multipart/form-data",
-    })
+    });
     if (result.success) {
-      return { success: true, fileId: result.data.fileId, filename: result.data.filename }
+      return { success: true, fileId: result.data.fileId, filename: result.data.filename };
     } else {
-      return { success: false, error: result.error }
+      return { success: false, error: result.error };
     }
   } catch (error) {
-    console.error("GridFS upload error:", error)
-    return { success: false, error: "Failed to upload file" }
+    console.error("GridFS upload error:", error);
+    return { success: false, error: "Failed to upload file" };
   }
-}
+};
 
 // Cache management
-const cache = new Map()
-const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 const getCachedData = (key) => {
-  const cached = cache.get(key)
+  const cached = cache.get(key);
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.data
+    return cached.data;
   }
-  cache.delete(key)
-  return null
-}
+  cache.delete(key);
+  return null;
+};
 
 const setCachedData = (key, data) => {
-  cache.set(key, { data, timestamp: Date.now() })
-}
+  cache.set(key, { data, timestamp: Date.now() });
+};
 
 function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, updateEmployee, saving }) {
-  const fileInputRef = useRef(null)
-  const [profileImage, setProfileImage] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [messages, setMessages] = useState([])
-  const [hasChanges, setHasChanges] = useState(false)
+  // Ensure activeTab is declared only once
+  const [activeTab, setActiveTab] = useState("personal");
+  const fileInputRef = useRef(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  // Enhanced file ID storage - FIXED: Don't reset after successful save in edit mode
   const [uploadedFileIds, setUploadedFileIds] = useState({
     profileImage: null,
     aadhaar: null,
@@ -838,7 +895,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     qualifications: {},
     experiences: {},
     kidsAadhaar: {},
-  })
+  });
 
   const [formData, setFormData] = useState({
     employeeId: "",
@@ -862,22 +919,20 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     employmentStatus: "",
     registrationNumber: "",
     validityDate: null,
-  })
+  });
 
-  // FIXED: KYC Details with UAN number added
   const [kycDetails, setKycDetails] = useState({
     aadhaarNumber: "",
     panNumber: "",
     panType: "",
-    uanNumber: "", // ADDED UAN NUMBER
-  })
+    uanNumber: "",
+  });
 
-  // FIXED: Enhanced family details with name fields added
   const [familyDetails, setFamilyDetails] = useState({
-    fatherName: "", // ADDED NAME FIELD
+    fatherName: "",
     fatherAadhaar: "",
     fatherDob: null,
-    motherName: "", // ADDED NAME FIELD
+    motherName: "",
     motherAadhaar: "",
     motherDob: null,
     spouseName: "",
@@ -890,23 +945,33 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         dob: null,
       },
     ],
-  })
+  });
 
   const [salaryDetails, setSalaryDetails] = useState({
     netSalary: "",
     grossSalary: "",
     ctc: "",
-  })
+  });
 
   const [fnfStatus, setFnfStatus] = useState({
     remarks: "",
-  })
+  });
 
-  // State for roles with caching
-  const [primaryRoleOptions, setPrimaryRoleOptions] = useState([])
-  const [additionalRoleOptions, setAdditionalRoleOptions] = useState([])
-  const [showAdditionalRoles, setShowAdditionalRoles] = useState(false)
-  const [showDataEntitlements, setShowDataEntitlements] = useState(false)
+  const [primaryRoleOptions, setPrimaryRoleOptions] = useState([]);
+  const [additionalRoleOptions, setAdditionalRoleOptions] = useState([]);
+  const [showAdditionalRoles, setShowAdditionalRoles] = useState(false);
+  const [showDataEntitlements, setShowDataEntitlements] = useState(false);
+  const [dataEntitlementOptions, setDataEntitlementOptions] = useState([]);
+  const [departmentsData, setDepartmentsData] = useState([]);
+  const [designationsData, setDesignationsData] = useState([]);
+  const [showDepartmentModal, setShowDepartmentModal] = useState(false);
+  const [showDesignationModal, setShowDesignationModal] = useState(false);
+  const [departmentModalData, setDepartmentModalData] = useState({ code: "", name: "", description: "" });
+  const [designationModalData, setDesignationModalData] = useState({ code: "", name: "", description: "" });
+  const [departmentModalError, setDepartmentModalError] = useState("");
+  const [designationModalError, setDesignationModalError] = useState("");
+  const [departmentModalLoading, setDepartmentModalLoading] = useState(false);
+  const [designationModalLoading, setDesignationModalLoading] = useState(false);
 
   const [qualifications, setQualifications] = useState([
     {
@@ -918,7 +983,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
       fromDate: null,
       toDate: null,
     },
-  ])
+  ]);
 
   const [experiences, setExperiences] = useState([
     {
@@ -929,24 +994,22 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
       fromDate: null,
       toDate: null,
     },
-  ])
+  ]);
 
   const [bankDetails, setBankDetails] = useState({
     bankName: "",
     ifscCode: "",
     accountNumber: "",
     branch: "",
-  })
+  });
 
-  const [activeTab, setActiveTab] = useState("personal")
+  //const [activeTab, setActiveTab] = useState("personal");
 
-  // FIXED: Pre-populate form data when editing - including file IDs and profile image
   useEffect(() => {
     if (isEditing && employeeData) {
       try {
-        console.log("Pre-populating form with employee data:", employeeData)
+        console.log("Pre-populating form with employee data:", employeeData);
 
-        // Set basic form data
         setFormData({
           employeeId: employeeData.employeeId || "",
           employeeName: employeeData.employeeName || "",
@@ -969,29 +1032,27 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
           employmentStatus: employeeData.employmentStatus || "",
           registrationNumber: employeeData.registrationNumber || "",
           validityDate: employeeData.validityDate ? moment(employeeData.validityDate).format("YYYY-MM-DD") : null,
-        })
+        });
 
-        // FIXED: Set KYC details with UAN number
         if (employeeData.kycDetails) {
           setKycDetails({
             aadhaarNumber: employeeData.kycDetails.aadhaarNumber || "",
             panNumber: employeeData.kycDetails.panNumber || "",
             panType: employeeData.kycDetails.panType || "",
-            uanNumber: employeeData.kycDetails.uanNumber || "", // ADDED UAN NUMBER
-          })
+            uanNumber: employeeData.kycDetails.uanNumber || "",
+          });
         }
 
-        // FIXED: Set family details with name fields
         if (employeeData.familyDetails) {
           setFamilyDetails({
-            fatherName: employeeData.familyDetails.fatherName || "", // ADDED NAME FIELD
+            fatherName: employeeData.familyDetails.fatherName || "",
             fatherAadhaar: employeeData.familyDetails.fatherAadhaar || "",
             fatherDob: employeeData.familyDetails.fatherDob
               ? moment(employeeData.familyDetails.fatherDob).isValid()
                 ? moment(employeeData.familyDetails.fatherDob).toDate()
                 : null
               : null,
-            motherName: employeeData.familyDetails.motherName || "", // ADDED NAME FIELD
+            motherName: employeeData.familyDetails.motherName || "",
             motherAadhaar: employeeData.familyDetails.motherAadhaar || "",
             motherDob: employeeData.familyDetails.motherDob
               ? moment(employeeData.familyDetails.motherDob).isValid()
@@ -1011,36 +1072,32 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                   dob: kid.dob ? (moment(kid.dob).isValid() ? moment(kid.dob).toDate() : null) : null,
                 }))
               : [{ name: "", aadhaar: "", dob: null }],
-          })
+          });
         }
 
-        // Set bank details
         if (employeeData.bankDetails) {
           setBankDetails({
             bankName: employeeData.bankDetails.bankName || "",
             ifscCode: employeeData.bankDetails.ifscCode || "",
             accountNumber: employeeData.bankDetails.accountNumber || "",
             branch: employeeData.bankDetails.branch || "",
-          })
+          });
         }
 
-        // Set salary details
         if (employeeData.salaryDetails) {
           setSalaryDetails({
             netSalary: employeeData.salaryDetails.netSalary || "",
             grossSalary: employeeData.salaryDetails.grossSalary || "",
             ctc: employeeData.salaryDetails.ctc || "",
-          })
+          });
         }
 
-        // Set FNF status
         if (employeeData.fnfStatus) {
           setFnfStatus({
             remarks: employeeData.fnfStatus.remarks || "",
-          })
+          });
         }
 
-        // Set qualifications
         if (employeeData.qualifications && employeeData.qualifications.length > 0) {
           const formattedQualifications = employeeData.qualifications.map((qual, index) => ({
             id: index + 1,
@@ -1050,11 +1107,10 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
             percentage: qual.percentage || "",
             fromDate: qual.fromDate ? (moment(qual.fromDate).isValid() ? moment(qual.fromDate).toDate() : null) : null,
             toDate: qual.toDate ? (moment(qual.toDate).isValid() ? moment(qual.toDate).toDate() : null) : null,
-          }))
-          setQualifications(formattedQualifications)
+          }));
+          setQualifications(formattedQualifications);
         }
 
-        // Set experiences
         if (employeeData.experiences && employeeData.experiences.length > 0) {
           const formattedExperiences = employeeData.experiences.map((exp, index) => ({
             id: index + 1,
@@ -1063,16 +1119,14 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
             yearsOfExperience: exp.yearsOfExperience || "",
             fromDate: exp.fromDate ? (moment(exp.fromDate).isValid() ? moment(exp.fromDate).toDate() : null) : null,
             toDate: exp.toDate ? (moment(exp.toDate).isValid() ? moment(exp.toDate).toDate() : null) : null,
-          }))
-          setExperiences(formattedExperiences)
+          }));
+          setExperiences(formattedExperiences);
         }
 
-        // FIXED: Set profile image and file IDs from existing data
         if (employeeData.profileImage) {
-          setProfileImage(employeeData.profileImage)
+          setProfileImage(employeeData.profileImage);
         }
 
-        // FIXED: Pre-populate file IDs from existing employee data
         if (employeeData.fileIds) {
           setUploadedFileIds({
             profileImage: employeeData.fileIds.profileImage || null,
@@ -1084,241 +1138,329 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
             qualifications: employeeData.fileIds.qualifications || {},
             experiences: employeeData.fileIds.experiences || {},
             kidsAadhaar: employeeData.fileIds.kidsAadhaar || {},
-          })
+          });
         }
 
         // Reset changes flag
-        setHasChanges(false)
+        setHasChanges(false);
       } catch (error) {
-        console.error("Error pre-populating form data:", error)
-        showMessage("Error loading employee data. Some fields may not display correctly.", "error")
+        console.error("Error pre-populating form data:", error);
+        showMessage("Error loading employee data. Some fields may not display correctly.", "error");
       }
     }
-  }, [isEditing, employeeData])
+  }, [isEditing, employeeData]);
 
-  // Track changes in form data
   const trackChanges = () => {
     if (isEditing) {
-      setHasChanges(true)
+      setHasChanges(true);
     }
-  }
+  };
 
-  // Fetch roles with caching
   useEffect(() => {
     const fetchRoles = async () => {
-      const cacheKey = "roles_data"
-      const cachedRoles = getCachedData(cacheKey)
+      const cacheKey = "roles_data";
+      const cachedRoles = getCachedData(cacheKey);
       if (cachedRoles) {
-        setPrimaryRoleOptions(cachedRoles)
-        setAdditionalRoleOptions(cachedRoles)
-        return
+        setPrimaryRoleOptions(cachedRoles);
+        setAdditionalRoleOptions(cachedRoles);
+        return;
       }
-      const result = await apiRequest(GlobalBaseUrl + "getprimaryandadditionalrole/")
+      const result = await apiRequest(GlobalBaseUrl + "getprimaryandadditionalrole/");
       if (result.success) {
-        const roles = result.data.designations || []
-        const activeRoles = roles.filter((role) => role.is_active === true)
-        setPrimaryRoleOptions(activeRoles)
-        setAdditionalRoleOptions(activeRoles)
-        setCachedData(cacheKey, activeRoles)
+        const roles = result.data.designations || [];
+        const activeRoles = roles.filter((role) => role.is_active === true);
+        setPrimaryRoleOptions(activeRoles);
+        setAdditionalRoleOptions(activeRoles);
+        setCachedData(cacheKey, activeRoles);
       } else {
-        showMessage("Error fetching roles: " + result.error, "error")
+        showMessage("Error fetching roles: " + result.error, "error");
         if (result.status === 401) {
-          showMessage("Your session has expired. Please log in again.", "error")
+          showMessage("Your session has expired. Please log in again.", "error");
         }
       }
-    }
-    fetchRoles()
-  }, [])
+    };
+    fetchRoles();
+  }, []);
 
-  // Message management
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      const cacheKey = "departments_data";
+      const cachedDepartments = getCachedData(cacheKey);
+      if (cachedDepartments) {
+        setDepartmentsData(cachedDepartments);
+        return;
+      }
+      const result = await apiRequest(GlobalBaseUrl + "get_data_departments/");
+      if (result.success) {
+        const allDepartments = result.data.departments;
+        const activeDepartments = allDepartments.filter((item) => item.is_active);
+        setDepartmentsData(activeDepartments);
+        setCachedData(cacheKey, activeDepartments);
+      } else {
+        showMessage("Error fetching departments: " + result.error, "error");
+        if (result.status === 401) {
+          showMessage("Your session has expired. Please log in again.", "error");
+        }
+      }
+    };
+    fetchDepartments();
+  }, []);
+
+  useEffect(() => {
+    const fetchDesignations = async () => {
+      const cacheKey = "designations_data";
+      const cachedDesignations = getCachedData(cacheKey);
+      if (cachedDesignations) {
+        setDesignationsData(cachedDesignations);
+        return;
+      }
+      const result = await apiRequest(GlobalBaseUrl + "get_data_designation/");
+      if (result.success) {
+        const data = result.data.designations;
+        const activeDesignations = data.filter((item) => item.is_active);
+        setDesignationsData(activeDesignations);
+        setCachedData(cacheKey, activeDesignations);
+      } else {
+        showMessage("Error fetching designations: " + result.error, "error");
+        if (result.status === 401) {
+          showMessage("Your session has expired. Please log in again.", "error");
+        }
+      }
+    };
+    fetchDesignations();
+  }, []);
+
+  useEffect(() => {
+    const fetchDataEntitlements = async () => {
+      const cacheKey = "data_entitlements";
+      const cachedEntitlements = getCachedData(cacheKey);
+      if (cachedEntitlements) {
+        setDataEntitlementOptions(cachedEntitlements);
+        return;
+      }
+      const result = await apiRequest(`${GlobalBaseUrl}data-entitlements/`);
+      if (result.success) {
+        setDataEntitlementOptions(result.data.dataEntitlements);
+        setCachedData(cacheKey, result.data.dataEntitlements);
+      } else {
+        showMessage("Error fetching data entitlements: " + result.error, "error");
+        if (result.status === 401) {
+          showMessage("Your session has expired. Please log in again.", "error");
+        }
+      }
+    };
+    fetchDataEntitlements();
+  }, []);
+
   const showMessage = (text, type = "success") => {
-    const id = Date.now()
-    const newMessage = { id, text, type }
-    setMessages((prev) => [...prev, newMessage])
+    const id = Date.now();
+    const newMessage = { id, text, type };
+    setMessages((prev) => [...prev, newMessage]);
     setTimeout(() => {
-      setMessages((prev) => prev.filter((msg) => msg.id !== id))
-    }, 5000)
-  }
+      setMessages((prev) => prev.filter((msg) => msg.id !== id));
+    }, 5000);
+  };
 
   const removeMessage = (id) => {
-    setMessages((prev) => prev.filter((msg) => msg.id !== id))
-  }
+    setMessages((prev) => prev.filter((msg) => msg.id !== id));
+  };
 
-  // Handle primary role change
   const handlePrimaryRoleChange = (e) => {
-    const selectedRoleCode = e.target.value
-    const roleObj = primaryRoleOptions.find((role) => role.role_code === selectedRoleCode)
+    const selectedRoleCode = e.target.value;
+    const roleObj = primaryRoleOptions.find((role) => role.role_code === selectedRoleCode);
     if (roleObj) {
       setFormData((prev) => ({
         ...prev,
         primaryRole: roleObj.role_code,
         primaryRoleName: roleObj.role_name,
-      }))
-      trackChanges()
+      }));
+      trackChanges();
     }
-  }
+  };
 
-  // Handle additional role selection
   const handleAdditionalRoleToggle = (roleCode, roleName) => {
     setFormData((prev) => {
-      const isSelected = prev.additionalRoles.includes(roleCode)
+      const isSelected = prev.additionalRoles.includes(roleCode);
       if (isSelected) {
         return {
           ...prev,
           additionalRoles: prev.additionalRoles.filter((code) => code !== roleCode),
           additionalRoleNames: prev.additionalRoleNames.filter((name) => name !== roleName),
-        }
+        };
       } else {
         return {
           ...prev,
           additionalRoles: [...prev.additionalRoles, roleCode],
           additionalRoleNames: [...prev.additionalRoleNames, roleName],
-        }
+        };
       }
-    })
-    trackChanges()
-  }
+    });
+    trackChanges();
+  };
 
-  // Remove additional role
   const handleRemoveAdditionalRole = (roleName) => {
-    const roleObj = additionalRoleOptions.find((role) => role.role_name === roleName)
+    const roleObj = additionalRoleOptions.find((role) => role.role_name === roleName);
     if (roleObj) {
       setFormData((prev) => ({
         ...prev,
         additionalRoles: prev.additionalRoles.filter((code) => code !== roleObj.role_code),
         additionalRoleNames: prev.additionalRoleNames.filter((name) => name !== roleName),
-      }))
-      trackChanges()
+      }));
+      trackChanges();
     }
-  }
+  };
+
+  const handleDataEntitlementToggle = (entitlementCode, entitlementName) => {
+    setFormData((prev) => {
+      const isSelected = prev.dataEntitlements.includes(entitlementCode);
+      if (isSelected) {
+        return {
+          ...prev,
+          dataEntitlements: prev.dataEntitlements.filter((code) => code !== entitlementCode),
+          dataEntitlementNames: prev.dataEntitlementNames.filter((name) => name !== entitlementName),
+        };
+      } else {
+        return {
+          ...prev,
+          dataEntitlements: [...prev.dataEntitlements, entitlementCode],
+          dataEntitlementNames: [...prev.dataEntitlementNames, entitlementName],
+        };
+      }
+    });
+    trackChanges();
+  };
+
+  const handleRemoveDataEntitlement = (entitlementName) => {
+    const entitlementObj = dataEntitlementOptions.find((ent) => ent.DataEntitlements === entitlementName);
+    if (entitlementObj) {
+      setFormData((prev) => ({
+        ...prev,
+        dataEntitlements: prev.dataEntitlements.filter((code) => code !== entitlementObj.DataEntitlementsCode),
+        dataEntitlementNames: prev.dataEntitlementNames.filter((name) => name !== entitlementName),
+      }));
+      trackChanges();
+    }
+  };
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
-    }))
-    trackChanges()
-  }
+    }));
+    trackChanges();
+  };
 
   const handleDateChange = (date, field) => {
     setFormData((prevData) => ({
       ...prevData,
       [field]: date ? moment(date).format("YYYY-MM-DD") : null,
-    }))
-    trackChanges()
-  }
+    }));
+    trackChanges();
+  };
 
   const handleBankDetailsChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setBankDetails((prevData) => ({
       ...prevData,
       [name]: value,
-    }))
-    trackChanges()
-  }
+    }));
+    trackChanges();
+  };
 
-  // FIXED: Enhanced KYC Details handlers with UAN number
   const handleKycChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setKycDetails((prev) => ({
       ...prev,
       [name]: value,
-    }))
-    trackChanges()
-  }
+    }));
+    trackChanges();
+  };
 
-  // FIXED: KYC file upload with proper file ID caching
   const handleKycFileUpload = async (e, fileType) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setLoading(true)
-      const uploadResult = await uploadToGridFS(file, `kyc_${fileType}`)
+      setIsUploading(true);
+      const uploadResult = await uploadToGridFS(file, `kyc_${fileType}`);
       if (uploadResult.success) {
-        // Store file ID in the uploadedFileIds state - FIXED
         setUploadedFileIds((prev) => ({
           ...prev,
           [fileType]: uploadResult.fileId,
-        }))
-        showMessage(`${fileType.toUpperCase()} uploaded successfully`, "success")
-        trackChanges()
+        }));
+        showMessage(`${fileType.toUpperCase()} uploaded successfully`, "success");
+        trackChanges();
       } else {
-        showMessage(`Failed to upload ${fileType}: ${uploadResult.error}`, "error")
+        showMessage(`Failed to upload ${fileType}: ${uploadResult.error}`, "error");
       }
-      setLoading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
-  // FIXED: Enhanced Family Details handlers with name fields
   const handleFamilyChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFamilyDetails((prev) => ({
       ...prev,
       [name]: value,
-    }))
-    trackChanges()
-  }
+    }));
+    trackChanges();
+  };
 
   const handleFamilyDateChange = (date, field) => {
     setFamilyDetails((prev) => ({
       ...prev,
       [field]: date,
-    }))
-    trackChanges()
-  }
+    }));
+    trackChanges();
+  };
 
-  // FIXED: Family member Aadhaar uploads with proper file ID caching
   const handleFamilyAadhaarUpload = async (e, memberType) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setLoading(true)
-      const uploadResult = await uploadToGridFS(file, `family_${memberType}_aadhaar`)
+      setIsUploading(true);
+      const uploadResult = await uploadToGridFS(file, `family_${memberType}_aadhaar`);
       if (uploadResult.success) {
-        // Store file ID in the uploadedFileIds state - FIXED
         setUploadedFileIds((prev) => ({
           ...prev,
           [`${memberType}Aadhaar`]: uploadResult.fileId,
-        }))
-        showMessage(`${memberType}'s Aadhaar uploaded successfully`, "success")
-        trackChanges()
+        }));
+        showMessage(`${memberType}'s Aadhaar uploaded successfully`, "success");
+        trackChanges();
       } else {
-        showMessage(`Failed to upload ${memberType}'s Aadhaar: ${uploadResult.error}`, "error")
+        showMessage(`Failed to upload ${memberType}'s Aadhaar: ${uploadResult.error}`, "error");
       }
-      setLoading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   const handleKidsChange = (index, field, value) => {
     setFamilyDetails((prev) => ({
       ...prev,
       kidsDetails: prev.kidsDetails.map((kid, i) => (i === index ? { ...kid, [field]: value } : kid)),
-    }))
-    trackChanges()
-  }
+    }));
+    trackChanges();
+  };
 
-  // FIXED: Kids Aadhaar uploads with proper file ID caching
   const handleKidsAadhaarUpload = async (e, index) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setLoading(true)
-      const uploadResult = await uploadToGridFS(file, `family_kid_${index}_aadhaar`)
+      setIsUploading(true);
+      const uploadResult = await uploadToGridFS(file, `family_kid_${index}_aadhaar`);
       if (uploadResult.success) {
-        // Store file ID in the uploadedFileIds state - FIXED
         setUploadedFileIds((prev) => ({
           ...prev,
           kidsAadhaar: {
             ...prev.kidsAadhaar,
             [index]: uploadResult.fileId,
           },
-        }))
-        showMessage(`Child's Aadhaar uploaded successfully`, "success")
-        trackChanges()
+        }));
+        showMessage(`Child's Aadhaar uploaded successfully`, "success");
+        trackChanges();
       } else {
-        showMessage(`Failed to upload child's Aadhaar: ${uploadResult.error}`, "error")
+        showMessage(`Failed to upload child's Aadhaar: ${uploadResult.error}`, "error");
       }
-      setLoading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   const addKid = () => {
     setFamilyDetails((prev) => ({
@@ -1331,89 +1473,84 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
           dob: null,
         },
       ],
-    }))
-    trackChanges()
-  }
+    }));
+    trackChanges();
+  };
 
   const removeKid = (index) => {
     if (familyDetails.kidsDetails.length > 1) {
       setFamilyDetails((prev) => ({
         ...prev,
         kidsDetails: prev.kidsDetails.filter((_, i) => i !== index),
-      }))
-      // Remove the file ID from cache as well
+      }));
       setUploadedFileIds((prev) => {
-        const newKidsAadhaar = { ...prev.kidsAadhaar }
-        delete newKidsAadhaar[index]
+        const newKidsAadhaar = { ...prev.kidsAadhaar };
+        delete newKidsAadhaar[index];
         return {
           ...prev,
           kidsAadhaar: newKidsAadhaar,
-        }
-      })
-      trackChanges()
+        };
+      });
+      trackChanges();
     }
-  }
+  };
 
-  // Salary Details handlers
   const handleSalaryChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setSalaryDetails((prev) => ({
       ...prev,
       [name]: value,
-    }))
-    trackChanges()
-  }
+    }));
+    trackChanges();
+  };
 
-  // FNF Status handlers
   const handleFnfChange = (e) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFnfStatus((prev) => ({
       ...prev,
       [name]: value,
-    }))
-    trackChanges()
-  }
+    }));
+    trackChanges();
+  };
 
   const handleQualificationChange = (id, field, value) => {
     setQualifications((prevQualifications) =>
       prevQualifications.map((qual) => (qual.id === id ? { ...qual, [field]: value } : qual)),
-    )
-    trackChanges()
-  }
+    );
+    trackChanges();
+  };
 
   const handleQualificationDateChange = (date, id, field) => {
     setQualifications((prevQualifications) =>
       prevQualifications.map((qual) => (qual.id === id ? { ...qual, [field]: date } : qual)),
-    )
-    trackChanges()
-  }
+    );
+    trackChanges();
+  };
 
-  // FIXED: Qualification file upload with proper file ID caching
   const handleQualificationFileUpload = async (e, id) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setLoading(true)
-      const uploadResult = await uploadToGridFS(file, `qualification_certificate`)
+      setIsUploading(true);
+      const uploadResult = await uploadToGridFS(file, `qualification_certificate`);
       if (uploadResult.success) {
-        // Store file ID in the uploadedFileIds state - FIXED
         setUploadedFileIds((prev) => ({
           ...prev,
           qualifications: {
             ...prev.qualifications,
             [id]: uploadResult.fileId,
           },
-        }))
-        showMessage("Qualification certificate uploaded successfully", "success")
-        trackChanges()
+        }));
+        showMessage("Qualification certificate uploaded successfully", "success");
+        trackChanges();
       } else {
-        showMessage(`Failed to upload certificate: ${uploadResult.error}`, "error")
+        showMessage(`Failed to upload certificate: ${uploadResult.error}`, "error");
       }
-      setLoading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   const addQualification = () => {
-    const newId = qualifications.length > 0 ? Math.max(...qualifications.map((q) => q.id)) + 1 : 1
+    const newId = qualifications.length > 0 ? Math.max(...qualifications.map((q) => q.id)) + 1 : 1;
     setQualifications([
       ...qualifications,
       {
@@ -1425,40 +1562,61 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         fromDate: null,
         toDate: null,
       },
-    ])
-    trackChanges()
-  }
+    ]);
+    trackChanges();
+  };
 
   const removeQualification = (id) => {
     if (qualifications.length > 1) {
-      setQualifications(qualifications.filter((qual) => qual.id !== id))
-      // Remove the file ID from cache as well
+      setQualifications(qualifications.filter((qual) => qual.id !== id));
       setUploadedFileIds((prev) => {
-        const newQualifications = { ...prev.qualifications }
-        delete newQualifications[id]
+        const newQualifications = { ...prev.qualifications };
+        delete newQualifications[id];
         return {
           ...prev,
           qualifications: newQualifications,
-        }
-      })
-      trackChanges()
+        };
+      });
+      trackChanges();
     }
-  }
+  };
 
   const handleExperienceChange = (id, field, value) => {
     setExperiences((prevExperiences) =>
       prevExperiences.map((exp) => (exp.id === id ? { ...exp, [field]: value } : exp)),
-    )
-    trackChanges()
-  }
+    );
+    trackChanges();
+  };
 
   const handleExperienceDateChange = (date, id, field) => {
-    setExperiences((prevExperiences) => prevExperiences.map((exp) => (exp.id === id ? { ...exp, [field]: date } : exp)))
-    trackChanges()
-  }
+    setExperiences((prevExperiences) => prevExperiences.map((exp) => (exp.id === id ? { ...exp, [field]: date } : exp)));
+    trackChanges();
+  };
+
+  const handleCertificateUpload = async (e, id) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      const uploadResult = await uploadToGridFS(file, `experience_certificate`);
+      if (uploadResult.success) {
+        setUploadedFileIds((prev) => ({
+          ...prev,
+          experiences: {
+            ...prev.experiences,
+            [id]: uploadResult.fileId,
+          },
+        }));
+        showMessage("Experience certificate uploaded successfully", "success");
+        trackChanges();
+      } else {
+        showMessage(`Failed to upload certificate: ${uploadResult.error}`, "error");
+      }
+      setIsUploading(false);
+    }
+  };
 
   const addExperience = () => {
-    const newId = experiences.length > 0 ? Math.max(...experiences.map((e) => e.id)) + 1 : 1
+    const newId = experiences.length > 0 ? Math.max(...experiences.map((e) => e.id)) + 1 : 1;
     setExperiences([
       ...experiences,
       {
@@ -1469,227 +1627,320 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         fromDate: null,
         toDate: null,
       },
-    ])
-    trackChanges()
-  }
+    ]);
+    trackChanges();
+  };
 
   const removeExperience = (id) => {
     if (experiences.length > 1) {
-      setExperiences(experiences.filter((exp) => exp.id !== id))
-      // Remove the file ID from cache as well
+      setExperiences(experiences.filter((exp) => exp.id !== id));
       setUploadedFileIds((prev) => {
-        const newExperiences = { ...prev.experiences }
-        delete newExperiences[id]
+        const newExperiences = { ...prev.experiences };
+        delete newExperiences[id];
         return {
           ...prev,
           experiences: newExperiences,
-        }
-      })
-      trackChanges()
+        };
+      });
+      trackChanges();
     }
-  }
+  };
 
-  // FIXED: Experience certificate upload with proper file ID caching
-  const handleCertificateUpload = async (e, id) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setLoading(true)
-      const uploadResult = await uploadToGridFS(file, `experience_certificate`)
-      if (uploadResult.success) {
-        // Store file ID in the uploadedFileIds state - FIXED
-        setUploadedFileIds((prev) => ({
-          ...prev,
-          experiences: {
-            ...prev.experiences,
-            [id]: uploadResult.fileId,
-          },
-        }))
-        showMessage("Experience certificate uploaded successfully", "success")
-        trackChanges()
-      } else {
-        showMessage(`Failed to upload certificate: ${uploadResult.error}`, "error")
-      }
-      setLoading(false)
-    }
-  }
-
-  // FIXED: Profile image upload with proper file ID caching
   const handleProfileImageUpload = async (e) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setLoading(true)
-      const uploadResult = await uploadToGridFS(file, "profile_image")
+      setIsUploading(true);
+      const uploadResult = await uploadToGridFS(file, "profile_image");
       if (uploadResult.success) {
-        const reader = new FileReader()
+        const reader = new FileReader();
         reader.onloadend = () => {
-          setProfileImage(reader.result)
-        }
-        reader.readAsDataURL(file)
-        // Store file ID in the uploadedFileIds state - FIXED
+          setProfileImage(reader.result);
+        };
+        reader.readAsDataURL(file);
         setUploadedFileIds((prev) => ({
           ...prev,
           profileImage: uploadResult.fileId,
-        }))
-        showMessage("Profile image uploaded successfully", "success")
-        trackChanges()
+        }));
+        showMessage("Profile image uploaded successfully", "success");
+        trackChanges();
       } else {
-        showMessage(`Failed to upload profile image: ${uploadResult.error}`, "error")
+        showMessage(`Failed to upload profile image: ${uploadResult.error}`, "error");
       }
-      setLoading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   const triggerFileInput = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.click()
+      fileInputRef.current.click();
     }
-  }
+  };
+const [departmentModalData1, setDepartmentModalData1] = useState({
+  department_code: "",
+});
+// --- Common fetch function ---
+const fetchNextCode = async (type) => {
+  try {
+    const endpoint =
+      type === "department"
+        ? "get_next_department_code/"
+        : "get_next_designation_code/";
 
-  const [dataEntitlementOptions, setDataEntitlementOptions] = useState([])
+    const result = await apiRequest(`${GlobalBaseUrl}${endpoint}`, "GET");
+    console.log("Raw API result:", result);
 
-  useEffect(() => {
-    const fetchDataEntitlements = async () => {
-      const cacheKey = "data_entitlements"
-      const cachedEntitlements = getCachedData(cacheKey)
-      if (cachedEntitlements) {
-        setDataEntitlementOptions(cachedEntitlements)
-        return
-      }
-      const result = await apiRequest(`${GlobalBaseUrl}data-entitlements/`)
-      if (result.success) {
-        setDataEntitlementOptions(result.data.dataEntitlements)
-        setCachedData(cacheKey, result.data.dataEntitlements)
-      } else {
-        showMessage("Error fetching data entitlements: " + result.error, "error")
-        if (result.status === 401) {
-          showMessage("Your session has expired. Please log in again.", "error")
-        }
-      }
+    const key =
+      type === "department" ? "department_code" : "Designation_code";
+
+    // ✅ handle nested data structure safely
+    const value = result?.data?.data?.[key];
+
+    if (result.success && value) {
+      return value;
     }
-    fetchDataEntitlements()
-  }, [])
 
-  // Handle data entitlement selection
-  const handleDataEntitlementToggle = (entitlementCode, entitlementName) => {
-    setFormData((prev) => {
-      const isSelected = prev.dataEntitlements.includes(entitlementCode)
-      if (isSelected) {
-        return {
-          ...prev,
-          dataEntitlements: prev.dataEntitlements.filter((code) => code !== entitlementCode),
-          dataEntitlementNames: prev.dataEntitlementNames.filter((name) => name !== entitlementName),
-        }
-      } else {
-        return {
-          ...prev,
-          dataEntitlements: [...prev.dataEntitlements, entitlementCode],
-          dataEntitlementNames: [...prev.dataEntitlementNames, entitlementName],
-        }
-      }
-    })
-    trackChanges()
+    throw new Error(`No ${type} code returned`);
+  } catch (err) {
+    console.error(`Error fetching next ${type} code:`, err);
+    showMessage(
+      `Failed to fetch next ${type} code. Please try again.`,
+      "error"
+    );
+    return null;
   }
+};
 
-  // Remove data entitlement
-  const handleRemoveDataEntitlement = (entitlementName) => {
-    const entitlementObj = dataEntitlementOptions.find((ent) => ent.DataEntitlements === entitlementName)
-    if (entitlementObj) {
-      setFormData((prev) => ({
+
+
+// when modal opens, fetch and set code
+useEffect(() => {
+  const loadNextCode = async () => {
+    const nextCode = await fetchNextCode("department");
+    if (nextCode) {
+      setDepartmentModalData1((prev) => ({
         ...prev,
-        dataEntitlements: prev.dataEntitlements.filter((code) => code !== entitlementObj.DataEntitlementsCode),
-        dataEntitlementNames: prev.dataEntitlementNames.filter((name) => name !== entitlementName),
-      }))
-      trackChanges()
+        department_code: nextCode,
+      }));
     }
+  };
+
+  loadNextCode();
+}, []); // 👈 run only once when modal mounts (or change dependency if needed)
+
+// --- Open Department Modal ---
+const openDepartmentModal = async () => {
+  setDepartmentModalLoading(true);
+  const nextCode = await fetchNextCode("department");
+
+  setDepartmentModalData({
+    code: nextCode,
+    name: "",
+    description: "",
+  });
+console.log("hhh",departmentModalData)
+  setDepartmentModalError(nextCode ? "" : "Failed to fetch next department code");
+  setDepartmentModalLoading(false);
+  setShowDepartmentModal(true);
+};
+
+// --- Open Designation Modal ---
+const openDesignationModal = async () => {
+  setDesignationModalLoading(true);
+  const nextCode = await fetchNextCode("designation");
+
+  setDesignationModalData({
+    code: nextCode,
+    name: "",
+    description: "",
+  });
+
+  setDesignationModalError(nextCode ? "" : "Failed to fetch next designation code");
+  setDesignationModalLoading(false);
+  setShowDesignationModal(true);
+};
+
+
+// Department Submit
+const handleDepartmentModalSubmit = async (e) => {
+  e.preventDefault();
+  if (!departmentModalData.name.trim()) {
+    setDepartmentModalError("Please enter a department name");
+    return;
   }
 
-  const [departmentsData, setDepartmentsData] = useState([])
+  setDepartmentModalLoading(true);
+  setDepartmentModalError("");
 
-  // Update the department handling with caching
-  useEffect(() => {
-    const fetchDepartments = async () => {
-      const cacheKey = "departments_data"
-      const cachedDepartments = getCachedData(cacheKey)
-      if (cachedDepartments) {
-        setDepartmentsData(cachedDepartments)
-        return
-      }
-      const result = await apiRequest(GlobalBaseUrl + "get_data_departments/")
-      if (result.success) {
-        const allDepartments = result.data.departments
-        const activeDepartments = allDepartments.filter((item) => item.is_active)
-        setDepartmentsData(activeDepartments)
-        setCachedData(cacheKey, activeDepartments)
-      } else {
-        showMessage("Error fetching departments: " + result.error, "error")
-        if (result.status === 401) {
-          showMessage("Your session has expired. Please log in again.", "error")
-        }
-      }
-    }
-    fetchDepartments()
-  }, [])
+  try {
+    const payload = {
+      department_code: departmentModalData1.department_code,
+      department_name: departmentModalData.name.trim(),
+      description: departmentModalData.description.trim() || departmentModalData.name.trim(),
+      is_active: true,
+      created_by: "system",
+      lastmodified_by: "system",
+    };
 
-  // Update department change handler
-  const handleDepartmentChange = (e) => {
-    const selectedDept = departmentsData.find((dept) => dept.department_code === e.target.value)
-    setFormData((prev) => ({
-      ...prev,
-      department: selectedDept.department_code,
-      departmentName: selectedDept.department_name,
-    }))
-    trackChanges()
+    const result = await apiRequest(`${GlobalBaseUrl}addnew_department/`, "POST", payload);
+
+if (result.success) {
+  // ✅ Manually refresh list after adding
+  const refreshed = await apiRequest(GlobalBaseUrl + "get_data_departments/");
+  if (refreshed.success) {
+    const activeDepartments = refreshed.data.departments.filter((item) => item.is_active);
+    setDepartmentsData(activeDepartments);
+    setCachedData("departments_data", activeDepartments);
   }
 
-  const [designationsData, setDesignationsData] = useState([])
+  // ✅ Auto-select the new department
+  setFormData((prev) => ({
+    ...prev,
+    department: result.data.department_code,
+    departmentName: result.data.department_name,
+  }));
 
-  // Update designation handling with caching
-  useEffect(() => {
-    const fetchDesignations = async () => {
-      const cacheKey = "designations_data"
-      const cachedDesignations = getCachedData(cacheKey)
-      if (cachedDesignations) {
-        setDesignationsData(cachedDesignations)
-        return
-      }
-      const result = await apiRequest(GlobalBaseUrl + "get_data_designation/")
-      if (result.success) {
-        const data = result.data.designations
-        const activeDesignations = data.filter((item) => item.is_active)
-        setDesignationsData(activeDesignations)
-        setCachedData(cacheKey, activeDesignations)
-      } else {
-        showMessage("Error fetching designations: " + result.error, "error")
-        if (result.status === 401) {
-          showMessage("Your session has expired. Please log in again.", "error")
-        }
-      }
-    }
-    fetchDesignations()
-  }, [])
-
-  // Update designation change handler
-  const handleDesignationChange = (e) => {
-    const selectedDesig = designationsData.find((desig) => desig.Designation_code === e.target.value)
-    setFormData((prev) => ({
-      ...prev,
-      designation: selectedDesig.Designation_code,
-      designationName: selectedDesig.designation,
-    }))
-    trackChanges()
+  // ✅ Fetch next department_code again (refresh like your useEffect)
+  const nextCode = await fetchNextCode("department");
+  if (nextCode) {
+    setDepartmentModalData1({ department_code: nextCode });
   }
+
+  setShowDepartmentModal(false);
+  setDepartmentModalData({ code: "", name: "", description: "" });
+  setHasChanges(true);
+
+  showMessage("✅ Department added successfully", "success");
+}
+ else {
+      setDepartmentModalError(`Failed to add department: ${result.error}`);
+    }
+  } catch (err) {
+    console.error("Error adding department:", err);
+    setDepartmentModalError("An unexpected error occurred while adding department");
+  } finally {
+    setDepartmentModalLoading(false);
+  }
+};
+
+// state for designation modal
+const [designationModalData1, setDesignationModalData1] = useState({
+  code: "",
+  name: "",
+  description: "",
+});
+
+// when modal opens, fetch next designation code
+useEffect(() => {
+  const loadNextCode = async () => {
+    const nextCode = await fetchNextCode("designation");
+    if (nextCode) {
+      setDesignationModalData1((prev) => ({
+        ...prev,
+        designation_code: nextCode,  // ✅ matches backend key
+      }));
+    }
+  };
+
+  loadNextCode();
+}, []);
+ // 👈 only runs once when component mounts
+
+
+// Designation Submit
+const handleDesignationModalSubmit = async (e) => {
+  e.preventDefault();
+  if (!designationModalData.name.trim()) {
+    setDesignationModalError("Please enter a designation name");
+    return;
+  }
+
+  setDesignationModalLoading(true);
+  setDesignationModalError("");
+
+  try {
+    const payload = {
+      Designation_code: designationModalData.code, // ✅ use only "Designation_code"
+      designation: designationModalData.name.trim(),
+      description: designationModalData.description.trim() || designationModalData.name.trim(),
+      is_active: true,
+      created_by: "system",
+      lastmodified_by: "system",
+    };
+
+    const result = await apiRequest(`${GlobalBaseUrl}addnew_designation/`, "POST", payload);
+
+if (result.success) {
+  const refreshed = await apiRequest(GlobalBaseUrl + "get_data_designation/");
+  if (refreshed.success) {
+    const activeDesignations = refreshed.data.designations.filter((item) => item.is_active);
+    setDesignationsData(activeDesignations);
+    setCachedData("designations_data", activeDesignations);
+  }
+
+  setFormData((prev) => ({
+    ...prev,
+    designation: result.data.Designation_code,
+    designationName: result.data.designation,
+  }));
+
+  // ✅ Fetch next designation_code again
+  const nextCode = await fetchNextCode("designation");
+  if (nextCode) {
+    setDesignationModalData1({ designation_code: nextCode });
+  }
+
+  setShowDesignationModal(false);
+  setDesignationModalData({ code: "", name: "", description: "" });
+  setHasChanges(true);
+
+  showMessage("✅ Designation added successfully", "success");
+}
+else {
+      setDesignationModalError(`Failed to add designation: ${result.error}`);
+    }
+  } catch (err) {
+    console.error("Error adding designation:", err);
+    setDesignationModalError("An unexpected error occurred while adding designation");
+  } finally {
+    setDesignationModalLoading(false);
+  }
+};
+
+
+// Department Change
+const handleDepartmentChange = (e) => {
+  const selectedDept = departmentsData.find(
+    (dept) => dept.department_code === e.target.value
+  );
+  setFormData((prev) => ({
+    ...prev,
+    department: selectedDept?.department_code || "",
+    departmentName: selectedDept?.department_name || "",
+  }));
+  trackChanges();
+};
+
+// Designation Change
+const handleDesignationChange = (e) => {
+  const selectedDesig = designationsData.find(
+    (desig) => desig.Designation_code === e.target.value // ✅ lowercase
+  );
+  setFormData((prev) => ({
+    ...prev,
+    designation: selectedDesig?.Designation_code || "",
+    designationName: selectedDesig?.designation || "",
+  }));
+  trackChanges();
+};
 
   const handleSubmit = (e) => {
-    e.preventDefault()
-    // Prevent default form submission - only save on button click
-  }
+    e.preventDefault();
+  };
 
-  // FIXED: Submit profile with proper edit/create handling and file ID persistence
   const submitProfile = async () => {
-    if (loading || saving) return
-    setLoading(true)
+    if (isUploading || isSubmitting || saving) return;
+    setIsSubmitting(true);
     try {
-      // Validate required fields
       const requiredFields = [
         "employeeId",
         "employeeName",
@@ -1699,40 +1950,44 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         "mobileNumber",
         "department",
         "designation",
-      ]
-      const missingFields = requiredFields.filter((field) => !formData[field])
+        "aadhaarNumber",
+        "bankName",
+        "ifscCode",
+        "accountNumber",
+      ];
+      const missingFields = requiredFields.filter((field) => {
+        if (field in formData) return !formData[field];
+        if (field in kycDetails) return !kycDetails[field];
+        if (field in bankDetails) return !bankDetails[field];
+        return false;
+      });
       if (missingFields.length > 0) {
-        showMessage(`Please fill in required fields: ${missingFields.join(", ")}`, "error")
-        setLoading(false)
-        return
+        showMessage(`Please fill in required fields: ${missingFields.join(", ")}`, "error");
+        setIsSubmitting(false);
+        return;
       }
 
-      // Prepare qualifications with file IDs
       const qualificationsWithFileIds = qualifications.map((q) => ({
         ...q,
         fromDate: q.fromDate ? moment(q.fromDate).format("YYYY-MM-DD") : null,
         toDate: q.toDate ? moment(q.toDate).format("YYYY-MM-DD") : null,
         certificateFileId: uploadedFileIds.qualifications[q.id] || null,
-      }))
+      }));
 
-      // Prepare experiences with file IDs
       const experiencesWithFileIds = experiences.map((e) => ({
         ...e,
         fromDate: e.fromDate ? moment(e.fromDate).format("YYYY-MM-DD") : null,
         toDate: e.toDate ? moment(e.toDate).format("YYYY-MM-DD") : null,
         certificateFileId: uploadedFileIds.experiences[e.id] || null,
-      }))
+      }));
 
-      // Prepare kids details with file IDs
       const kidsWithFileIds = familyDetails.kidsDetails.map((kid, index) => ({
         ...kid,
         dob: kid.dob ? moment(kid.dob).format("YYYY-MM-DD") : null,
         aadhaarFileId: uploadedFileIds.kidsAadhaar[index] || null,
-      }))
+      }));
 
-      // Prepare the payload with proper field names matching backend expectations
       const profileData = {
-        // Basic employee info
         employeeId: formData.employeeId,
         employeeName: formData.employeeName,
         fatherName: formData.fatherName,
@@ -1752,72 +2007,102 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         employmentStatus: formData.employmentStatus,
         registrationNumber: formData.registrationNumber,
         validityDate: formData.validityDate,
-        // Profile image file ID
         profileImage: uploadedFileIds.profileImage,
-        // FIXED: KYC details with UAN number and proper field names
         kyc_aadhaarNumber: kycDetails.aadhaarNumber,
         kyc_panNumber: kycDetails.panNumber,
         kyc_panType: kycDetails.panType,
-        kyc_uanNumber: kycDetails.uanNumber, // ADDED UAN NUMBER
-        kyc_aadhaarFileId: uploadedFileIds.aadhaar, // FIXED: File ID persistence
-        kyc_panFileId: uploadedFileIds.pan, // FIXED: File ID persistence
-        // FIXED: Family details with name fields and proper field names
-        family_fatherName: familyDetails.fatherName, // ADDED NAME FIELD
+        kyc_uanNumber: kycDetails.uanNumber,
+        kyc_aadhaarFileId: uploadedFileIds.aadhaar,
+        kyc_panFileId: uploadedFileIds.pan,
+        family_fatherName: familyDetails.fatherName,
         family_fatherAadhaar: familyDetails.fatherAadhaar,
         family_fatherDob: familyDetails.fatherDob ? moment(familyDetails.fatherDob).format("YYYY-MM-DD") : null,
-        family_fatherAadhaarFileId: uploadedFileIds.fatherAadhaar, // FIXED: File ID persistence
-        family_motherName: familyDetails.motherName, // ADDED NAME FIELD
+        family_fatherAadhaarFileId: uploadedFileIds.fatherAadhaar,
+        family_motherName: familyDetails.motherName,
         family_motherAadhaar: familyDetails.motherAadhaar,
         family_motherDob: familyDetails.motherDob ? moment(familyDetails.motherDob).format("YYYY-MM-DD") : null,
-        family_motherAadhaarFileId: uploadedFileIds.motherAadhaar, // FIXED: File ID persistence
+        family_motherAadhaarFileId: uploadedFileIds.motherAadhaar,
         family_spouseName: familyDetails.spouseName,
         family_spouseAadhaar: familyDetails.spouseAadhaar,
         family_spouseDob: familyDetails.spouseDob ? moment(familyDetails.spouseDob).format("YYYY-MM-DD") : null,
-        family_spouseAadhaarFileId: uploadedFileIds.spouseAadhaar, // FIXED: File ID persistence
-        // Bank details with proper field names
+        family_spouseAadhaarFileId: uploadedFileIds.spouseAadhaar,
         bank_bankName: bankDetails.bankName,
         bank_ifscCode: bankDetails.ifscCode,
         bank_accountNumber: bankDetails.accountNumber,
         bank_branch: bankDetails.branch,
-        // Salary details with proper field names
         salary_netSalary: salaryDetails.netSalary,
         salary_grossSalary: salaryDetails.grossSalary,
         salary_ctc: salaryDetails.ctc,
-        // FNF status with proper field names
         fnf_remarks: fnfStatus.remarks,
-        // JSON fields as strings (backend will parse them)
         qualifications: JSON.stringify(qualificationsWithFileIds),
         experiences: JSON.stringify(experiencesWithFileIds),
         kidsDetails: JSON.stringify(kidsWithFileIds),
-      }
+      };
 
-      console.log("Submitting profile data:", profileData)
-      console.log("Uploaded file IDs:", uploadedFileIds)
+      console.log("Submitting profile data:", profileData);
+      console.log("Uploaded file IDs:", uploadedFileIds);
 
-      let result
+      let result;
       if (isEditing) {
-        // Update existing employee
-        const formDataForUpdate = new FormData()
+        const formDataForUpdate = new FormData();
         Object.keys(profileData).forEach((key) => {
           if (profileData[key] !== null && profileData[key] !== undefined) {
-            formDataForUpdate.append(key, profileData[key])
+            formDataForUpdate.append(key, profileData[key]);
           }
-        })
-        result = await updateEmployee(formData.employeeId, formDataForUpdate)
+        });
+        result = await updateEmployee(formData.employeeId, formDataForUpdate);
       } else {
-        // Create new employee
-        result = await apiRequest(GlobalBaseUrl + "create_employee/", "POST", profileData)
+        result = await apiRequest(GlobalBaseUrl + "create_employee/", "POST", profileData);
       }
 
       if (result.success || (result.data && result.data.success)) {
-        const successMessage = isEditing ? "Profile updated successfully!" : "Profile created successfully!"
-        showMessage(successMessage, "success")
-        // Reset changes flag
-        setHasChanges(false)
+        const successMessage = isEditing ? "Profile updated successfully!" : "Profile created successfully!";
+        showMessage(successMessage, "success");
+        setHasChanges(false);
 
-        // FIXED: Don't clear file IDs after successful submission in edit mode
         if (!isEditing) {
-          // Only clear file IDs for new profile creation
+          setFormData({
+            employeeId: "",
+            employeeName: "",
+            fatherName: "",
+            motherName: "",
+            gender: "",
+            mobileNumber: "",
+            bloodGroup: "",
+            maritalStatus: "",
+            guardianNumber: "",
+            dateOfBirth: null,
+            email: "",
+            department: "",
+            designation: "",
+            primaryRole: "",
+            additionalRoles: [],
+            additionalRoleNames: [],
+            dataEntitlements: [],
+            dataEntitlementNames: [],
+            employmentStatus: "",
+            registrationNumber: "",
+            validityDate: null,
+          });
+          setKycDetails({ aadhaarNumber: "", panNumber: "", panType: "", uanNumber: "" });
+          setFamilyDetails({
+            fatherName: "",
+            fatherAadhaar: "",
+            fatherDob: null,
+            motherName: "",
+            motherAadhaar: "",
+            motherDob: null,
+            spouseName: "",
+            spouseAadhaar: "",
+            spouseDob: null,
+            kidsDetails: [{ name: "", aadhaar: "", dob: null }],
+          });
+          setBankDetails({ bankName: "", ifscCode: "", accountNumber: "", branch: "" });
+          setSalaryDetails({ netSalary: "", grossSalary: "", ctc: "" });
+          setFnfStatus({ remarks: "" });
+          setQualifications([{ id: 1, degree: "", institution: "", passedOut: "", percentage: "", fromDate: null, toDate: null }]);
+          setExperiences([{ id: 1, company: "", position: "", yearsOfExperience: "", fromDate: null, toDate: null }]);
+          setProfileImage(null);
           setUploadedFileIds({
             profileImage: null,
             aadhaar: null,
@@ -1828,30 +2113,29 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
             qualifications: {},
             experiences: {},
             kidsAadhaar: {},
-          })
+          });
         }
 
-        // Call success callback
         if (onSaveSuccess) {
-          onSaveSuccess(result.data?.employee || result.data)
+          onSaveSuccess(result.data?.employee || result.data);
         }
       } else {
         if (result.status === 400) {
-          showMessage("Invalid profile data. Please check your inputs and try again.", "error")
-          console.error("Validation errors:", result.data)
+          showMessage("Invalid profile data. Please check your inputs and try again.", "error");
+          console.error("Validation errors:", result.data);
         } else if (result.status === 401) {
-          showMessage("Your session has expired. Please log in again.", "error")
+          showMessage("Your session has expired. Please log in again.", "error");
         } else {
-          showMessage(`Error ${isEditing ? "updating" : "creating"} profile: ${result.error}`, "error")
+          showMessage(`Error ${isEditing ? "updating" : "creating"} profile: ${result.error}`, "error");
         }
       }
     } catch (error) {
-      console.error("Submit error:", error)
-      showMessage("An unexpected error occurred. Please try again.", "error")
+      console.error("Submit error:", error);
+      showMessage("An unexpected error occurred. Please try again.", "error");
     } finally {
-      setLoading(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <>
@@ -1859,7 +2143,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
       <Container>
         <ContentWrapper>
           <Card>
-            {/* Header */}
             <CardHeader>
               <CardTitle>
                 {isEditing ? `Edit Employee Profile - ${formData.employeeName}` : "Create Employee Profile"}
@@ -1869,7 +2152,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
               </CardSubtitle>
             </CardHeader>
 
-            {/* Tabs */}
             <TabsContainer>
               <TabButton active={activeTab === "personal"} onClick={() => setActiveTab("personal")}>
                 <TabIcon>
@@ -1913,7 +2195,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                 </TabIcon>
                 Bank Details
               </TabButton>
-              {/* FIXED: Show FNF Status tab only in edit mode */}
               {isEditing && (
                 <TabButton active={activeTab === "fnf"} onClick={() => setActiveTab("fnf")}>
                   <TabIcon>
@@ -1924,9 +2205,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
               )}
             </TabsContainer>
 
-            {/* Form */}
             <FormContainer onSubmit={handleSubmit}>
-              {/* Personal Information Tab */}
               {activeTab === "personal" && (
                 <>
                   <SectionTitle>
@@ -1993,6 +2272,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           style={{ display: "none" }}
                           accept="image/*"
                           onChange={handleProfileImageUpload}
+                          aria-label="Upload profile image"
                         />
                       </div>
                     </div>
@@ -2006,9 +2286,10 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         name="employeeId"
                         value={formData.employeeId}
                         onChange={handleChange}
-                        required
                         placeholder="Enter employee ID"
-                        disabled={isEditing} // Disable editing employee ID
+                        required
+                        disabled={isEditing}
+                        aria-label="Employee ID"
                       />
                     </FormGroup>
                     <FormGroup>
@@ -2019,8 +2300,9 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         name="employeeName"
                         value={formData.employeeName}
                         onChange={handleChange}
+                        placeholder="Enter employee name"
                         required
-                        placeholder="Enter full name"
+                        aria-label="Employee Name"
                       />
                     </FormGroup>
                     <FormGroup>
@@ -2035,51 +2317,32 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
-                          required
                           placeholder="Enter email address"
+                          required
+                          aria-label="Email Address"
                         />
                       </InputGroup>
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor="dateOfBirth">Date of Birth*</Label>
-                      <InputGroup>
-                        <InputAddon>
+                      {/* <InputGroup> */}
+                        {/* <InputAddon>
                           <Calendar size={16} />
-                        </InputAddon>
-                        <DatePickerWithAddon
+                        </InputAddon> */}
+                        <StyledDatePicker
+
                           selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : null}
                           onChange={(date) => handleDateChange(date, "dateOfBirth")}
                           dateFormat="dd/MM/yyyy"
                           placeholderText="Select date of birth"
+                          showMonthDropdown
                           showYearDropdown
                           dropdownMode="select"
+                          maxDate={new Date()}
                           required
+                          aria-label="Date of Birth"
                         />
-                      </InputGroup>
-                    </FormGroup>
-                    <FormGroup>
-                      <Label htmlFor="fatherName">Father's Name*</Label>
-                      <Input
-                        type="text"
-                        id="fatherName"
-                        name="fatherName"
-                        value={formData.fatherName}
-                        onChange={handleChange}
-                        required
-                        placeholder="Enter father's name"
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label htmlFor="motherName">Mother's Name*</Label>
-                      <Input
-                        type="text"
-                        id="motherName"
-                        name="motherName"
-                        value={formData.motherName}
-                        onChange={handleChange}
-                        required
-                        placeholder="Enter mother's name"
-                      />
+                      {/* </InputGroup> */}
                     </FormGroup>
                     <FormGroup>
                       <Label>Gender*</Label>
@@ -2091,6 +2354,8 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             value="male"
                             checked={formData.gender === "male"}
                             onChange={handleChange}
+                            required
+                            aria-label="Male gender"
                           />
                           <RadioText>Male</RadioText>
                         </RadioLabel>
@@ -2101,6 +2366,8 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             value="female"
                             checked={formData.gender === "female"}
                             onChange={handleChange}
+                            required
+                            aria-label="Female gender"
                           />
                           <RadioText>Female</RadioText>
                         </RadioLabel>
@@ -2111,6 +2378,8 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                             value="other"
                             checked={formData.gender === "other"}
                             onChange={handleChange}
+                            required
+                            aria-label="Other gender"
                           />
                           <RadioText>Other</RadioText>
                         </RadioLabel>
@@ -2128,40 +2397,44 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           name="mobileNumber"
                           value={formData.mobileNumber}
                           onChange={handleChange}
-                          required
                           placeholder="Enter mobile number"
+                          required
+                          aria-label="Mobile Number"
                         />
                       </InputGroup>
                     </FormGroup>
+                    
                     <FormGroup>
                       <Label htmlFor="department">Department*</Label>
-                      <InputGroup>
-                        <InputAddon>
-                          <Building2 size={16} />
-                        </InputAddon>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <Select
-                          id="department"
-                          name="department"
-                          value={formData.department}
-                          onChange={handleDepartmentChange}
-                          required
-                          style={{ border: "none", borderRadius: 0 }}
-                        >
-                          <option value="">Select department</option>
-                          {departmentsData.slice(0, 60).map((dept) => (
-                            <option key={dept.department_code} value={dept.department_code}>
-                              {dept.department_name}
-                            </option>
-                          ))}
-                        </Select>
-                      </InputGroup>
+  id="department"
+  name="department"
+  value={formData.department}   // ✅ will now point to new department_code
+  onChange={handleDepartmentChange}
+  required
+style={{ border: "none", borderRadius: 0 }}
+                          aria-label="Department"
+>
+  <option value="">Select department</option>
+  {departmentsData.map((dept) => (
+    <option key={dept.department_code} value={dept.department_code}>
+      {dept.department_name}
+    </option>
+  ))}
+</Select>
+
+                        <AddButton type="button" onClick={openDepartmentModal}>
+                       
+                            <Plus size={16} />
+                          
+                      
+                        </AddButton>
+                      </div>
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor="designation">Designation*</Label>
-                      <InputGroup>
-                        <InputAddon>
-                          <Briefcase size={16} />
-                        </InputAddon>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <Select
                           id="designation"
                           name="designation"
@@ -2169,130 +2442,137 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           onChange={handleDesignationChange}
                           required
                           style={{ border: "none", borderRadius: 0 }}
+                          aria-label="Designation"
                         >
                           <option value="">Select designation</option>
-                          {designationsData.slice(0, 100).map((desig) => (
+                          {designationsData.map((desig) => (
                             <option key={desig.Designation_code} value={desig.Designation_code}>
                               {desig.designation}
                             </option>
                           ))}
                         </Select>
-                      </InputGroup>
+                        <AddButton type="button" onClick={openDesignationModal}>
+                        
+                            <Plus size={16} />
+    
+                        
+                        </AddButton>
+                      </div>
                     </FormGroup>
-                    {/* Primary Role Normal Select */}
                     <FormGroup>
-                      <Label htmlFor="primaryRole">Primary Role*</Label>
-                      <InputGroup>
-                        <InputAddon>
-                          <User size={16} />
-                        </InputAddon>
-                        <Select
-                          id="primaryRole"
-                          name="primaryRole"
-                          value={formData.primaryRole}
-                          onChange={handlePrimaryRoleChange}
-                          required
-                          style={{ border: "none", borderRadius: 0 }}
-                        >
-                          <option value="">Select primary role</option>
-                          {primaryRoleOptions.slice(0, 100).map((role) => (
-                            <option key={role.role_code} value={role.role_code}>
-                              {role.role_name}
-                            </option>
-                          ))}
-                        </Select>
-                      </InputGroup>
+                      <Label htmlFor="primaryRole">Primary Role</Label>
+                      <Select
+                        id="primaryRole"
+                        name="primaryRole"
+                        value={formData.primaryRole}
+                        onChange={handlePrimaryRoleChange}
+                        aria-label="Primary Role"
+                      >
+                        <option value="">Select primary role</option>
+                        {primaryRoleOptions.map((role) => (
+                          <option key={role.role_code} value={role.role_code}>
+                            {role.role_name}
+                          </option>
+                        ))}
+                      </Select>
                     </FormGroup>
-                    {/* Additional Roles Multi-select */}
                     <FormGroup>
                       <Label htmlFor="additionalRoles">Additional Roles</Label>
                       <MultiSelectContainer>
-                        <MultiSelectDropdown>
-                          <MultiSelectButton type="button" onClick={() => setShowAdditionalRoles(!showAdditionalRoles)}>
-                            <span>
-                              {formData.additionalRoleNames.length > 0
-                                ? `${formData.additionalRoleNames.length} roles selected`
-                                : "Select additional roles"}
-                            </span>
-                            <ChevronDown size={16} />
-                          </MultiSelectButton>
-                          {showAdditionalRoles && (
+                        <MultiSelectButton
+                          type="button"
+                          onClick={() => setShowAdditionalRoles(!showAdditionalRoles)}
+                          aria-label="Select additional roles"
+                        >
+                          {formData.additionalRoleNames.length > 0
+                            ? `${formData.additionalRoleNames.length} role(s) selected`
+                            : "Select additional roles"}
+                          <ChevronDown size={16} />
+                        </MultiSelectButton>
+                        {showAdditionalRoles && (
+                          <MultiSelectDropdown>
                             <MultiSelectOptions>
-                              {additionalRoleOptions.slice(0, 100).map((role) => (
+                              {additionalRoleOptions.map((role) => (
                                 <MultiSelectOption
                                   key={role.role_code}
+                                  onClick={() =>{ handleAdditionalRoleToggle(role.role_code, role.role_name)
+                                    // ✅ close dropdown after selecting
+      setShowAdditionalRoles(false);
+                                  }}
                                   className={formData.additionalRoles.includes(role.role_code) ? "selected" : ""}
-                                  onClick={() => handleAdditionalRoleToggle(role.role_code, role.role_name)}
                                 >
                                   {role.role_name}
-                                  {formData.additionalRoles.includes(role.role_code) && "✓"}
+                                  {formData.additionalRoles.includes(role.role_code) && <CheckCircle size={16} />}
                                 </MultiSelectOption>
                               ))}
                             </MultiSelectOptions>
-                          )}
-                        </MultiSelectDropdown>
+                          </MultiSelectDropdown>
+                        )}
                       </MultiSelectContainer>
                       {formData.additionalRoleNames.length > 0 && (
                         <SelectedItemsContainer>
-                          {formData.additionalRoleNames.map((role) => (
-                            <SelectedItem key={role}>
-                              {role}
-                              <RemoveItemButton onClick={() => handleRemoveAdditionalRole(role)}>
-                                <X size={14} />
+                          {formData.additionalRoleNames.map((roleName) => (
+                            <SelectedItem key={roleName}>
+                              {roleName}
+                              <RemoveItemButton onClick={() => handleRemoveAdditionalRole(roleName)}>
+                                <X size={12} />
                               </RemoveItemButton>
                             </SelectedItem>
                           ))}
                         </SelectedItemsContainer>
                       )}
                     </FormGroup>
-                    {/* Data Entitlements Multi-select */}
                     <FormGroup>
                       <Label htmlFor="dataEntitlements">Business Unit</Label>
                       <MultiSelectContainer>
-                        <MultiSelectDropdown>
-                          <MultiSelectButton
-                            type="button"
-                            onClick={() => setShowDataEntitlements(!showDataEntitlements)}
-                          >
-                            <span>
-                              {formData.dataEntitlementNames.length > 0
-                                ? `${formData.dataEntitlementNames.length} entitlements selected`
-                                : "Select data entitlements"}
-                            </span>
-                            <ChevronDown size={16} />
-                          </MultiSelectButton>
-                          {showDataEntitlements && (
+                        
+                        <MultiSelectButton
+                          type="button"
+                          onClick={() => setShowDataEntitlements(!showDataEntitlements)}
+                          aria-label="Select data entitlements"
+                        >
+                          {formData.dataEntitlementNames.length > 0
+                            ? `${formData.dataEntitlementNames.length} entitlement(s) selected`
+                            : "Select data entitlements"}
+                          <ChevronDown size={16} />
+                        </MultiSelectButton>
+                        {showDataEntitlements && (
+                          <MultiSelectDropdown>
                             <MultiSelectOptions>
-                              {dataEntitlementOptions.slice(0, 100).map((entitlement) => (
+                              {dataEntitlementOptions.map((entitlement) => (
                                 <MultiSelectOption
                                   key={entitlement.DataEntitlementsCode}
+                                  onClick={() =>{
+                                    handleDataEntitlementToggle(
+                                      entitlement.DataEntitlementsCode,
+                                      entitlement.DataEntitlements,
+                                    )
+                                    // ✅ close after selecting
+      setShowDataEntitlements(false);}
+                                  }
                                   className={
                                     formData.dataEntitlements.includes(entitlement.DataEntitlementsCode)
                                       ? "selected"
                                       : ""
                                   }
-                                  onClick={() =>
-                                    handleDataEntitlementToggle(
-                                      entitlement.DataEntitlementsCode,
-                                      entitlement.DataEntitlements,
-                                    )
-                                  }
                                 >
                                   {entitlement.DataEntitlements}
-                                  {formData.dataEntitlements.includes(entitlement.DataEntitlementsCode) && "✓"}
+                                  {formData.dataEntitlements.includes(entitlement.DataEntitlementsCode) && (
+                                    <CheckCircle size={16} />
+                                  )}
                                 </MultiSelectOption>
                               ))}
                             </MultiSelectOptions>
-                          )}
-                        </MultiSelectDropdown>
+                          </MultiSelectDropdown>
+                        )}
                       </MultiSelectContainer>
                       {formData.dataEntitlementNames.length > 0 && (
                         <SelectedItemsContainer>
-                          {formData.dataEntitlementNames.map((entitlement) => (
-                            <SelectedItem key={entitlement}>
-                              {entitlement}
-                              <RemoveItemButton onClick={() => handleRemoveDataEntitlement(entitlement)}>
-                                <X size={14} />
+                          {formData.dataEntitlementNames.map((entitlementName) => (
+                            <SelectedItem key={entitlementName}>
+                              {entitlementName}
+                              <RemoveItemButton onClick={() => handleRemoveDataEntitlement(entitlementName)}>
+                                <X size={12} />
                               </RemoveItemButton>
                             </SelectedItem>
                           ))}
@@ -2300,13 +2580,14 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                       )}
                     </FormGroup>
                     <FormGroup>
-                      <Label htmlFor="employmentStatus">Employment Status*</Label>
+                      <Label htmlFor="employmentStatus">Employment Status</Label>
                       <Select
                         id="employmentStatus"
                         name="employmentStatus"
                         value={formData.employmentStatus}
                         onChange={handleChange}
                         required
+                        aria-label="Employment Status"
                       >
                         <option value="">Select employment status</option>
                         <option value="part-time">Part Time</option>
@@ -2315,7 +2596,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         <option value="temporary">Temporary</option>
                         <option value="contract">Contract</option>
                         <option value="internship">Internship</option>
-                      </Select>
+                        </Select>
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor="registrationNumber">Registration Number</Label>
@@ -2326,6 +2607,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         value={formData.registrationNumber}
                         onChange={handleChange}
                         placeholder="Enter registration number"
+                        aria-label="Registration Number"
                       />
                     </FormGroup>
                     <FormGroup>
@@ -2343,23 +2625,23 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         <InputAddon>
                           <Heart size={16} />
                         </InputAddon>
-                        <Select
-                          id="bloodGroup"
-                          name="bloodGroup"
-                          value={formData.bloodGroup}
-                          onChange={handleChange}
-                          style={{ border: "none", borderRadius: 0 }}
-                        >
-                          <option value="">Select blood group</option>
-                          <option value="A+">A+</option>
-                          <option value="A-">A-</option>
-                          <option value="B+">B+</option>
-                          <option value="B-">B-</option>
-                          <option value="AB+">AB+</option>
-                          <option value="AB-">AB-</option>
-                          <option value="O+">O+</option>
-                          <option value="O-">O-</option>
-                        </Select>
+                      <Select
+                        id="bloodGroup"
+                        name="bloodGroup"
+                        value={formData.bloodGroup}
+                        onChange={handleChange}
+                        aria-label="Blood Group"
+                      >
+                        <option value="">Select blood group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                      </Select>
                       </InputGroup>
                     </FormGroup>
                     <FormGroup>
@@ -2369,6 +2651,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         name="maritalStatus"
                         value={formData.maritalStatus}
                         onChange={handleChange}
+                        aria-label="Marital Status"
                       >
                         <option value="">Select marital status</option>
                         <option value="single">Single</option>
@@ -2381,7 +2664,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                       <Label htmlFor="guardianNumber">Guardian Number/Emergency Number</Label>
                       <InputGroup>
                         <InputAddon>
-                          <Users size={16} />
+                          <Phone size={16} />
                         </InputAddon>
                         <InputWithAddon
                           type="tel"
@@ -2390,6 +2673,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           value={formData.guardianNumber}
                           onChange={handleChange}
                           placeholder="Enter guardian number"
+                          aria-label="Guardian Number"
                         />
                       </InputGroup>
                     </FormGroup>
@@ -2397,67 +2681,79 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                 </>
               )}
 
-              {/* Qualification Tab */}
               {activeTab === "qualification" && (
                 <>
                   <SectionTitle>
                     <SectionIcon>
                       <Building size={20} />
                     </SectionIcon>
-                    Qualification Details
+                    Educational Qualifications
                   </SectionTitle>
-                  {qualifications.map((qualification, index) => (
+                  {qualifications.map((qualification) => (
                     <QualificationCard key={qualification.id}>
                       <QualificationHeader>
-                        <QualificationTitle>Qualification #{index + 1}</QualificationTitle>
+                        <QualificationTitle>Qualification {qualification.id}</QualificationTitle>
                         {qualifications.length > 1 && (
-                          <RemoveButton type="button" onClick={() => removeQualification(qualification.id)}>
+                          <RemoveButton
+                            type="button"
+                            onClick={() => removeQualification(qualification.id)}
+                            aria-label={`Remove qualification ${qualification.id}`}
+                          >
                             <Trash2 size={16} />
                           </RemoveButton>
                         )}
                       </QualificationHeader>
                       <FormGrid>
                         <FormGroup>
-                          <Label>Degree/Certification*</Label>
+                          <Label htmlFor={`degree-${qualification.id}`}>Degree/Certification*</Label>
                           <Input
                             type="text"
+                            id={`degree-${qualification.id}`}
                             value={qualification.degree}
                             onChange={(e) => handleQualificationChange(qualification.id, "degree", e.target.value)}
                             required
                             placeholder="E.g., B.Tech, MBA, etc."
+                            aria-label={`Degree for qualification ${qualification.id}`}
                           />
                         </FormGroup>
                         <FormGroup>
-                          <Label>Institution/University*</Label>
+                          <Label htmlFor={`institution-${qualification.id}`}>Institution/University*</Label>
                           <Input
                             type="text"
+                            id={`institution-${qualification.id}`}
                             value={qualification.institution}
                             onChange={(e) => handleQualificationChange(qualification.id, "institution", e.target.value)}
-                            required
+                            required                            
                             placeholder="Name of institution"
+
+                            aria-label={`Institution for qualification ${qualification.id}`}
                           />
                         </FormGroup>
                         <FormGroup>
-                          <Label>Passed Out Year*</Label>
+                          <Label htmlFor={`passedOut-${qualification.id}`}>Year Passed Out*</Label>
                           <Input
                             type="text"
+                            id={`passedOut-${qualification.id}`}
                             value={qualification.passedOut}
                             onChange={(e) => handleQualificationChange(qualification.id, "passedOut", e.target.value)}
                             required
                             placeholder="Year of completion"
+                            aria-label={`Year passed out for qualification ${qualification.id}`}
                           />
                         </FormGroup>
                         <FormGroup>
-                          <Label>Percentage/CGPA</Label>
+                          <Label htmlFor={`percentage-${qualification.id}`}>Percentage/CGPA</Label>
                           <Input
                             type="text"
+                            id={`percentage-${qualification.id}`}
                             value={qualification.percentage}
                             onChange={(e) => handleQualificationChange(qualification.id, "percentage", e.target.value)}
                             placeholder="E.g., 85% or 8.5 CGPA"
+                            aria-label={`Percentage for qualification ${qualification.id}`}
                           />
                         </FormGroup>
                         <FormGroup>
-                          <Label>From Date</Label>
+                          <Label htmlFor={`fromDate-${qualification.id}`}>From Date</Label>
                           <StyledDatePicker
                             selected={qualification.fromDate}
                             onChange={(date) => handleQualificationDateChange(date, qualification.id, "fromDate")}
@@ -2467,7 +2763,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           />
                         </FormGroup>
                         <FormGroup>
-                          <Label>To Date</Label>
+                          <Label htmlFor={`toDate-${qualification.id}`}>To Date</Label>
                           <StyledDatePicker
                             selected={qualification.toDate}
                             onChange={(date) => handleQualificationDateChange(date, qualification.id, "toDate")}
@@ -2477,24 +2773,34 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           />
                         </FormGroup>
                         <FormGroup style={{ gridColumn: "1 / -1" }}>
-                          <Label>Qualification Certificate</Label>
-                          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                            <UploadButton>
-                              <UploadIcon>
-                                <Upload size={16} />
-                              </UploadIcon>
-                              <UploadText>Upload Certificate</UploadText>
-                              <input
-                                type="file"
-                                style={{ display: "none" }}
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={(e) => handleQualificationFileUpload(e, qualification.id)}
-                              />
-                            </UploadButton>
-                            {uploadedFileIds.qualifications[qualification.id] && (
-                              <FileName>Certificate uploaded</FileName>
-                            )}
-                          </div>
+                          <Label htmlFor={`certificate-${qualification.id}`}>Upload Certificate</Label>
+                          <UploadButton htmlFor={`certificate-${qualification.id}`}>
+                            <UploadIcon>
+                              <Upload size={16} />
+                            </UploadIcon>
+                            <UploadText>Upload Certificate</UploadText>
+                            <input
+                              id={`certificate-${qualification.id}`}
+                              type="file"
+                              style={{ display: "none" }}
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              onChange={(e) => handleQualificationFileUpload(e, qualification.id)}
+                              aria-label={`Upload certificate for qualification ${qualification.id}`}
+                            />
+                          </UploadButton>
+                          {uploadedFileIds.qualifications[qualification.id] && (
+                            <FileName>
+                              Certificate uploaded
+                              <a
+                                href={`${GlobalBaseUrl}download-gridfs/${uploadedFileIds.qualifications[qualification.id]}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ marginLeft: "0.5rem", color: theme.colors.primary.main }}
+                              >
+                                View/Download
+                              </a>
+                            </FileName>
+                          )}
                         </FormGroup>
                       </FormGrid>
                     </QualificationCard>
@@ -2510,58 +2816,67 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                 </>
               )}
 
-              {/* Experience Tab */}
+{/* Experience Tab */}
               {activeTab === "experience" && (
                 <>
                   <SectionTitle>
                     <SectionIcon>
                       <Briefcase size={20} />
                     </SectionIcon>
-                    Experience Details
+                    Work Experience
                   </SectionTitle>
-                  {experiences.map((experience, index) => (
+                  {experiences.map((experience) => (
                     <QualificationCard key={experience.id}>
                       <QualificationHeader>
-                        <QualificationTitle>Experience #{index + 1}</QualificationTitle>
+                        <QualificationTitle>Experience {experience.id}</QualificationTitle>
                         {experiences.length > 1 && (
-                          <RemoveButton type="button" onClick={() => removeExperience(experience.id)}>
+                          <RemoveButton
+                            type="button"
+                            onClick={() => removeExperience(experience.id)}
+                            aria-label={`Remove experience ${experience.id}`}
+                          >
                             <Trash2 size={16} />
                           </RemoveButton>
                         )}
                       </QualificationHeader>
                       <FormGrid>
                         <FormGroup>
-                          <Label>Company Name*</Label>
+                          <Label htmlFor={`company-${experience.id}`}>Company Name*</Label>
                           <Input
                             type="text"
+                            id={`company-${experience.id}`}
                             value={experience.company}
                             onChange={(e) => handleExperienceChange(experience.id, "company", e.target.value)}
+                            placeholder="Enter company name"
                             required
-                            placeholder="Name of company"
+                            aria-label={`Company for experience ${experience.id}`}
                           />
                         </FormGroup>
                         <FormGroup>
-                          <Label>Position*</Label>
+                          <Label htmlFor={`position-${experience.id}`}>Position*</Label>
                           <Input
                             type="text"
+                            id={`position-${experience.id}`}
                             value={experience.position}
                             onChange={(e) => handleExperienceChange(experience.id, "position", e.target.value)}
+                            placeholder="Enter position"
                             required
-                            placeholder="Your job title"
+                            aria-label={`Position for experience ${experience.id}`}
                           />
                         </FormGroup>
                         <FormGroup>
-                          <Label>Years of Experience*</Label>
+                          <Label htmlFor={`yearsOfExperience-${experience.id}`}>Years of Experience</Label>
                           <Input
                             type="text"
+                            id={`yearsOfExperience-${experience.id}`}
                             value={experience.yearsOfExperience}
                             onChange={(e) => handleExperienceChange(experience.id, "yearsOfExperience", e.target.value)}
-                            required
-                            placeholder="E.g., 2.5 years"
+                            placeholder="Enter years of experience"
+                            aria-label={`Years of experience for experience ${experience.id}`}
                           />
                         </FormGroup>
                         <FormGroup>
-                          <Label>From Date*</Label>
+                          <Label htmlFor={`fromDate-${experience.id}`}>From Date</Label>
                           <StyledDatePicker
                             selected={experience.fromDate}
                             onChange={(date) => handleExperienceDateChange(date, experience.id, "fromDate")}
@@ -2572,7 +2887,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           />
                         </FormGroup>
                         <FormGroup>
-                          <Label>To Date</Label>
+                          <Label htmlFor={`toDate-${experience.id}`}>To Date</Label>
                           <StyledDatePicker
                             selected={experience.toDate}
                             onChange={(date) => handleExperienceDateChange(date, experience.id, "toDate")}
@@ -2582,22 +2897,34 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           />
                         </FormGroup>
                         <FormGroup style={{ gridColumn: "1 / -1" }}>
-                          <Label>Experience Certificate</Label>
-                          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                            <UploadButton>
-                              <UploadIcon>
-                                <Upload size={16} />
-                              </UploadIcon>
-                              <UploadText>Upload Certificate</UploadText>
-                              <input
-                                type="file"
-                                style={{ display: "none" }}
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={(e) => handleCertificateUpload(e, experience.id)}
-                              />
-                            </UploadButton>
-                            {uploadedFileIds.experiences[experience.id] && <FileName>Certificate uploaded</FileName>}
-                          </div>
+                          <Label htmlFor={`certificate-${experience.id}`}>Upload Certificate</Label>
+                          <UploadButton htmlFor={`certificate-${experience.id}`}>
+                            <UploadIcon>
+                              <Upload size={16} />
+                            </UploadIcon>
+                            <UploadText>Upload Certificate</UploadText>
+                            <input
+                              id={`certificate-${experience.id}`}
+                              type="file"
+                              style={{ display: "none" }}
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              onChange={(e) => handleCertificateUpload(e, experience.id)}
+                              aria-label={`Upload certificate for experience ${experience.id}`}
+                            />
+                          </UploadButton>
+                          {uploadedFileIds.experiences[experience.id] && (
+                            <FileName>
+                              Certificate uploaded
+                              <a
+                                href={`${GlobalBaseUrl}download-gridfs/${uploadedFileIds.experiences[experience.id]}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ marginLeft: "0.5rem", color: theme.colors.primary.main }}
+                              >
+                                View/Download
+                              </a>
+                            </FileName>
+                          )}
                         </FormGroup>
                       </FormGrid>
                     </QualificationCard>
@@ -2613,7 +2940,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                 </>
               )}
 
-              {/* FIXED: KYC Details Tab with UAN number */}
+{/* FIXED: KYC Details Tab with UAN number */}
               {activeTab === "kyc" && (
                 <>
                   <SectionTitle>
@@ -2631,10 +2958,41 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         name="aadhaarNumber"
                         value={kycDetails.aadhaarNumber}
                         onChange={handleKycChange}
-                        required
+
                         placeholder="Enter 12-digit Aadhaar number"
                         maxLength={12}
+                        aria-label="Aadhaar Number"
                       />
+                    </FormGroup>
+                    <FormGroup>
+                      <Label htmlFor="aadhaar-upload">Upload Aadhaar</Label>
+                      <UploadButton htmlFor="aadhaar-upload">
+                        <UploadIcon>
+                          <Upload size={16} />
+                        </UploadIcon>
+                        <UploadText>Upload Aadhaar</UploadText>
+                        <input
+                          id="aadhaar-upload"
+                          type="file"
+                          style={{ display: "none" }}
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => handleKycFileUpload(e, "aadhaar")}
+                          aria-label="Upload Aadhaar document"
+                        />
+                      </UploadButton>
+                      {uploadedFileIds.aadhaar && (
+                        <FileName>
+                          Aadhaar uploaded
+                          <a
+                            href={`${GlobalBaseUrl}download-gridfs/${uploadedFileIds.aadhaar}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ marginLeft: "0.5rem", color: theme.colors.primary.main }}
+                          >
+                            View/Download
+                          </a>
+                        </FileName>
+                      )}
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor="panNumber">PAN Number</Label>
@@ -2645,21 +3003,51 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         value={kycDetails.panNumber}
                         onChange={handleKycChange}
                         placeholder="Enter PAN number"
-                        maxLength={10}
+                        aria-label="PAN Number"
                       />
                     </FormGroup>
                     <FormGroup>
-                      <Label htmlFor="panType">PAN Type</Label>
-                      <Select id="panType" name="panType" value={kycDetails.panType} onChange={handleKycChange}>
-                        <option value="">Select PAN type</option>
-                        <option value="individual">Individual</option>
-                        <option value="company">Company</option>
-                        <option value="trust">Trust</option>
-                        <option value="partnership">Partnership</option>
-                        <option value="huf">HUF</option>
-                      </Select>
+                      <Label htmlFor="pan-upload">Upload PAN</Label>
+                      <UploadButton htmlFor="pan-upload">
+                        <UploadIcon>
+                          <Upload size={16} />
+                        </UploadIcon>
+                        <UploadText>Upload PAN</UploadText>
+                        <input
+                          id="pan-upload"
+                          type="file"
+                          style={{ display: "none" }}
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => handleKycFileUpload(e, "pan")}
+                          aria-label="Upload PAN document"
+                        />
+                      </UploadButton>
+                      {uploadedFileIds.pan && (
+                        <FileName>
+                          PAN uploaded
+                          <a
+                            href={`${GlobalBaseUrl}download-gridfs/${uploadedFileIds.pan}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ marginLeft: "0.5rem", color: theme.colors.primary.main }}
+                          >
+                            View/Download
+                          </a>
+                        </FileName>
+                      )}
                     </FormGroup>
-                    {/* ADDED: UAN Number field */}
+                    <FormGroup>
+                      <Label htmlFor="panType">PAN Type</Label>
+                      <Input
+                        type="text"
+                        id="panType"
+                        name="panType"
+                        value={kycDetails.panType}
+                        onChange={handleKycChange}
+                        placeholder="Enter PAN type"
+                        aria-label="PAN Type"
+                      />
+                    </FormGroup>
                     <FormGroup>
                       <Label htmlFor="uanNumber">UAN Number</Label>
                       <Input
@@ -2669,50 +3057,13 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         value={kycDetails.uanNumber}
                         onChange={handleKycChange}
                         placeholder="Enter UAN number"
-                        maxLength={12}
+                        aria-label="UAN Number"
                       />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>Aadhaar Upload*</Label>
-                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                        <UploadButton>
-                          <UploadIcon>
-                            <Upload size={16} />
-                          </UploadIcon>
-                          <UploadText>Upload Aadhaar</UploadText>
-                          <input
-                            type="file"
-                            style={{ display: "none" }}
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleKycFileUpload(e, "aadhaar")}
-                          />
-                        </UploadButton>
-                        {uploadedFileIds.aadhaar && <FileName>Aadhaar uploaded</FileName>}
-                      </div>
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>PAN Upload</Label>
-                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                        <UploadButton>
-                          <UploadIcon>
-                            <Upload size={16} />
-                          </UploadIcon>
-                          <UploadText>Upload PAN</UploadText>
-                          <input
-                            type="file"
-                            style={{ display: "none" }}
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleKycFileUpload(e, "pan")}
-                          />
-                        </UploadButton>
-                        {uploadedFileIds.pan && <FileName>PAN uploaded</FileName>}
-                      </div>
                     </FormGroup>
                   </FormGrid>
                 </>
               )}
 
-              {/* FIXED: Family Details Tab with name fields */}
               {activeTab === "family" && (
                 <>
                   <SectionTitle>
@@ -2722,7 +3073,6 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     Family Details
                   </SectionTitle>
                   <FormGrid>
-                    {/* ADDED: Father's Name field */}
                     <FormGroup>
                       <Label htmlFor="fatherName">Father's Name</Label>
                       <Input
@@ -2732,6 +3082,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         value={familyDetails.fatherName}
                         onChange={handleFamilyChange}
                         placeholder="Enter father's name"
+                        aria-label="Father's Name"
                       />
                     </FormGroup>
                     <FormGroup>
@@ -2742,8 +3093,8 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         name="fatherAadhaar"
                         value={familyDetails.fatherAadhaar}
                         onChange={handleFamilyChange}
-                        placeholder="Enter father's Aadhaar number"
-                        maxLength={12}
+                        placeholder="Enter father's Aadhaar"
+                        aria-label="Father's Aadhaar"
                       />
                     </FormGroup>
                     <FormGroup>
@@ -2753,29 +3104,41 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         onChange={(date) => handleFamilyDateChange(date, "fatherDob")}
                         dateFormat="dd/MM/yyyy"
                         placeholderText="Select father's DOB"
+                        showMonthDropdown
                         showYearDropdown
                         dropdownMode="select"
                       />
                     </FormGroup>
                     <FormGroup>
-                      <Label>Father's Aadhaar Upload</Label>
-                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                        <UploadButton>
-                          <UploadIcon>
-                            <Upload size={16} />
-                          </UploadIcon>
-                          <UploadText>Upload Father's Aadhaar</UploadText>
-                          <input
-                            type="file"
-                            style={{ display: "none" }}
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFamilyAadhaarUpload(e, "father")}
-                          />
-                        </UploadButton>
-                        {uploadedFileIds.fatherAadhaar && <FileName>Father's Aadhaar uploaded</FileName>}
-                      </div>
+                      <Label htmlFor="father-aadhaar-upload">Upload Father's Aadhaar</Label>
+                      <UploadButton htmlFor="father-aadhaar-upload">
+                        <UploadIcon>
+                          <Upload size={16} />
+                        </UploadIcon>
+                        <UploadText>Upload Father's Aadhaar</UploadText>
+                        <input
+                          id="father-aadhaar-upload"
+                          type="file"
+                          style={{ display: "none" }}
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => handleFamilyAadhaarUpload(e, "father")}
+                          aria-label="Upload father's Aadhaar document"
+                        />
+                      </UploadButton>
+                      {uploadedFileIds.fatherAadhaar && (
+                        <FileName>
+                          Father's Aadhaar uploaded
+                          <a
+                            href={`${GlobalBaseUrl}download-gridfs/${uploadedFileIds.fatherAadhaar}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ marginLeft: "0.5rem", color: theme.colors.primary.main }}
+                          >
+                            View/Download
+                          </a>
+                        </FileName>
+                      )}
                     </FormGroup>
-                    {/* ADDED: Mother's Name field */}
                     <FormGroup>
                       <Label htmlFor="motherName">Mother's Name</Label>
                       <Input
@@ -2785,6 +3148,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         value={familyDetails.motherName}
                         onChange={handleFamilyChange}
                         placeholder="Enter mother's name"
+                        aria-label="Mother's Name"
                       />
                     </FormGroup>
                     <FormGroup>
@@ -2795,8 +3159,8 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         name="motherAadhaar"
                         value={familyDetails.motherAadhaar}
                         onChange={handleFamilyChange}
-                        placeholder="Enter mother's Aadhaar number"
-                        maxLength={12}
+                        placeholder="Enter mother's Aadhaar"
+                        aria-label="Mother's Aadhaar"
                       />
                     </FormGroup>
                     <FormGroup>
@@ -2811,48 +3175,61 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                       />
                     </FormGroup>
                     <FormGroup>
-                      <Label>Mother's Aadhaar Upload</Label>
-                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                        <UploadButton>
-                          <UploadIcon>
-                            <Upload size={16} />
-                          </UploadIcon>
-                          <UploadText>Upload Mother's Aadhaar</UploadText>
-                          <input
-                            type="file"
-                            style={{ display: "none" }}
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFamilyAadhaarUpload(e, "mother")}
-                          />
-                        </UploadButton>
-                        {uploadedFileIds.motherAadhaar && <FileName>Mother's Aadhaar uploaded</FileName>}
-                      </div>
+                      <Label htmlFor="mother-aadhaar-upload">Upload Mother's Aadhaar</Label>
+                      <UploadButton htmlFor="mother-aadhaar-upload">
+                        <UploadIcon>
+                          <Upload size={16} />
+                        </UploadIcon>
+                        <UploadText>Upload Mother's Aadhaar</UploadText>
+                        <input
+                          id="mother-aadhaar-upload"
+                          type="file"
+                          style={{ display: "none" }}
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => handleFamilyAadhaarUpload(e, "mother")}
+                          aria-label="Upload mother's Aadhaar document"
+                        />
+                      </UploadButton>
+                      {uploadedFileIds.motherAadhaar && (
+                        <FileName>
+                          Mother's Aadhaar uploaded
+                          <a
+                            href={`${GlobalBaseUrl}download-gridfs/${uploadedFileIds.motherAadhaar}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ marginLeft: "0.5rem", color: theme.colors.primary.main }}
+                          >
+                            View/Download
+                          </a>
+                        </FileName>
+                      )}
                     </FormGroup>
                     <FormGroup>
-                      <Label htmlFor="spouseName">Spouse Name</Label>
+                      <Label htmlFor="spouseName">Spouse's Name</Label>
                       <Input
                         type="text"
                         id="spouseName"
                         name="spouseName"
                         value={familyDetails.spouseName}
                         onChange={handleFamilyChange}
-                        placeholder="Enter spouse name"
+                        placeholder="Enter spouse's name"
+                        aria-label="Spouse's Name"
                       />
                     </FormGroup>
                     <FormGroup>
-                      <Label htmlFor="spouseAadhaar">Spouse Aadhaar</Label>
+                      <Label htmlFor="spouseAadhaar">Spouse's Aadhaar</Label>
                       <Input
                         type="text"
                         id="spouseAadhaar"
                         name="spouseAadhaar"
                         value={familyDetails.spouseAadhaar}
                         onChange={handleFamilyChange}
-                        placeholder="Enter spouse Aadhaar number"
-                        maxLength={12}
+                        placeholder="Enter spouse's Aadhaar"
+                        aria-label="Spouse's Aadhaar"
                       />
                     </FormGroup>
                     <FormGroup>
-                      <Label htmlFor="spouseDob">Spouse Date of Birth</Label>
+                      <Label htmlFor="spouseDob">Spouse's Date of Birth</Label>
                       <StyledDatePicker
                         selected={familyDetails.spouseDob}
                         onChange={(date) => handleFamilyDateChange(date, "spouseDob")}
@@ -2863,72 +3240,82 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                       />
                     </FormGroup>
                     <FormGroup>
-                      <Label>Spouse Aadhaar Upload</Label>
-                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                        <UploadButton>
-                          <UploadIcon>
-                            <Upload size={16} />
-                          </UploadIcon>
-                          <UploadText>Upload Spouse Aadhaar</UploadText>
-                          <input
-                            type="file"
-                            style={{ display: "none" }}
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFamilyAadhaarUpload(e, "spouse")}
-                          />
-                        </UploadButton>
-                        {uploadedFileIds.spouseAadhaar && <FileName>Spouse Aadhaar uploaded</FileName>}
-                      </div>
+                      <Label htmlFor="spouse-aadhaar-upload">Upload Spouse's Aadhaar</Label>
+                      <UploadButton htmlFor="spouse-aadhaar-upload">
+                        <UploadIcon>
+                          <Upload size={16} />
+                        </UploadIcon>
+                        <UploadText>Upload Spouse's Aadhaar</UploadText>
+                        <input
+                          id="spouse-aadhaar-upload"
+                          type="file"
+                          style={{ display: "none" }}
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          onChange={(e) => handleFamilyAadhaarUpload(e, "spouse")}
+                          aria-label="Upload spouse's Aadhaar document"
+                        />
+                      </UploadButton>
+                      {uploadedFileIds.spouseAadhaar && (
+                        <FileName>
+                          Spouse's Aadhaar uploaded
+                          <a
+                            href={`${GlobalBaseUrl}download-gridfs/${uploadedFileIds.spouseAadhaar}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ marginLeft: "0.5rem", color: theme.colors.primary.main }}
+                          >
+                            View/Download
+                          </a>
+                        </FileName>
+                      )}
                     </FormGroup>
                   </FormGrid>
-                  {/* Children Details Section */}
-                  <div style={{ marginTop: "2rem" }}>
-                    <h3
-                      style={{
-                        fontSize: "1.125rem",
-                        fontWeight: "700",
-                        color: theme.colors.primary.dark,
-                        marginBottom: "1rem",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Users size={18} style={{ marginRight: "0.5rem", color: theme.colors.primary.main }} />
-                      Children Details
-                    </h3>
-                    {familyDetails.kidsDetails.map((kid, index) => (
-                      <QualificationCard key={index}>
-                        <QualificationHeader>
-                          <QualificationTitle>Child #{index + 1}</QualificationTitle>
-                          {familyDetails.kidsDetails.length > 1 && (
-                            <RemoveButton type="button" onClick={() => removeKid(index)}>
-                              <Trash2 size={16} />
-                            </RemoveButton>
-                          )}
-                        </QualificationHeader>
-                        <FormGrid>
-                          <FormGroup>
-                            <Label>Child Name</Label>
-                            <Input
-                              type="text"
-                              value={kid.name}
-                              onChange={(e) => handleKidsChange(index, "name", e.target.value)}
-                              placeholder="Enter child name"
-                            />
-                          </FormGroup>
-                          <FormGroup>
-                            <Label>Child Aadhaar</Label>
-                            <Input
-                              type="text"
-                              value={kid.aadhaar}
-                              onChange={(e) => handleKidsChange(index, "aadhaar", e.target.value)}
-                              placeholder="Enter child Aadhaar number"
-                              maxLength={12}
-                            />
-                          </FormGroup>
-                          <FormGroup>
-                            <Label>Child Date of Birth</Label>
-                            <StyledDatePicker
+                  <SectionTitle style={{ marginTop: "2rem" }}>
+                    <SectionIcon>
+                      <Users size={20} />
+                    </SectionIcon>
+                    Children's Details
+                  </SectionTitle>
+                  {familyDetails.kidsDetails.map((kid, index) => (
+                    <QualificationCard key={index}>
+                      <QualificationHeader>
+                        <QualificationTitle>Child {index + 1}</QualificationTitle>
+                        {familyDetails.kidsDetails.length > 1 && (
+                          <RemoveButton
+                            type="button"
+                            onClick={() => removeKid(index)}
+                            aria-label={`Remove child ${index + 1}`}
+                          >
+                            <Trash2 size={16} />
+                          </RemoveButton>
+                        )}
+                      </QualificationHeader>
+                      <FormGrid>
+                        <FormGroup>
+                          <Label htmlFor={`kidName-${index}`}>Child Name</Label>
+                          <Input
+                            type="text"
+                            id={`kidName-${index}`}
+                            value={kid.name}
+                            onChange={(e) => handleKidsChange(index, "name", e.target.value)}
+                            placeholder="Enter child's name"
+                            aria-label={`Name for child ${index + 1}`}
+                          />
+                        </FormGroup>
+                        <FormGroup>
+                          <Label htmlFor={`kidAadhaar-${index}`}>Child Aadhaar</Label>
+                          <Input
+                            type="text"
+                            id={`kidAadhaar-${index}`}
+                            value={kid.aadhaar}
+                            onChange={(e) => handleKidsChange(index, "aadhaar", e.target.value)}
+                            placeholder="Enter child's Aadhaar"
+                            aria-label={`Aadhaar for child ${index + 1}`}
+                          />
+                        </FormGroup>
+                        <FormGroup>
+                          <Label htmlFor={`kidDob-${index}`}>Date of Birth</Label>
+                          <StyledDatePicker
                               selected={kid.dob}
                               onChange={(date) => handleKidsChange(index, "dob", date)}
                               dateFormat="dd/MM/yyyy"
@@ -2936,41 +3323,52 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                               showYearDropdown
                               dropdownMode="select"
                             />
-                          </FormGroup>
-                          <FormGroup>
-                            <Label>Child Aadhaar Upload</Label>
-                            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                              <UploadButton>
-                                <UploadIcon>
-                                  <Upload size={16} />
-                                </UploadIcon>
-                                <UploadText>Upload Child's Aadhaar</UploadText>
-                                <input
-                                  type="file"
-                                  style={{ display: "none" }}
-                                  accept=".pdf,.jpg,.jpeg,.png"
-                                  onChange={(e) => handleKidsAadhaarUpload(e, index)}
-                                />
-                              </UploadButton>
-                              {uploadedFileIds.kidsAadhaar[index] && <FileName>Child's Aadhaar uploaded</FileName>}
-                            </div>
-                          </FormGroup>
-                        </FormGrid>
-                      </QualificationCard>
-                    ))}
-                    <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem" }}>
-                      <AddButton type="button" onClick={addKid}>
-                        <AddButtonIcon>
-                          <Plus size={16} />
-                        </AddButtonIcon>
-                        Add Another Child
-                      </AddButton>
-                    </div>
-                  </div>
+                        </FormGroup>
+                        <FormGroup>
+                          <Label htmlFor={`kid-aadhaar-upload-${index}`}>Upload Child Aadhaar</Label>
+                          <UploadButton htmlFor={`kid-aadhaar-upload-${index}`}>
+                            <UploadIcon>
+                              <Upload size={16} />
+                            </UploadIcon>
+                            <UploadText>Upload Child's Aadhaar</UploadText>
+                            <input
+                              id={`kid-aadhaar-upload-${index}`}
+                              type="file"
+                              style={{ display: "none" }}
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              onChange={(e) => handleKidsAadhaarUpload(e, index)}
+                              aria-label={`Upload Aadhaar for child ${index + 1}`}
+                            />
+                          </UploadButton>
+                          {uploadedFileIds.kidsAadhaar[index] && (
+                            <FileName>
+                              Child's Aadhaar uploaded
+                              <a
+                                href={`${GlobalBaseUrl}download-gridfs/${uploadedFileIds.kidsAadhaar[index]}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ marginLeft: "0.5rem", color: theme.colors.primary.main }}
+                              >
+                                View/Download
+                              </a>
+                            </FileName>
+                          )}
+                        </FormGroup>
+                      </FormGrid>
+                    </QualificationCard>
+                  ))}
+                  <AddButton type="button" onClick={addKid}>
+                    <AddButtonIcon>
+                      <Plus size={16} />
+                    </AddButtonIcon>
+                    Add Another Child
+                  </AddButton>
+
+
                 </>
               )}
 
-              {/* Salary Details Tab */}
+{/* Salary Details Tab */}
               {activeTab === "salary" && (
                 <>
                   <SectionTitle>
@@ -2993,10 +3391,10 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           placeholder="Enter net salary"
                         />
                       </InputGroup>
-                    </FormGroup>
+                      </FormGroup>
                     <FormGroup>
                       <Label htmlFor="grossSalary">Gross Salary</Label>
-                      <InputGroup>
+                    <InputGroup>
                         <InputAddon>₹</InputAddon>
                         <InputWithAddon
                           type="text"
@@ -3007,7 +3405,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           placeholder="Enter gross salary"
                         />
                       </InputGroup>
-                    </FormGroup>
+                      </FormGroup>
                     <FormGroup>
                       <Label htmlFor="ctc">CTC (Cost to Company)</Label>
                       <InputGroup>
@@ -3033,7 +3431,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     <SectionIcon>
                       <CreditCard size={20} />
                     </SectionIcon>
-                    Bank Account Details
+                    Bank Details
                   </SectionTitle>
                   <FormGrid>
                     <FormGroup>
@@ -3044,8 +3442,9 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         name="bankName"
                         value={bankDetails.bankName}
                         onChange={handleBankDetailsChange}
-                        required
                         placeholder="Enter bank name"
+                        // required
+                        aria-label="Bank Name"
                       />
                     </FormGroup>
                     <FormGroup>
@@ -3056,8 +3455,9 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         name="ifscCode"
                         value={bankDetails.ifscCode}
                         onChange={handleBankDetailsChange}
-                        required
                         placeholder="Enter IFSC code"
+                        // required
+                        aria-label="IFSC Code"
                       />
                     </FormGroup>
                     <FormGroup>
@@ -3068,12 +3468,13 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         name="accountNumber"
                         value={bankDetails.accountNumber}
                         onChange={handleBankDetailsChange}
-                        required
                         placeholder="Enter account number"
+                        // required
+                        aria-label="Account Number"
                       />
                     </FormGroup>
                     <FormGroup>
-                      <Label htmlFor="branch">Branch Name</Label>
+                      <Label htmlFor="branch">Branch</Label>
                       <Input
                         type="text"
                         id="branch"
@@ -3081,6 +3482,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         value={bankDetails.branch}
                         onChange={handleBankDetailsChange}
                         placeholder="Enter branch name"
+                        aria-label="Branch Name"
                       />
                     </FormGroup>
                   </FormGrid>
@@ -3096,42 +3498,216 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                     </SectionIcon>
                     Full and Final Settlement Status
                   </SectionTitle>
-                  <FormGroup>
-                    <Label htmlFor="remarks">Remarks</Label>
-                    <Textarea
-                      id="remarks"
-                      name="remarks"
-                      value={fnfStatus.remarks}
-                      onChange={handleFnfChange}
-                      placeholder="Enter any remarks or notes regarding full and final settlement"
-                      rows={6}
-                    />
-                  </FormGroup>
+                  <FormGrid>
+                    <FormGroup style={{ gridColumn: "1 / -1" }}>
+                      <Label htmlFor="remarks">Remarks</Label>
+                      <Textarea
+                        id="remarks"
+                        name="remarks"
+                        value={fnfStatus.remarks}
+                        onChange={handleFnfChange}
+                        placeholder="Enter remarks"
+                        aria-label="FNF Remarks"
+                      />
+                    </FormGroup>
+                  </FormGrid>
                 </>
               )}
 
               <SubmitButtonContainer>
-                {/* Show save button only if there are changes or it's a new profile */}
-                {(!isEditing || hasChanges) && (
-                  <SubmitButton type="button" onClick={submitProfile} disabled={loading || saving}>
-                    <SubmitButtonIcon>{loading || saving ? <LoadingSpinner /> : <Save size={18} />}</SubmitButtonIcon>
-                    {loading || saving ? "Saving..." : isEditing ? "Update Profile" : "Save Profile"}
-                  </SubmitButton>
-                )}
+                <SubmitButton
+                  type="button"
+                  onClick={onCancel}
+                  style={{
+                    background: theme.colors.error.gradient,
+                    color: "white",
+                    fontWeight: 700,
+                    boxShadow: theme.shadows.md,
+                  }}
+                  disabled={isUploading || isSubmitting || saving}
+                  aria-label="Cancel profile"
+                >
+                  <SubmitButtonIcon>
+                    <X size={18} />
+                  </SubmitButtonIcon>
+                  Cancel
+                </SubmitButton>
+                <SubmitButton
+                  type="button"
+                  onClick={submitProfile}
+                  disabled={isUploading || isSubmitting || saving || (!hasChanges && isEditing)}
+                  aria-label={isEditing ? "Update profile" : "Save profile"}
+                >
+                  <SubmitButtonIcon>
+                    {isUploading || isSubmitting || saving ? <LoadingSpinner /> : <Save size={18} />}
+                  </SubmitButtonIcon>
+                  {isUploading || isSubmitting || saving
+                    ? "Processing..."
+                    : isEditing
+                    ? "Update Profile"
+                    : "Save Profile"}
+                </SubmitButton>
               </SubmitButtonContainer>
             </FormContainer>
           </Card>
         </ContentWrapper>
 
-        {/* Message Container */}
+        {showDepartmentModal && (
+          <Modal>
+            <ModalContent>
+              <ModalTitle>
+                <ModalIcon>
+                  <Building2 size={20} />
+                </ModalIcon>
+                Add New Department
+              </ModalTitle>
+              <CloseModalButton
+                onClick={() => setShowDepartmentModal(false)}
+                aria-label="Close department modal"
+              >
+                <X size={20} />
+              </CloseModalButton>
+              {departmentModalError && <ErrorMessage>{departmentModalError}</ErrorMessage>}
+              <form onSubmit={handleDepartmentModalSubmit}>
+                <FormGrid>
+                 
+                  
+  <FormGroup style={{ gridColumn: "span 6" }}>
+    <Label htmlFor="departmentCode">Department Code</Label>
+    <Input
+      type="text"
+      id="departmentCode"
+      value={departmentModalData1.department_code || ""}
+      disabled
+      aria-label="Department Code"
+    />
+  </FormGroup>
+
+                  <FormGroup style={{ gridColumn: "span 6" }}>
+                    <Label htmlFor="departmentName">Department Name*</Label>
+                    <Input
+                      type="text"
+                      id="departmentName"
+                      value={departmentModalData.name}
+                      onChange={(e) =>
+                        setDepartmentModalData({ ...departmentModalData, name: e.target.value })
+                      }
+                      placeholder="Enter department name"
+                      required
+                      aria-label="Department Name"
+                    />
+                  </FormGroup>
+              
+                  <FormGroup style={{ gridColumn: "1 / -1" }}>
+                    <Label htmlFor="departmentDescription">Description</Label>
+                    <Textarea
+                      id="departmentDescription"
+                      value={departmentModalData.description}
+                      onChange={(e) =>
+                        setDepartmentModalData({ ...departmentModalData, description: e.target.value })
+                      }
+                      placeholder="Enter department description"
+                      aria-label="Department Description"
+                    />
+                  </FormGroup>
+                </FormGrid>
+                <SubmitButtonContainer>
+                  <SubmitButton
+                    type="submit"
+                    disabled={departmentModalLoading}
+                    aria-label="Save department"
+                  >
+                    <SubmitButtonIcon>
+                      {departmentModalLoading ? <LoadingSpinner /> : <Save size={18} />}
+                    </SubmitButtonIcon>
+                    {departmentModalLoading ? "Saving..." : "Save Department"}
+                  </SubmitButton>
+                </SubmitButtonContainer>
+              </form>
+            </ModalContent>
+          </Modal>
+        )}
+
+        {showDesignationModal && (
+          <Modal>
+            <ModalContent>
+              <ModalTitle>
+                <ModalIcon>
+                  <Briefcase size={20} />
+                </ModalIcon>
+                Add New Designation
+              </ModalTitle>
+              <CloseModalButton
+                onClick={() => setShowDesignationModal(false)}
+                aria-label="Close designation modal"
+              >
+                <X size={20} />
+              </CloseModalButton>
+              {designationModalError && <ErrorMessage>{designationModalError}</ErrorMessage>}
+              <form onSubmit={handleDesignationModalSubmit}>
+                <FormGrid>
+<FormGroup style={{ gridColumn: "span 6" }}>
+  <Label htmlFor="designationCode">Designation Code</Label>
+  <Input
+    type="text"
+    id="designationCode"
+    value={designationModalData.code || ""}
+    disabled
+    aria-label="Designation Code"
+  />
+</FormGroup>
+                  <FormGroup style={{ gridColumn: "span 6" }}>
+                    <Label htmlFor="designationName">Designation Name*</Label>
+                    <Input
+                      type="text"
+                      id="designationName"
+                      value={designationModalData.name}
+                      onChange={(e) =>
+                        setDesignationModalData({ ...designationModalData, name: e.target.value })
+                      }
+                      placeholder="Enter designation name"
+                      required
+                      aria-label="Designation Name"
+                    />
+                  </FormGroup>
+                  <FormGroup style={{ gridColumn: "1 / -1" }}>
+                    <Label htmlFor="designationDescription">Description</Label>
+                    <Textarea
+                      id="designationDescription"
+                      value={designationModalData.description}
+                      onChange={(e) =>
+                        setDesignationModalData({ ...designationModalData, description: e.target.value })
+                      }
+                      placeholder="Enter designation description"
+                      aria-label="Designation Description"
+                    />
+                  </FormGroup>
+                </FormGrid>
+                <SubmitButtonContainer>
+                  <SubmitButton
+                    type="submit"
+                    disabled={designationModalLoading}
+                    aria-label="Save designation"
+                  >
+                    <SubmitButtonIcon>
+                      {designationModalLoading ? <LoadingSpinner /> : <Save size={18} />}
+                    </SubmitButtonIcon>
+                    {designationModalLoading ? "Saving..." : "Save Designation"}
+                  </SubmitButton>
+                </SubmitButtonContainer>
+              </form>
+            </ModalContent>
+          </Modal>
+        )}
+
         <MessageContainer>
-          {messages.map((message) => (
-            <Message key={message.id} className={message.type}>
+          {messages.map((msg) => (
+            <Message key={msg.id} className={msg.type}>
               <MessageIcon>
-                {message.type === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
+                {msg.type === "success" ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
               </MessageIcon>
-              <MessageText>{message.text}</MessageText>
-              <CloseButton onClick={() => removeMessage(message.id)}>
+              <MessageText>{msg.text}</MessageText>
+              <CloseButton onClick={() => removeMessage(msg.id)} aria-label="Close message">
                 <X size={16} />
               </CloseButton>
             </Message>
@@ -3139,7 +3715,8 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         </MessageContainer>
       </Container>
     </>
-  )
+  );
 }
 
-export default Profile
+export default Profile;
+                        

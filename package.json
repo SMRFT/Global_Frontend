@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.2",
     "axios": "^1.8.4",
+    "canvas-confetti": "^1.9.3",
     "headlessui": "^0.0.0",
     "jsauth": "git+https://github.com/ashokkumarta/jsauth.git#v1.0.0",
     "jwt-decode": "^4.0.0",

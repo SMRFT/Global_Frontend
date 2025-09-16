@@ -17,6 +17,7 @@ import {
   Bell,
   User,
   Database,
+  Cake,
 } from "lucide-react"
 import { theme } from "./Colors"
 
@@ -334,6 +335,11 @@ const navigationPages = [
     path: '/EmployeeData',
     icon: Database,
   },
+  {
+    name: "Birthdays",
+    path: "/birthdays",
+    icon: Cake,
+  },
   // {
   //   name: 'Performance',
   //   path: '/performance',
@@ -351,9 +357,7 @@ const navigationPages = [
   // },
 ]
 
-const Sidebar = ({ children }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+const Sidebar = ({ isCollapsed, setIsCollapsed, isMobile }) => {
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -361,34 +365,18 @@ const Sidebar = ({ children }) => {
   const userPayload = JSON.parse(localStorage.getItem("user_payload") || "{}")
   const selectedBranch = localStorage.getItem("selected_branch")
 
-  // Handle responsive behavior
-  useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth <= 768
-      setIsMobile(mobile)
-      if (mobile) {
-        setIsCollapsed(true)
-      }
+  const handleLogout = () => {
+    if (typeof Storage !== "undefined") {
+      localStorage.removeItem("user_payload");
+      localStorage.removeItem("selected_branch");
+      localStorage.removeItem("access_token"); // also clear token if used
     }
 
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
+    const redirectURL = import.meta.env.VITE_LOGIN_REDIRECT_URL;
 
-const handleLogout = () => {
-  if (typeof Storage !== "undefined") {
-    localStorage.removeItem("user_payload");
-    localStorage.removeItem("selected_branch");
-    localStorage.removeItem("access_token"); // also clear token if used
-  }
-
-  const redirectURL = import.meta.env.VITE_LOGIN_REDIRECT_URL;
-
-  // Clear page cache and redirect
-  window.location.href = redirectURL; // More reliable than navigate()
-};
-
+    // Clear page cache and redirect
+    window.location.href = redirectURL; // More reliable than navigate()
+  };
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed)
@@ -458,8 +446,6 @@ const handleLogout = () => {
           </LogoutButton>
         </SidebarFooter>
       </SidebarContainer>
-
-      {children}
     </>
   )
 }

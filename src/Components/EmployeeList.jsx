@@ -5,9 +5,9 @@ import axios from "axios"
 import styled, { createGlobalStyle } from "styled-components"
 import { theme } from "./Colors"
 
-import { Search, User, Phone, Mail, Briefcase, Building, Users, Database, Lock, X, Eye, EyeOff, Filter } from 'lucide-react'
+import { Search, User, Phone, Mail, Briefcase, Building, Users, Database, Lock, X, Eye, EyeOff, Filter, RefreshCw } from 'lucide-react'
 
-// Global styles
+// Global styles and styled components remain unchanged
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
@@ -230,6 +230,7 @@ const CardFooter = styled.div`
   border-top: 1px solid ${theme.colors.secondary.main};
   display: flex;
   justify-content: flex-end;
+  gap: 1rem;
 `
 
 const CardButton = styled.button`
@@ -612,44 +613,44 @@ const EmployeeList = () => {
 
   const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
-const getAllEmployees = async () => {
-  setIsLoading(true);
-  const result = await apiRequest(GlobalBaseUrl + "get_employees_with_labels/");
+  const getAllEmployees = async () => {
+    setIsLoading(true)
+    const result = await apiRequest(GlobalBaseUrl + "get_employees_with_labels/")
 
-  if (result.success) {
-    const employeeData = (result.data.employees || []).map((emp) => ({
-      ...emp,
-      additionalRoles: safeParseJSON(emp.additionalRoles, []),
-      dataEntitlements: safeParseJSON(emp.dataEntitlements, []),
-      qualifications: safeParseJSON(emp.qualifications, []),
-      experiences: safeParseJSON(emp.experiences, []),
-      bankDetails: safeParseJSON(emp.bankDetails, {}),
-    }));
+    if (result.success) {
+      const employeeData = (result.data.employees || []).map((emp) => ({
+        ...emp,
+        additionalRoles: safeParseJSON(emp.additionalRoles, []),
+        dataEntitlements: safeParseJSON(emp.dataEntitlements, []),
+        qualifications: safeParseJSON(emp.qualifications, []),
+        experiences: safeParseJSON(emp.experiences, []),
+        bankDetails: safeParseJSON(emp.bankDetails, {}),
+      }))
 
-    setEmployees(employeeData);
-    setFilteredEmployees(employeeData);
+      setEmployees(employeeData)
+      setFilteredEmployees(employeeData)
 
-    const uniqueDepartments = [...new Set(employeeData.map((emp) => emp.department_name))].filter(Boolean);
-    setDepartments(uniqueDepartments);
-  } else {
-    if (result.status === 401) {
-      alert("Your session has expired. Please log in again.");
+      const uniqueDepartments = [...new Set(employeeData.map((emp) => emp.department_name))].filter(Boolean)
+      setDepartments(uniqueDepartments)
     } else {
-      alert(`Error fetching employees: ${result.error}`);
+      if (result.status === 401) {
+        alert("Your session has expired. Please log in again.")
+      } else {
+        alert(`Error fetching employees: ${result.error}`)
+      }
+    }
+
+    setIsLoading(false)
+  }
+
+// Helper to parse JSON with fallback  
+  const safeParseJSON = (input, fallback) => {
+    try {
+      return typeof input === "string" ? JSON.parse(input) : input || fallback
+    } catch {
+      return fallback
     }
   }
-
-  setIsLoading(false);
-};
-
-// Helper to parse JSON with fallback
-const safeParseJSON = (input, fallback) => {
-  try {
-    return typeof input === "string" ? JSON.parse(input) : input || fallback;
-  } catch {
-    return fallback;
-  }
-};
 
 
   useEffect(() => {
@@ -698,6 +699,20 @@ const safeParseJSON = (input, fallback) => {
     setIsModalOpen(true)
   }
 
+  const handleResendEmail = async (employeeId) => {
+    const result = await apiRequest(GlobalBaseUrl + `resend_employee_email/${employeeId}/`, "POST")
+    if (result.success) {
+      alert("Email resent successfully")
+    } else {
+      if (result.status === 401) {
+        alert("Your session has expired. Please log in again.")
+      } else {
+        alert(`Error resending email: ${result.error}`)
+      }
+    }
+  }
+
+
   const closeModal = () => {
     setIsModalOpen(false)
     setSelectedEmployee(null)
@@ -718,43 +733,40 @@ const safeParseJSON = (input, fallback) => {
     return true
   }
 
-const handleSaveCredentials = async () => {
-  if (!validatePasswords()) return;
+  const handleSaveCredentials = async () => {
+    if (!validatePasswords()) return
 
-  try {
-    const response = await apiRequest(GlobalBaseUrl + "set_employee_password/", "POST", {
-      employeeId: selectedEmployee.employeeId,
-      employeeName: selectedEmployee.employeeName,
-      department: selectedEmployee.department,
-      designation: selectedEmployee.designation,
-      password: password,
-    });
+    try {
+      const response = await apiRequest(GlobalBaseUrl + "set_employee_password/", "POST", {
+        employeeId: selectedEmployee.employeeId,
+        employeeName: selectedEmployee.employeeName,
+        department: selectedEmployee.department,
+        designation: selectedEmployee.designation,
+        password: password,
+      })
 
-    if (response?.success) {
-      alert(response.message || "Password set successfully.");
-      closeModal();
-    } else {
-      if (response?.message) {
-        setPasswordError(response.message);
+      if (response?.success) {
+        alert(response.message || "Password set successfully.")
+        closeModal()
       } else {
-        setPasswordError("Something went wrong. Please try again.");
+        if (response?.message) {
+          setPasswordError(response.message)
+        } else {
+          setPasswordError("Something went wrong. Please try again.")
+        }
+      }
+    } catch (error) {
+      if (error?.response?.status === 400) {
+        setPasswordError("Invalid input. Please check your data.")
+      } else if (error?.response?.status === 401) {
+        setPasswordError("Unauthorized. Your session has expired.")
+      } else if (error?.response?.status === 500) {
+        setPasswordError("Server error. Please try again later.")
+      } else {
+        setPasswordError("Unknown error occurred.")
       }
     }
-  } catch (error) {
-    // Handle HTTP error responses or connection failures
-    if (error?.response?.status === 400) {
-      setPasswordError("Invalid input. Please check your data.");
-    } else if (error?.response?.status === 401) {
-      setPasswordError("Unauthorized. Your session has expired.");
-      // Optional: redirect to login
-    } else if (error?.response?.status === 500) {
-      setPasswordError("Server error. Please try again later.");
-    } else {
-      setPasswordError("Unknown error occurred.");
-    }
   }
-};
-
 
   return (
     <>
@@ -873,12 +885,14 @@ const handleSaveCredentials = async () => {
                 </CardBody>
 
                 <CardFooter>
-                  <CardButton onClick={() => openCredentialsModal(employee)}>
-                    <ButtonIcon>
-                      <Lock size={16} />
-                    </ButtonIcon>
-                    Login Credentials
-                  </CardButton>
+                  {!employee.is_password_set && (
+                    <CardButton onClick={() => handleResendEmail(employee.employeeId)}>
+                      <ButtonIcon>
+                        <RefreshCw size={16} />
+                      </ButtonIcon>
+                      Resend Email
+                    </CardButton>
+                  )}
                 </CardFooter>
               </Card>
             ))
@@ -889,7 +903,7 @@ const handleSaveCredentials = async () => {
           )}
         </CardsGrid>
 
-        {/* Credentials Modal */}
+          {/* Credentials Modal */}
         {isModalOpen && selectedEmployee && (
           <ModalOverlay>
             <ModalContainer>

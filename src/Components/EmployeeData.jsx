@@ -790,8 +790,10 @@ const fetchEmployeeById = async (employeeId) => {
   }
 }
 
-
   // Update employee data
+
+// In EmployeeData.jsx
+
 const updateEmployee = async (employeeId, formData) => {
   try {
     setSaving(true);
@@ -804,33 +806,33 @@ const updateEmployee = async (employeeId, formData) => {
       headers: {
         Authorization: token,
         "Branch-Code": branchCode,
+        // Do NOT set Content-Type for FormData
       },
-      body: formData, // Do NOT set Content-Type when using FormData
+      body: formData,
     });
 
     const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.message || "Failed to update employee.");
+    // ✅ FIX: Check for success:false and read 'details' (where your specific error lives)
+    if (!response.ok || data.success === false) {
+      // Prioritize 'details' because that's where the "get() returned 2" message is
+      const errorText = data.details || data.error || data.message || "Failed to update employee.";
+      throw new Error(errorText);
     }
 
-    // ✅ Show alert, then refresh on OK
+    // Success case
     alert("Employee updated successfully!");
-    window.location.reload(); // Will refresh after clicking "OK" on alert
+    window.location.reload(); 
 
     return data;
   } catch (err) {
     console.error("Update employee error:", err);
-    alert(err.message || "Failed to update employee.");
-    throw new Error(err.message || "Failed to update employee.");
+    // Throw the error so Profile.jsx can catch it
+    throw err; 
   } finally {
     setSaving(false);
   }
 };
-
-
-
-
   // Get unique departments for filter
   const departments = useMemo(() => {
     const deptSet = new Set(employees.map((emp) => emp.department_name).filter(Boolean))

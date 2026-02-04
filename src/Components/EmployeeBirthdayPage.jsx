@@ -632,16 +632,19 @@ const EmployeeBirthdayPage = () => {
       try {
         // Get token from localStorage (try both possible keys)
         const token = localStorage.getItem("access_token") || localStorage.getItem("token");
+      const branchCode = localStorage.getItem("selected_branch")
 
         if (!token) {
           throw new Error("No authentication token found");
         }
 
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL}employees/birthdays/today/`,
+          `${import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL}employees_birthdays_today/`,
           {
             headers: {
               Authorization: token,
+          "Branch-Code": branchCode,
+
               'Content-Type': 'application/json',
             },
             timeout: 10000,

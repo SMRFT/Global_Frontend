@@ -887,6 +887,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
 
   const [uploadedFileIds, setUploadedFileIds] = useState({
     profileImage: null,
+    signature: null,
     aadhaar: null,
     pan: null,
     fatherAadhaar: null,
@@ -1003,12 +1004,86 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     branch: "",
   });
 
-  //const [activeTab, setActiveTab] = useState("personal");
+  // 3. NEW: Sync Effect to populate Additional Role Names for UI Chips
+  useEffect(() => {
+    if (formData.additionalRoles.length > 0 && additionalRoleOptions.length > 0) {
+      const names = formData.additionalRoles
+        .map((code) => {
+          const found = additionalRoleOptions.find((opt) => opt.role_code === code);
+          return found ? found.role_name : null;
+        })
+        .filter(Boolean); // Remove nulls
 
+      // Only update if names are actually different to avoid infinite loops
+      setFormData((prev) => {
+        if (JSON.stringify(prev.additionalRoleNames) !== JSON.stringify(names)) {
+          return { ...prev, additionalRoleNames: names };
+        }
+        return prev;
+      });
+    }
+  }, [formData.additionalRoles, additionalRoleOptions]);
+
+  // 4. NEW: Sync Effect to populate Data Entitlement Names for UI Chips
+  useEffect(() => {
+    if (formData.dataEntitlements.length > 0 && dataEntitlementOptions.length > 0) {
+      const names = formData.dataEntitlements
+        .map((code) => {
+          const found = dataEntitlementOptions.find((opt) => opt.DataEntitlementsCode === code);
+          return found ? found.DataEntitlements : null;
+        })
+        .filter(Boolean);
+
+      setFormData((prev) => {
+        if (JSON.stringify(prev.dataEntitlementNames) !== JSON.stringify(names)) {
+          return { ...prev, dataEntitlementNames: names };
+        }
+        return prev;
+      });
+    }
+  }, [formData.dataEntitlements, dataEntitlementOptions]);
+
+  //const [activeTab, setActiveTab] = useState("personal");
+useEffect(() => {
+  setFormData((prev) => ({
+    ...prev,
+    additionalRoles: prev.additionalRoles.includes("GP-R-GP")
+      ? prev.additionalRoles
+      : [...prev.additionalRoles, "GP-R-GP"],
+
+    additionalRoleNames: prev.additionalRoleNames.includes("Profile")
+      ? prev.additionalRoleNames
+      : [...prev.additionalRoleNames, "Profile"],
+  }));
+}, []);
+
+ // 1. NEW: Helper function to parse Python-style list strings "['A', 'B']"
+  const parseStringList = (str) => {
+    if (!str) return [];
+    if (Array.isArray(str)) return str;
+    try {
+      // Replace single quotes with double quotes for valid JSON
+      const validJson = str.replace(/'/g, '"');
+      return JSON.parse(validJson);
+    } catch (e) {
+      console.error("Error parsing string list:", str, e);
+      return [];
+    }
+  };
+
+  // 2. UPDATE: The main useEffect to populate form data
   useEffect(() => {
     if (isEditing && employeeData) {
       try {
         console.log("Pre-populating form with employee data:", employeeData);
+
+        // Parse Additional Roles
+        const parsedRoles = parseStringList(employeeData.additionalRoles);
+        // Ensure "GP-R-GP" is always included and array is unique
+        const finalAdditionalRoles = [...new Set([...parsedRoles, "GP-R-GP"])];
+
+        // Parse Data Entitlements
+        const parsedEntitlements = parseStringList(employeeData.dataEntitlements);
 
         setFormData({
           employeeId: employeeData.employeeId || "",
@@ -1025,15 +1100,19 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
           department: employeeData.department || "",
           designation: employeeData.designation || "",
           primaryRole: employeeData.primaryRole || "",
-          additionalRoles: employeeData.additionalRoles || [],
-          additionalRoleNames: employeeData.additionalRoleNames || [],
-          dataEntitlements: employeeData.dataEntitlements || [],
-          dataEntitlementNames: employeeData.dataEntitlementNames || [],
+          
+          // UPDATED: Use the parsed arrays
+          additionalRoles: finalAdditionalRoles,
+          // We initialize names as empty; the Sync Effect (below) will populate them
+          additionalRoleNames: [], 
+          
+          dataEntitlements: parsedEntitlements,
+          dataEntitlementNames: [], 
+          
           employmentStatus: employeeData.employmentStatus || "",
           registrationNumber: employeeData.registrationNumber || "",
           validityDate: employeeData.validityDate ? moment(employeeData.validityDate).format("YYYY-MM-DD") : null,
         });
-
         if (employeeData.kycDetails) {
           setKycDetails({
             aadhaarNumber: employeeData.kycDetails.aadhaarNumber || "",
@@ -1127,19 +1206,40 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
           setProfileImage(employeeData.profileImage);
         }
 
-        if (employeeData.fileIds) {
-          setUploadedFileIds({
-            profileImage: employeeData.fileIds.profileImage || null,
-            aadhaar: employeeData.fileIds.aadhaar || null,
-            pan: employeeData.fileIds.pan || null,
-            fatherAadhaar: employeeData.fileIds.fatherAadhaar || null,
-            motherAadhaar: employeeData.fileIds.motherAadhaar || null,
-            spouseAadhaar: employeeData.fileIds.spouseAadhaar || null,
-            qualifications: employeeData.fileIds.qualifications || {},
-            experiences: employeeData.fileIds.experiences || {},
-            kidsAadhaar: employeeData.fileIds.kidsAadhaar || {},
-          });
-        }
+setUploadedFileIds(prev => ({
+  ...prev,
+
+  // Profile files
+  profileImage: employeeData.profileImage || null,
+  signature: employeeData.signatureFileId || null,
+
+  // KYC files
+  aadhaar: employeeData.kycDetails?.aadhaarFileId || null,
+  pan: employeeData.kycDetails?.panFileId || null,
+
+  // Family Aadhaar files
+  fatherAadhaar: employeeData.familyDetails?.fatherAadhaarFileId || null,
+  motherAadhaar: employeeData.familyDetails?.motherAadhaarFileId || null,
+  spouseAadhaar: employeeData.familyDetails?.spouseAadhaarFileId || null,
+
+  // Qualifications certificates
+  qualifications: (employeeData.qualifications || []).reduce((acc, q, idx) => {
+    if (q.certificateFileId) acc[idx + 1] = q.certificateFileId;
+    return acc;
+  }, {}),
+
+  // Experience certificates
+  experiences: (employeeData.experiences || []).reduce((acc, e, idx) => {
+    if (e.certificateFileId) acc[idx + 1] = e.certificateFileId;
+    return acc;
+  }, {}),
+
+  // Kids Aadhaar
+  kidsAadhaar: (employeeData.familyDetails?.kidsDetails || []).reduce((acc, kid, idx) => {
+    if (kid.aadhaarFileId) acc[idx] = kid.aadhaarFileId;
+    return acc;
+  }, {}),
+}));
 
         // Reset changes flag
         setHasChanges(false);
@@ -1278,37 +1378,47 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     }
   };
 
-  const handleAdditionalRoleToggle = (roleCode, roleName) => {
-    setFormData((prev) => {
-      const isSelected = prev.additionalRoles.includes(roleCode);
-      if (isSelected) {
-        return {
-          ...prev,
-          additionalRoles: prev.additionalRoles.filter((code) => code !== roleCode),
-          additionalRoleNames: prev.additionalRoleNames.filter((name) => name !== roleName),
-        };
-      } else {
-        return {
-          ...prev,
-          additionalRoles: [...prev.additionalRoles, roleCode],
-          additionalRoleNames: [...prev.additionalRoleNames, roleName],
-        };
-      }
-    });
-    trackChanges();
-  };
+const handleAdditionalRoleToggle = (roleCode, roleName) => {
+  // Prevent deselecting the default assigned "Profile" role
+  if (roleCode === "GP-R-GP") {
+    return; // Do nothing
+  }
 
-  const handleRemoveAdditionalRole = (roleName) => {
-    const roleObj = additionalRoleOptions.find((role) => role.role_name === roleName);
-    if (roleObj) {
-      setFormData((prev) => ({
+  setFormData((prev) => {
+    const isSelected = prev.additionalRoles.includes(roleCode);
+
+    if (isSelected) {
+      return {
         ...prev,
-        additionalRoles: prev.additionalRoles.filter((code) => code !== roleObj.role_code),
+        additionalRoles: prev.additionalRoles.filter((code) => code !== roleCode),
         additionalRoleNames: prev.additionalRoleNames.filter((name) => name !== roleName),
-      }));
-      trackChanges();
+      };
+    } else {
+      return {
+        ...prev,
+        additionalRoles: [...prev.additionalRoles, roleCode],
+        additionalRoleNames: [...prev.additionalRoleNames, roleName],
+      };
     }
-  };
+  });
+
+  trackChanges();
+};
+
+const handleRemoveAdditionalRole = (roleName) => {
+  if (roleName === "Profile") return; // prevent removal
+
+  setFormData((prev) => ({
+    ...prev,
+    additionalRoles: prev.additionalRoles.filter(
+      (code) => code !== "GP-R-GP" && code !== roleName
+    ),
+    additionalRoleNames: prev.additionalRoleNames.filter((name) => name !== roleName),
+  }));
+
+  trackChanges();
+};
+
 
   const handleDataEntitlementToggle = (entitlementCode, entitlementName) => {
     setFormData((prev) => {
@@ -1670,6 +1780,43 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     }
   };
 
+  const SIGNATURE_ALLOWED_CODES = ["DESIG094"]; // Doctor, Surgeon, Consultant (example)
+
+
+// const isSignatureAllowed = () => {
+//   return SIGNATURE_ALLOWED_CODES.includes((formData.designation || "").trim());
+// };
+
+const isSignatureAllowed = () => true;
+
+  const handleSignatureUpload = async (e) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    setIsUploading(true);
+    const uploadResult = await uploadToGridFS(file, "signature");
+    if (uploadResult.success) {
+      setUploadedFileIds((prev) => ({
+        ...prev,
+        signature: uploadResult.fileId,
+      }));
+      showMessage("Signature uploaded successfully", "success");
+      trackChanges();
+    } else {
+      showMessage(`Failed to upload signature: ${uploadResult.error}`, "error");
+    }
+    setIsUploading(false);
+  }
+};
+
+const handleDeleteSignature = () => {
+  setUploadedFileIds((prev) => ({
+    ...prev,
+    signature: null,
+  }));
+  showMessage("Signature removed", "success");
+  trackChanges();
+};
+
   const triggerFileInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -1944,16 +2091,16 @@ const handleDesignationChange = (e) => {
       const requiredFields = [
         "employeeId",
         "employeeName",
-        "email",
+        // "email",
         "dateOfBirth",
         "gender",
         "mobileNumber",
-        "department",
-        "designation",
-        "aadhaarNumber",
-        "bankName",
-        "ifscCode",
-        "accountNumber",
+        // "department",
+        // "designation",
+        // "aadhaarNumber",
+        // "bankName",
+        // "ifscCode",
+        // "accountNumber",
       ];
       const missingFields = requiredFields.filter((field) => {
         if (field in formData) return !formData[field];
@@ -2008,6 +2155,7 @@ const handleDesignationChange = (e) => {
         registrationNumber: formData.registrationNumber,
         validityDate: formData.validityDate,
         profileImage: uploadedFileIds.profileImage,
+        signatureFileId: uploadedFileIds.signature,   // ✅ ADD THIS
         kyc_aadhaarNumber: kycDetails.aadhaarNumber,
         kyc_panNumber: kycDetails.panNumber,
         kyc_panType: kycDetails.panType,
@@ -2105,6 +2253,7 @@ const handleDesignationChange = (e) => {
           setProfileImage(null);
           setUploadedFileIds({
             profileImage: null,
+            signature: null,
             aadhaar: null,
             pan: null,
             fatherAadhaar: null,
@@ -2131,7 +2280,7 @@ const handleDesignationChange = (e) => {
       }
     } catch (error) {
       console.error("Submit error:", error);
-      showMessage("An unexpected error occurred. Please try again.", "error");
+      showMessage(error.message ||"An unexpected error occurred. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -2318,7 +2467,7 @@ const handleDesignationChange = (e) => {
                           value={formData.email}
                           onChange={handleChange}
                           placeholder="Enter email address"
-                          required
+                  
                           aria-label="Email Address"
                         />
                       </InputGroup>
@@ -2339,7 +2488,7 @@ const handleDesignationChange = (e) => {
                           showYearDropdown
                           dropdownMode="select"
                           maxDate={new Date()}
-                          required
+                          // required
                           aria-label="Date of Birth"
                         />
                       {/* </InputGroup> */}
@@ -2398,7 +2547,7 @@ const handleDesignationChange = (e) => {
                           value={formData.mobileNumber}
                           onChange={handleChange}
                           placeholder="Enter mobile number"
-                          required
+                          // required
                           aria-label="Mobile Number"
                         />
                       </InputGroup>
@@ -2412,7 +2561,7 @@ const handleDesignationChange = (e) => {
   name="department"
   value={formData.department}   // ✅ will now point to new department_code
   onChange={handleDepartmentChange}
-  required
+  // required
 style={{ border: "none", borderRadius: 0 }}
                           aria-label="Department"
 >
@@ -2440,7 +2589,7 @@ style={{ border: "none", borderRadius: 0 }}
                           name="designation"
                           value={formData.designation}
                           onChange={handleDesignationChange}
-                          required
+                          // required
                           style={{ border: "none", borderRadius: 0 }}
                           aria-label="Designation"
                         >
@@ -2586,7 +2735,7 @@ style={{ border: "none", borderRadius: 0 }}
                         name="employmentStatus"
                         value={formData.employmentStatus}
                         onChange={handleChange}
-                        required
+                        // required
                         aria-label="Employment Status"
                       >
                         <option value="">Select employment status</option>
@@ -2677,6 +2826,51 @@ style={{ border: "none", borderRadius: 0 }}
                         />
                       </InputGroup>
                     </FormGroup>
+{isSignatureAllowed() && (
+<FormGroup style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "1.5rem" }}>
+  <Label>Signature (Optional)</Label>
+
+  {!uploadedFileIds.signature ? (
+    <UploadButton htmlFor="signature-upload" style={{ justifyContent: "center" }}>
+      <UploadIcon>
+        <Upload size={16} />
+      </UploadIcon>
+      <UploadText>Upload Signature</UploadText>
+      <input
+        id="signature-upload"
+        type="file"
+        style={{ display: "none" }}
+        accept=".png,.jpg,.jpeg"
+        onChange={handleSignatureUpload}
+        aria-label="Upload signature"
+      />
+    </UploadButton>
+  ) : (
+    <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
+      {/* View */}
+      <AddButton
+        type="button"
+        onClick={() =>
+          window.open(
+            `${GlobalBaseUrl}download-gridfs/${uploadedFileIds.signature}`,
+            "_blank"
+          )
+        }
+      >
+        <AddButtonIcon>
+          <FileText size={16} />
+        </AddButtonIcon>
+        View Signature
+      </AddButton>
+
+      {/* Delete */}
+      <RemoveButton type="button" onClick={handleDeleteSignature}>
+        <Trash2 size={16} />
+      </RemoveButton>
+    </div>
+  )}
+</FormGroup>
+)}
                   </FormGrid>
                 </>
               )}
@@ -2711,7 +2905,7 @@ style={{ border: "none", borderRadius: 0 }}
                             id={`degree-${qualification.id}`}
                             value={qualification.degree}
                             onChange={(e) => handleQualificationChange(qualification.id, "degree", e.target.value)}
-                            required
+                            // required
                             placeholder="E.g., B.Tech, MBA, etc."
                             aria-label={`Degree for qualification ${qualification.id}`}
                           />
@@ -2723,7 +2917,7 @@ style={{ border: "none", borderRadius: 0 }}
                             id={`institution-${qualification.id}`}
                             value={qualification.institution}
                             onChange={(e) => handleQualificationChange(qualification.id, "institution", e.target.value)}
-                            required                            
+                            // required                            
                             placeholder="Name of institution"
 
                             aria-label={`Institution for qualification ${qualification.id}`}
@@ -2736,7 +2930,7 @@ style={{ border: "none", borderRadius: 0 }}
                             id={`passedOut-${qualification.id}`}
                             value={qualification.passedOut}
                             onChange={(e) => handleQualificationChange(qualification.id, "passedOut", e.target.value)}
-                            required
+                            // required
                             placeholder="Year of completion"
                             aria-label={`Year passed out for qualification ${qualification.id}`}
                           />
@@ -2848,7 +3042,7 @@ style={{ border: "none", borderRadius: 0 }}
                             value={experience.company}
                             onChange={(e) => handleExperienceChange(experience.id, "company", e.target.value)}
                             placeholder="Enter company name"
-                            required
+                            // required
                             aria-label={`Company for experience ${experience.id}`}
                           />
                         </FormGroup>
@@ -2860,7 +3054,7 @@ style={{ border: "none", borderRadius: 0 }}
                             value={experience.position}
                             onChange={(e) => handleExperienceChange(experience.id, "position", e.target.value)}
                             placeholder="Enter position"
-                            required
+                            // required
                             aria-label={`Position for experience ${experience.id}`}
                           />
                         </FormGroup>
@@ -2883,7 +3077,7 @@ style={{ border: "none", borderRadius: 0 }}
                             dateFormat="MM/yyyy"
                             showMonthYearPicker
                             placeholderText="Start date"
-                            required
+                            // required
                           />
                         </FormGroup>
                         <FormGroup>

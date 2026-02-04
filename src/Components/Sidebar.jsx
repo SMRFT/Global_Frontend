@@ -366,11 +366,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed, isMobile }) => {
   const selectedBranch = localStorage.getItem("selected_branch")
 
   const handleLogout = () => {
-    if (typeof Storage !== "undefined") {
-      localStorage.removeItem("user_payload");
-      localStorage.removeItem("selected_branch");
-      localStorage.removeItem("access_token"); // also clear token if used
-    }
 
     const redirectURL = import.meta.env.VITE_LOGIN_REDIRECT_URL;
 

@@ -887,6 +887,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
 
   const [uploadedFileIds, setUploadedFileIds] = useState({
     profileImage: null,
+    signature: null,
     aadhaar: null,
     pan: null,
     fatherAadhaar: null,
@@ -1205,19 +1206,40 @@ useEffect(() => {
           setProfileImage(employeeData.profileImage);
         }
 
-        if (employeeData.fileIds) {
-          setUploadedFileIds({
-            profileImage: employeeData.fileIds.profileImage || null,
-            aadhaar: employeeData.fileIds.aadhaar || null,
-            pan: employeeData.fileIds.pan || null,
-            fatherAadhaar: employeeData.fileIds.fatherAadhaar || null,
-            motherAadhaar: employeeData.fileIds.motherAadhaar || null,
-            spouseAadhaar: employeeData.fileIds.spouseAadhaar || null,
-            qualifications: employeeData.fileIds.qualifications || {},
-            experiences: employeeData.fileIds.experiences || {},
-            kidsAadhaar: employeeData.fileIds.kidsAadhaar || {},
-          });
-        }
+setUploadedFileIds(prev => ({
+  ...prev,
+
+  // Profile files
+  profileImage: employeeData.profileImage || null,
+  signature: employeeData.signatureFileId || null,
+
+  // KYC files
+  aadhaar: employeeData.kycDetails?.aadhaarFileId || null,
+  pan: employeeData.kycDetails?.panFileId || null,
+
+  // Family Aadhaar files
+  fatherAadhaar: employeeData.familyDetails?.fatherAadhaarFileId || null,
+  motherAadhaar: employeeData.familyDetails?.motherAadhaarFileId || null,
+  spouseAadhaar: employeeData.familyDetails?.spouseAadhaarFileId || null,
+
+  // Qualifications certificates
+  qualifications: (employeeData.qualifications || []).reduce((acc, q, idx) => {
+    if (q.certificateFileId) acc[idx + 1] = q.certificateFileId;
+    return acc;
+  }, {}),
+
+  // Experience certificates
+  experiences: (employeeData.experiences || []).reduce((acc, e, idx) => {
+    if (e.certificateFileId) acc[idx + 1] = e.certificateFileId;
+    return acc;
+  }, {}),
+
+  // Kids Aadhaar
+  kidsAadhaar: (employeeData.familyDetails?.kidsDetails || []).reduce((acc, kid, idx) => {
+    if (kid.aadhaarFileId) acc[idx] = kid.aadhaarFileId;
+    return acc;
+  }, {}),
+}));
 
         // Reset changes flag
         setHasChanges(false);
@@ -1758,6 +1780,43 @@ const handleRemoveAdditionalRole = (roleName) => {
     }
   };
 
+  const SIGNATURE_ALLOWED_CODES = ["DESIG094"]; // Doctor, Surgeon, Consultant (example)
+
+
+// const isSignatureAllowed = () => {
+//   return SIGNATURE_ALLOWED_CODES.includes((formData.designation || "").trim());
+// };
+
+const isSignatureAllowed = () => true;
+
+  const handleSignatureUpload = async (e) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    setIsUploading(true);
+    const uploadResult = await uploadToGridFS(file, "signature");
+    if (uploadResult.success) {
+      setUploadedFileIds((prev) => ({
+        ...prev,
+        signature: uploadResult.fileId,
+      }));
+      showMessage("Signature uploaded successfully", "success");
+      trackChanges();
+    } else {
+      showMessage(`Failed to upload signature: ${uploadResult.error}`, "error");
+    }
+    setIsUploading(false);
+  }
+};
+
+const handleDeleteSignature = () => {
+  setUploadedFileIds((prev) => ({
+    ...prev,
+    signature: null,
+  }));
+  showMessage("Signature removed", "success");
+  trackChanges();
+};
+
   const triggerFileInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -2096,6 +2155,7 @@ const handleDesignationChange = (e) => {
         registrationNumber: formData.registrationNumber,
         validityDate: formData.validityDate,
         profileImage: uploadedFileIds.profileImage,
+        signatureFileId: uploadedFileIds.signature,   // ✅ ADD THIS
         kyc_aadhaarNumber: kycDetails.aadhaarNumber,
         kyc_panNumber: kycDetails.panNumber,
         kyc_panType: kycDetails.panType,
@@ -2193,6 +2253,7 @@ const handleDesignationChange = (e) => {
           setProfileImage(null);
           setUploadedFileIds({
             profileImage: null,
+            signature: null,
             aadhaar: null,
             pan: null,
             fatherAadhaar: null,
@@ -2406,7 +2467,7 @@ const handleDesignationChange = (e) => {
                           value={formData.email}
                           onChange={handleChange}
                           placeholder="Enter email address"
-                          // required
+                  
                           aria-label="Email Address"
                         />
                       </InputGroup>
@@ -2765,6 +2826,51 @@ style={{ border: "none", borderRadius: 0 }}
                         />
                       </InputGroup>
                     </FormGroup>
+{isSignatureAllowed() && (
+<FormGroup style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "1.5rem" }}>
+  <Label>Signature (Optional)</Label>
+
+  {!uploadedFileIds.signature ? (
+    <UploadButton htmlFor="signature-upload" style={{ justifyContent: "center" }}>
+      <UploadIcon>
+        <Upload size={16} />
+      </UploadIcon>
+      <UploadText>Upload Signature</UploadText>
+      <input
+        id="signature-upload"
+        type="file"
+        style={{ display: "none" }}
+        accept=".png,.jpg,.jpeg"
+        onChange={handleSignatureUpload}
+        aria-label="Upload signature"
+      />
+    </UploadButton>
+  ) : (
+    <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
+      {/* View */}
+      <AddButton
+        type="button"
+        onClick={() =>
+          window.open(
+            `${GlobalBaseUrl}download-gridfs/${uploadedFileIds.signature}`,
+            "_blank"
+          )
+        }
+      >
+        <AddButtonIcon>
+          <FileText size={16} />
+        </AddButtonIcon>
+        View Signature
+      </AddButton>
+
+      {/* Delete */}
+      <RemoveButton type="button" onClick={handleDeleteSignature}>
+        <Trash2 size={16} />
+      </RemoveButton>
+    </div>
+  )}
+</FormGroup>
+)}
                   </FormGrid>
                 </>
               )}

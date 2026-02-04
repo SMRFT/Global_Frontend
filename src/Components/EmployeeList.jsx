@@ -571,7 +571,7 @@ const apiRequest = async (url, method = "GET", data = null, headers = {}) => {
       validateStatus: () => true, // Allow all status codes to be handled in the then block
     }
 
-    if (data && (method === "POST" || method === "PUT")) {
+    if (data && (method === "POST" || method === "PUT" || method === "PATCH")) {
       config.data = data
     }
 
@@ -737,7 +737,7 @@ const EmployeeList = () => {
     if (!validatePasswords()) return
 
     try {
-      const response = await apiRequest(GlobalBaseUrl + "set_employee_password/", "POST", {
+      const response = await apiRequest(GlobalBaseUrl + "set_employee_password/", "PATCH", {
         employeeId: selectedEmployee.employeeId,
         employeeName: selectedEmployee.employeeName,
         department: selectedEmployee.department,
@@ -885,6 +885,14 @@ const EmployeeList = () => {
                 </CardBody>
 
                 <CardFooter>
+                
+                  <CardButton onClick={() => openCredentialsModal(employee)}>
+                  <ButtonIcon>
+                    <Lock size={16} />
+                  </ButtonIcon>
+                  Login Credentials
+                </CardButton>
+         
                   {!employee.is_password_set && (
                     <CardButton onClick={() => handleResendEmail(employee.employeeId)}>
                       <ButtonIcon>

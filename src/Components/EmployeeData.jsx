@@ -15,6 +15,8 @@ import {
   Award,
   GraduationCap,
   Briefcase,
+  UserX,
+  UserCheck,
 } from "lucide-react"
 import styled from "styled-components"
 import { theme } from "./colors"
@@ -605,6 +607,159 @@ export const BackButton = styled.button`
     transform: translateX(-2px);
   }
 `
+// Add these to your styled-components definition section
+
+export const StatusRadioContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.md};
+  padding: ${theme.spacing.xs} ${theme.spacing.sm};
+  background: ${theme.colors.background.secondary};
+  border-radius: ${theme.borderRadius.md};
+  border: 1px solid ${theme.colors.border.light};
+  margin-top: ${theme.spacing.sm};
+  justify-content: center;
+`
+
+export const RadioLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+  font-size: ${theme.typography.fontSize.sm};
+  font-weight: ${(props) => (props.checked ? theme.typography.fontWeight.bold : theme.typography.fontWeight.medium)};
+  color: ${(props) => {
+    if (props.disabled) return theme.colors.text.tertiary;
+    if (props.checked) {
+      return props.value === "active" ? theme.colors.success.dark : theme.colors.error.dark;
+    }
+    return theme.colors.text.secondary;
+  }};
+  opacity: ${(props) => (props.disabled ? 0.6 : 1)};
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: ${(props) => !props.disabled && theme.colors.text.primary};
+  }
+`
+
+export const RadioInput = styled.input`
+  accent-color: ${(props) => (props.value === "active" ? theme.colors.success.main : theme.colors.error.main)};
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin: 0;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+`
+
+// --- Toggle Switch Components ---
+
+export const ToggleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${theme.spacing.sm};
+  margin-top: ${theme.spacing.sm};
+  padding: ${theme.spacing.xs};
+  background: ${theme.colors.background.secondary};
+  border-radius: ${theme.borderRadius.lg};
+  border: 1px solid ${theme.colors.border.light};
+`
+
+export const SwitchLabel = styled.label`
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+`
+
+export const HiddenCheckbox = styled.input`
+  opacity: 0;
+  width: 0;
+  height: 0;
+`
+// --- Add these new components for Toast ---
+const ToastContainer = styled.div`
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+const ToastMessage = styled.div`
+  background: ${(props) => (props.type === "success" ? theme.colors.success.main : theme.colors.error.main)};
+  color: white;
+  padding: 12px 24px;
+  border-radius: ${theme.borderRadius.md};
+  box-shadow: ${theme.shadows.lg};
+  font-weight: ${theme.typography.fontWeight.semibold};
+  font-size: ${theme.typography.fontSize.sm};
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideIn 0.3s ease-out forwards;
+  min-width: 300px;
+
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+`
+
+// --- UPDATE Existing Slider Component ---
+export const Slider = styled.span`
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Default (Inactive) is now Red instead of Grey */
+  background-color: ${(props) => (props.disabled ? theme.colors.neutral[300] : theme.colors.error.main)};
+  transition: .4s;
+  border-radius: 34px;
+
+  &:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  /* Checked State (Active) remains Green */
+  ${HiddenCheckbox}:checked + & {
+    background-color: ${theme.colors.success.main};
+  }
+
+  ${HiddenCheckbox}:checked + &:before {
+    transform: translateX(20px);
+  }
+  
+  ${(props) => props.disabled && `
+    cursor: not-allowed;
+    opacity: 0.6;
+  `}
+`
+
+// --- UPDATE StatusText to handle Red color ---
+export const StatusText = styled.span`
+  font-size: ${theme.typography.fontSize.sm};
+  font-weight: ${theme.typography.fontWeight.semibold};
+  min-width: 60px;
+  color: ${(props) => (props.active ? theme.colors.success.dark : theme.colors.error.dark)};
+`
 
 // File Link Component
 const FileLinkComponent = ({ fileId, fileName, label }) => {
@@ -718,6 +873,17 @@ const EmployeeManagement = () => {
   const [saving, setSaving] = useState(false)
   const [fetchingEmployee, setFetchingEmployee] = useState(false)
   const [activeTab, setActiveTab] = useState("personal")
+  
+  const [updatingStatusId, setUpdatingStatusId] = useState(null)
+
+  // 1. Add Toast State
+  const [toast, setToast] = useState(null) // { message, type }
+
+  // 2. Add Toast Helper
+  const showToast = (message, type = "success") => {
+    setToast({ message, type })
+    setTimeout(() => setToast(null), 3000) // Auto-hide after 3 seconds
+  }
 
   const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
@@ -891,6 +1057,64 @@ const updateEmployee = async (employeeId, formData) => {
     setSelectedEmployee(null)
   }
 
+  // NEW: Handle Deactivate Logic
+// 3. Update Status Handler to use Toast
+  const handleStatusUpdate = async (employeeId, newIsActiveStatus) => {
+    // Determine labels
+    const actionLabel = newIsActiveStatus ? "reactivate" : "deactivate"
+    
+    // Optional: Keep confirm dialog or remove it for smoother toggle action
+    // if (!window.confirm(`Are you sure you want to ${actionLabel} this employee?`)) return;
+
+    try {
+      setUpdatingStatusId(employeeId)
+      const token = localStorage.getItem("access_token")
+      const branchCode = localStorage.getItem("selected_branch")
+
+      const response = await fetch(`${GlobalBaseUrl}UpdateUserStatus-user/${employeeId}/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+          "Branch-Code": branchCode,
+        },
+        body: JSON.stringify({ 
+          is_active: newIsActiveStatus,
+          employment_status: newIsActiveStatus ? "Active" : "Inactive" 
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || data.details || `Failed to ${actionLabel} employee.`)
+      }
+
+      // ✅ SUCCESS: Show Toast instead of Alert
+      showToast(`Employee ${actionLabel}d successfully!`, "success")
+
+      setEmployees((prev) =>
+        prev.map((emp) => {
+          if (emp.employeeId === employeeId) {
+            return {
+              ...emp,
+              is_active: newIsActiveStatus,
+              employmentStatus: newIsActiveStatus ? "Active" : "Inactive" 
+            }
+          }
+          return emp
+        })
+      )
+
+    } catch (err) {
+      console.error(`${actionLabel} error:`, err)
+      // ❌ ERROR: Show Toast
+      showToast(err.message || "An error occurred", "error")
+    } finally {
+      setUpdatingStatusId(null)
+    }
+  }
+
   const handleSaveSuccess = async (savedEmployee) => {
     try {
       if (isCreating) {
@@ -977,6 +1201,16 @@ const updateEmployee = async (employeeId, formData) => {
 
   return (
     <Container>
+      {/* 4. Render Toast Component at the top level */}
+      {toast && (
+        <ToastContainer>
+          <ToastMessage type={toast.type}>
+            {toast.type === "success" ? <UserCheck size={18} /> : <UserX size={18} />}
+            {toast.message}
+          </ToastMessage>
+        </ToastContainer>
+      )}
+
       <Header>
         <Title>Employee Management System</Title>
         <AddButton onClick={handleCreate}>
@@ -1002,82 +1236,108 @@ const updateEmployee = async (employeeId, formData) => {
         </Select>
       </FilterSection>
 
-      <CardsGrid>
-        {filteredEmployees.map((employee) => (
-          <EmployeeCard key={employee.employeeId}>
-            <CardImageSection>
-              {employee.profileImage ? (
-                <CardProfileImage
-                  src={`${GlobalBaseUrl}serve_file/${employee.profileImage}/`}
-                  alt={`${employee.employeeName} Profile`}
-                  onError={(e) => {
-                    e.target.style.display = "none"
-                    e.target.nextSibling.style.display = "flex"
-                  }}
+ <CardsGrid>
+        {filteredEmployees.map((employee) => {
+          // ✅ FIX: Define the variable INSIDE the loop
+const isActive = employee.is_active;
+  
+// ✅ FIX: Define the missing 'isUpdating' variable here
+    const isUpdating = updatingStatusId === employee.employeeId;
+          // ✅ FIX: Use 'return' explicitly
+          return (
+            <EmployeeCard key={employee.employeeId}>
+              <CardImageSection>
+                {employee.profileImage ? (
+                  <CardProfileImage
+                    src={`${GlobalBaseUrl}serve_file/${employee.profileImage}/`}
+                    alt={`${employee.employeeName} Profile`}
+                    onError={(e) => {
+                      e.target.style.display = "none"
+                      e.target.nextSibling.style.display = "flex"
+                    }}
+                  />
+                ) : (
+                  <CardProfilePlaceholder>
+                    <User size={32} />
+                  </CardProfilePlaceholder>
+                )}
+              </CardImageSection>
+
+              <CardContent>
+                <CardHeader>
+                  <EmployeeName>{employee.employeeName}</EmployeeName>
+                  <EmployeeId>ID: {employee.employeeId}</EmployeeId>
+                  <EmployeeRole>{employee.designation_name || "N/A"}</EmployeeRole>
+                </CardHeader>
+
+                <CardBody>
+                  <CardInfoRow>
+                    <CardIcon>
+                      <Mail size={16} />
+                    </CardIcon>
+                    <CardInfoText>{employee.email || "N/A"}</CardInfoText>
+                  </CardInfoRow>
+                  <CardInfoRow>
+                    <CardIcon>
+                      <Phone size={16} />
+                    </CardIcon>
+                    <CardInfoText>{employee.mobileNumber || "N/A"}</CardInfoText>
+                  </CardInfoRow>
+                  <CardInfoRow>
+                    <CardIcon>
+                      <Building size={16} />
+                    </CardIcon>
+                    <CardInfoText>{employee.department_name || "N/A"}</CardInfoText>
+                  </CardInfoRow>
+                  <CardInfoRow>
+                    <CardIcon>
+                      <Award size={16} />
+                    </CardIcon>
+                    <CardInfoText>
+                      <StatusBadge status={employee.employmentStatus}>
+                        {employee.employmentStatus || "N/A"}
+                      </StatusBadge>
+                    </CardInfoText>
+                  </CardInfoRow>
+                </CardBody>
+{/* --- MODIFIED ACTION AREA --- */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.sm }}>
+            <ActionButtons>
+              <IconButton variant="view" onClick={() => handleViewDetails(employee)}>
+                <Eye size={16} /> View
+              </IconButton>
+              <IconButton 
+                variant="edit" 
+                onClick={() => handleEdit(employee)} 
+                disabled={fetchingEmployee}
+              >
+                <Edit size={16} /> Edit
+              </IconButton>
+            </ActionButtons>
+
+            {/* TOGGLE SWITCH - Uses isUpdating */}
+
+            <ToggleContainer>
+              <SwitchLabel>
+                <HiddenCheckbox
+                  type="checkbox"
+                  checked={isActive} // Now uses the correct boolean
+                  disabled={isUpdating}
+                  onChange={(e) => handleStatusUpdate(employee.employeeId, e.target.checked)}
                 />
-              ) : (
-                <CardProfilePlaceholder>
-                  <User size={32} />
-                </CardProfilePlaceholder>
-              )}
-            </CardImageSection>
+                <Slider disabled={isUpdating} />
+              </SwitchLabel>
 
-            <CardContent>
-              <CardHeader>
-                <EmployeeName>{employee.employeeName}</EmployeeName>
-                <EmployeeId>ID: {employee.employeeId}</EmployeeId>
-                <EmployeeRole>{employee.designation_name || "N/A"}</EmployeeRole>
-              </CardHeader>
-
-              <CardBody>
-                <CardInfoRow>
-                  <CardIcon>
-                    <Mail size={16} />
-                  </CardIcon>
-                  <CardInfoText>{employee.email || "N/A"}</CardInfoText>
-                </CardInfoRow>
-                <CardInfoRow>
-                  <CardIcon>
-                    <Phone size={16} />
-                  </CardIcon>
-                  <CardInfoText>{employee.mobileNumber || "N/A"}</CardInfoText>
-                </CardInfoRow>
-                <CardInfoRow>
-                  <CardIcon>
-                    <Building size={16} />
-                  </CardIcon>
-                  <CardInfoText>{employee.department_name || "N/A"}</CardInfoText>
-                </CardInfoRow>
-                <CardInfoRow>
-                  <CardIcon>
-                    <Award size={16} />
-                  </CardIcon>
-                  <CardInfoText>
-                    <StatusBadge status={employee.employmentStatus}>{employee.employmentStatus || "N/A"}</StatusBadge>
-                  </CardInfoText>
-                </CardInfoRow>
-              </CardBody>
-
-              <ActionButtons>
-                <IconButton variant="view" onClick={() => handleViewDetails(employee)} title="View Details">
-                  <Eye size={16} />
-                  View
-                </IconButton>
-                <IconButton
-                  variant="edit"
-                  onClick={() => handleEdit(employee)}
-                  title="Edit Employee"
-                  disabled={fetchingEmployee}
-                >
-                  <Edit size={16} />
-                  Edit
-                </IconButton>
-              </ActionButtons>
-            </CardContent>
-          </EmployeeCard>
-        ))}
+              <StatusText active={isActive}>
+                {isUpdating ? "Updating..." : isActive ? "Active" : "Inactive"}
+              </StatusText>
+            </ToggleContainer>
+          </div>
+              </CardContent>
+            </EmployeeCard>
+          );
+        })}
       </CardsGrid>
-
       {filteredEmployees.length === 0 && <ErrorMessage>No employees found matching your search criteria.</ErrorMessage>}
 
       {/* Enhanced Modal for viewing employee details */}
@@ -1237,6 +1497,26 @@ const updateEmployee = async (employeeId, formData) => {
                         />
                       </FileGrid>
                     </InfoItem>
+                  
+  <SectionTitle>
+    <FileText size={18} />
+    Signature
+  </SectionTitle>
+
+  <InfoItem>
+    <InfoLabel>Signature</InfoLabel>
+    {selectedEmployee.signatureFileId ? (
+      <FileLinkComponent
+        fileId={selectedEmployee.signatureFileId}
+        fileName="Signature"
+        label="Signature"
+      />
+    ) : (
+      <NoFileText>No signature uploaded</NoFileText>
+    )}
+  </InfoItem>
+
+
                   </DetailSection>
                 </DetailGrid>
               </TabContent>

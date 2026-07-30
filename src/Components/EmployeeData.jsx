@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import {
   Eye,
   Edit,
@@ -17,10 +17,11 @@ import {
   Briefcase,
   UserX,
   UserCheck,
+  Database,
 } from "lucide-react"
 import styled from "styled-components"
-import { theme } from "./colors"
-import Profile from "./profile"
+import { theme } from "./Colors"
+import Profile from "./Profile"
 
 // Enhanced styled components
 export const Container = styled.div`
@@ -46,6 +47,13 @@ export const Title = styled.h1`
   font-size: ${theme.typography.fontSize["2xl"]};
   font-weight: ${theme.typography.fontWeight.bold};
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  svg {
+    color: ${theme.colors.primary.main};
+  }
 `
 
 export const AddButton = styled.button`
@@ -918,52 +926,51 @@ const EmployeeManagement = () => {
   const [toast, setToast] = useState(null) // { message, type }
 
   // 2. Add Toast Helper
-  const showToast = (message, type = "success") => {
+  const showToast = useCallback((message, type = "success") => {
     setToast({ message, type })
     setTimeout(() => setToast(null), 3000) // Auto-hide after 3 seconds
-  }
+  }, [])
 
   const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
+  const fetchEmployees = useCallback(async () => {
+    try {
+      setLoading(true)
+
+      const token = localStorage.getItem("access_token") // Or sessionStorage
+      const branchCode = localStorage.getItem("selected_branch")
+
+      const response = await fetch(GlobalBaseUrl + "get_employees_with_labels/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+          "Branch-Code": branchCode,
+        },
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong.")
+      }
+
+      setEmployees(data.employees || [])
+      setError(null)
+    } catch (err) {
+      setError("Failed to fetch employee data. Please try again.")
+      console.error("Fetch error:", err)
+    } finally {
+      setLoading(false)
+    }
+  }, [GlobalBaseUrl])
+
   // Fetch employees data
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        setLoading(true)
-
-        const token = localStorage.getItem("access_token") // Or sessionStorage
-        const branchCode = localStorage.getItem("selected_branch")
-
-        const response = await fetch(GlobalBaseUrl + "get_employees_with_labels/", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-            "Branch-Code": branchCode,
-          },
-        })
-
-        const data = await response.json()
-        if (!response.ok) {
-          throw new Error(data.message || "Something went wrong.")
-        }
-
-        setEmployees(data.employees || [])
-        setError(null)
-      } catch (err) {
-        setError("Failed to fetch employee data. Please try again.")
-        console.error("Fetch error:", err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchEmployees()
-  }, [])
-
+  }, [fetchEmployees])
 
   // Fetch individual employee data by ID
-  const fetchEmployeeById = async (employeeId) => {
+  const fetchEmployeeById = useCallback(async (employeeId) => {
     try {
       setFetchingEmployee(true)
 
@@ -992,13 +999,13 @@ const EmployeeManagement = () => {
     } finally {
       setFetchingEmployee(false)
     }
-  }
+  }, [GlobalBaseUrl])
 
   // Update employee data
 
   // In EmployeeData.jsx
 
-  const updateEmployee = async (employeeId, formData) => {
+  const updateEmployee = useCallback(async (employeeId, formData) => {
     try {
       setSaving(true);
 
@@ -1036,24 +1043,31 @@ const EmployeeManagement = () => {
     } finally {
       setSaving(false);
     }
-  };
+  }, [GlobalBaseUrl]);
   // Get unique departments for filter
   const departments = useMemo(() => {
     const deptSet = new Set(employees.map((emp) => emp.department_name).filter(Boolean))
     return Array.from(deptSet).sort()
   }, [employees])
 
+  const normalizedSearchTerm = useMemo(() => searchTerm.trim().toLowerCase(), [searchTerm])
+
   // Filter employees based on search and department
   const filteredEmployees = useMemo(() => {
+    if (!normalizedSearchTerm && !selectedDepartment) {
+      return employees
+    }
+
     return employees.filter((employee) => {
       const matchesSearch =
-        employee.employeeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        employee.employeeId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        employee.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        !normalizedSearchTerm ||
+        employee.employeeName?.toLowerCase().includes(normalizedSearchTerm) ||
+        employee.employeeId?.toLowerCase().includes(normalizedSearchTerm) ||
+        employee.email?.toLowerCase().includes(normalizedSearchTerm)
       const matchesDepartment = !selectedDepartment || employee.department_name === selectedDepartment
       return matchesSearch && matchesDepartment
     })
-  }, [employees, searchTerm, selectedDepartment])
+  }, [employees, normalizedSearchTerm, selectedDepartment])
 
   // Calculate stats for the dashboard (with department filter awareness)
   const stats = useMemo(() => {
@@ -1281,7 +1295,10 @@ const EmployeeManagement = () => {
       )}
 
       <Header>
-        <Title>Employee Management System</Title>
+        <Title>
+          <Database size={26} />
+          Employee Management System
+        </Title>
         <AddButton onClick={handleCreate}>
           <Plus size={20} />
           Add New Employee

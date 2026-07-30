@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useCallback, useMemo } from "react"
 import styled from "styled-components"
 import { Calendar, Target, BarChart3, Plus, Edit, Trash2 } from 'lucide-react'
 
@@ -217,22 +217,30 @@ const EmptyState = styled.div`
   color: #6b7280;
 `
 
+const DEFAULT_PERFORMANCE_DATA = [
+  { category: "Goal Achievement", selfRating: 0, managerRating: 0, comments: "" },
+  { category: "Collaboration & Teamwork", selfRating: 0, managerRating: 0, comments: "" },
+  { category: "Problem Solving", selfRating: 0, managerRating: 0, comments: "" },
+  { category: "Initiative & Ownership", selfRating: 0, managerRating: 0, comments: "" },
+  { category: "Communication", selfRating: 0, managerRating: 0, comments: "" },
+]
+
+const RATING_OPTIONS = [1, 2, 3, 4, 5]
+
 export default function PerformanceManagement() {
   const [activeTab, setActiveTab] = useState("goals")
   const [goals, setGoals] = useState([])
   const [checkIns, setCheckIns] = useState([])
-  const [performanceData, setPerformanceData] = useState([
-    { category: "Goal Achievement", selfRating: 0, managerRating: 0, comments: "" },
-    { category: "Collaboration & Teamwork", selfRating: 0, managerRating: 0, comments: "" },
-    { category: "Problem Solving", selfRating: 0, managerRating: 0, comments: "" },
-    { category: "Initiative & Ownership", selfRating: 0, managerRating: 0, comments: "" },
-    { category: "Communication", selfRating: 0, managerRating: 0, comments: "" },
-  ])
+  const [performanceData, setPerformanceData] = useState(DEFAULT_PERFORMANCE_DATA)
 
   const [showGoalForm, setShowGoalForm] = useState(false)
   const [showCheckInForm, setShowCheckInForm] = useState(false)
 
-  const handleAddGoal = (e) => {
+  const ratingOptions = useMemo(() => RATING_OPTIONS, [])
+  const hasGoals = useMemo(() => goals.length > 0, [goals.length])
+  const hasCheckIns = useMemo(() => checkIns.length > 0, [checkIns.length])
+
+  const handleAddGoal = useCallback((e) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const newGoal = {
@@ -242,12 +250,12 @@ export default function PerformanceManagement() {
       owner: formData.get("owner"),
       dueDate: formData.get("dueDate"),
     }
-    setGoals([...goals, newGoal])
+    setGoals((prevGoals) => [...prevGoals, newGoal])
     setShowGoalForm(false)
     e.currentTarget.reset()
-  }
+  }, [])
 
-  const handleAddCheckIn = (e) => {
+  const handleAddCheckIn = useCallback((e) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const newCheckIn = {
@@ -258,30 +266,38 @@ export default function PerformanceManagement() {
       support: formData.get("support"),
       nextSteps: formData.get("nextSteps"),
     }
-    setCheckIns([...checkIns, newCheckIn])
+    setCheckIns((prevCheckIns) => [...prevCheckIns, newCheckIn])
     setShowCheckInForm(false)
     e.currentTarget.reset()
-  }
+  }, [])
 
-  const updatePerformanceRating = (index, field, value) => {
-    const updated = [...performanceData]
-    updated[index][field] = value
-    setPerformanceData(updated)
-  }
+  const updatePerformanceRating = useCallback((index, field, value) => {
+    setPerformanceData((prevData) => {
+      const updated = [...prevData]
+      updated[index][field] = value
+      return updated
+    })
+  }, [])
 
-  const updatePerformanceComments = (index, comments) => {
-    const updated = [...performanceData]
-    updated[index].comments = comments
-    setPerformanceData(updated)
-  }
+  const updatePerformanceComments = useCallback((index, comments) => {
+    setPerformanceData((prevData) => {
+      const updated = [...prevData]
+      updated[index].comments = comments
+      return updated
+    })
+  }, [])
 
-  const deleteGoal = (goalId) => {
-    setGoals(goals.filter(goal => goal.id !== goalId))
-  }
+  const deleteGoal = useCallback((goalId) => {
+    setGoals((prevGoals) => prevGoals.filter((goal) => goal.id !== goalId))
+  }, [])
 
-  const deleteCheckIn = (checkInId) => {
-    setCheckIns(checkIns.filter(checkIn => checkIn.id !== checkInId))
-  }
+  const deleteCheckIn = useCallback((checkInId) => {
+    setCheckIns((prevCheckIns) => prevCheckIns.filter((checkIn) => checkIn.id !== checkInId))
+  }, [])
+
+  const toggleGoalForm = useCallback(() => setShowGoalForm((prev) => !prev), [])
+  const toggleCheckInForm = useCallback(() => setShowCheckInForm((prev) => !prev), [])
+  const switchTab = useCallback((tab) => setActiveTab(tab), [])
 
   return (
     <Container>
@@ -292,15 +308,15 @@ export default function PerformanceManagement() {
         </Header>
 
         <TabContainer>
-          <Tab active={activeTab === "goals"} onClick={() => setActiveTab("goals")}>
+          <Tab active={activeTab === "goals"} onClick={() => switchTab("goals")}>
             <Target size={20} />
             Goal Setting
           </Tab>
-          <Tab active={activeTab === "checkins"} onClick={() => setActiveTab("checkins")}>
+          <Tab active={activeTab === "checkins"} onClick={() => switchTab("checkins")}>
             <Calendar size={20} />
             Check-Ins
           </Tab>
-          <Tab active={activeTab === "performance"} onClick={() => setActiveTab("performance")}>
+          <Tab active={activeTab === "performance"} onClick={() => switchTab("performance")}>
             <BarChart3 size={20} />
             Performance Review
           </Tab>
@@ -311,7 +327,7 @@ export default function PerformanceManagement() {
             <div>
               <CardHeader>
                 <CardTitle>Goals & Objectives</CardTitle>
-                <Button variant="primary" onClick={() => setShowGoalForm(!showGoalForm)}>
+                <Button variant="primary" onClick={toggleGoalForm}>
                   <Plus size={16} />
                   Add Goal
                 </Button>
@@ -348,7 +364,7 @@ export default function PerformanceManagement() {
                 </Card>
               )}
 
-              {goals.length === 0 ? (
+              {!hasGoals ? (
                 <EmptyState>
                   <Target size={48} style={{ margin: "0 auto 1rem", opacity: 0.3 }} />
                   <p>No goals set yet. Click "Add Goal" to get started.</p>
@@ -395,7 +411,7 @@ export default function PerformanceManagement() {
             <div>
               <CardHeader>
                 <CardTitle>Check-Ins</CardTitle>
-                <Button variant="primary" onClick={() => setShowCheckInForm(!showCheckInForm)}>
+                <Button variant="primary" onClick={toggleCheckInForm}>
                   <Plus size={16} />
                   Add Check-In
                 </Button>
@@ -436,7 +452,7 @@ export default function PerformanceManagement() {
                 </Card>
               )}
 
-              {checkIns.length === 0 ? (
+              {!hasCheckIns ? (
                 <EmptyState>
                   <Calendar size={48} style={{ margin: "0 auto 1rem", opacity: 0.3 }} />
                   <p>No check-ins recorded yet. Click "Add Check-In" to get started.</p>
@@ -503,7 +519,7 @@ export default function PerformanceManagement() {
                         <Td style={{ fontWeight: "500" }}>{item.category}</Td>
                         <Td>
                           <RatingContainer>
-                            {[1, 2, 3, 4, 5].map((rating) => (
+                            {ratingOptions.map((rating) => (
                               <RatingButton
                                 key={rating}
                                 active={item.selfRating === rating}
@@ -516,7 +532,7 @@ export default function PerformanceManagement() {
                         </Td>
                         <Td>
                           <RatingContainer>
-                            {[1, 2, 3, 4, 5].map((rating) => (
+                            {ratingOptions.map((rating) => (
                               <RatingButton
                                 key={rating}
                                 active={item.managerRating === rating}

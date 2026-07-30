@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import axios from "axios";
 import moment from "moment";
-import { theme } from "./colors";
+import { theme } from "./Colors";
 
 
 import {
@@ -156,6 +156,9 @@ const CardTitle = styled.h1`
   margin: 0;
   letter-spacing: -0.025em;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   @media (min-width: 640px) {
     font-size: 1.75rem;
   }
@@ -285,7 +288,7 @@ const Input = styled.input`
   background-color: white;
   &:focus {
     border-color: ${theme.colors.primary.light};
-    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
+    box-shadow: 0 0 0 3px rgba(81, 89, 134, 0.2);
     transform: translateY(-1px);
   }
   &:hover {
@@ -310,7 +313,7 @@ const Textarea = styled.textarea`
   background-color: white;
   &:focus {
     border-color: ${theme.colors.primary.light};
-    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
+    box-shadow: 0 0 0 3px rgba(81, 89, 134, 0.2);
     transform: translateY(-1px);
   }
   &:hover {
@@ -335,7 +338,7 @@ const Select = styled.select`
   cursor: pointer;
   &:focus {
     border-color: ${theme.colors.primary.light};
-    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
+    box-shadow: 0 0 0 3px rgba(81, 89, 134, 0.2);
     transform: translateY(-1px);
   }
   &:hover {
@@ -373,7 +376,7 @@ const MultiSelectButton = styled.button`
   align-items: center;
   &:focus {
     border-color: ${theme.colors.primary.light};
-    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
+    box-shadow: 0 0 0 3px rgba(81, 89, 134, 0.2);
     transform: translateY(-1px);
   }
   &:hover {
@@ -430,7 +433,7 @@ const InputGroup = styled.div`
   transition: all 0.3s ease;
   &:focus-within {
     border-color: ${theme.colors.primary.light};
-    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
+    box-shadow: 0 0 0 3px rgba(81, 89, 134, 0.2);
     transform: translateY(-1px);
   }
   &:hover {
@@ -469,7 +472,7 @@ const StyledDatePicker = styled(DatePicker)`
   background-color: white;
   &:focus {
     border-color: ${theme.colors.primary.light};
-    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
+    box-shadow: 0 0 0 3px rgba(81, 89, 134, 0.2);
     transform: translateY(-1px);
   }
   &:hover {
@@ -514,7 +517,7 @@ const RadioInput = styled.input`
   cursor: pointer;
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.2);
+    box-shadow: 0 0 0 3px rgba(81, 89, 134, 0.2);
   }
 `;
 
@@ -595,7 +598,7 @@ const AddButton = styled.button`
   }
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.3);
+    box-shadow: 0 0 0 3px rgba(81, 89, 134, 0.3);
   }
 `;
 
@@ -674,7 +677,7 @@ const SubmitButton = styled.button`
   }
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(243, 135, 90, 0.3);
+    box-shadow: 0 0 0 3px rgba(81, 89, 134, 0.3);
   }
   &:disabled {
     opacity: 0.6;
@@ -1038,17 +1041,25 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     return () => clearTimeout(timer);
   }, [formData.employeeId, isEditing]);
 
+  const roleLookup = useMemo(() => {
+    const lookup = new Map();
+    additionalRoleOptions.forEach((opt) => lookup.set(opt.role_code, opt.role_name));
+    return lookup;
+  }, [additionalRoleOptions]);
+
+  const entitlementLookup = useMemo(() => {
+    const lookup = new Map();
+    dataEntitlementOptions.forEach((opt) => lookup.set(opt.DataEntitlementsCode, opt.DataEntitlements));
+    return lookup;
+  }, [dataEntitlementOptions]);
+
   // 3. NEW: Sync Effect to populate Additional Role Names for UI Chips
   useEffect(() => {
-    if (formData.additionalRoles.length > 0 && additionalRoleOptions.length > 0) {
+    if (formData.additionalRoles.length > 0 && roleLookup.size > 0) {
       const names = formData.additionalRoles
-        .map((code) => {
-          const found = additionalRoleOptions.find((opt) => opt.role_code === code);
-          return found ? found.role_name : null;
-        })
-        .filter(Boolean); // Remove nulls
+        .map((code) => roleLookup.get(code))
+        .filter(Boolean);
 
-      // Only update if names are actually different to avoid infinite loops
       setFormData((prev) => {
         if (JSON.stringify(prev.additionalRoleNames) !== JSON.stringify(names)) {
           return { ...prev, additionalRoleNames: names };
@@ -1056,16 +1067,13 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         return prev;
       });
     }
-  }, [formData.additionalRoles, additionalRoleOptions]);
+  }, [formData.additionalRoles, roleLookup]);
 
   // 4. NEW: Sync Effect to populate Data Entitlement Names for UI Chips
   useEffect(() => {
-    if (formData.dataEntitlements.length > 0 && dataEntitlementOptions.length > 0) {
+    if (formData.dataEntitlements.length > 0 && entitlementLookup.size > 0) {
       const names = formData.dataEntitlements
-        .map((code) => {
-          const found = dataEntitlementOptions.find((opt) => opt.DataEntitlementsCode === code);
-          return found ? found.DataEntitlements : null;
-        })
+        .map((code) => entitlementLookup.get(code))
         .filter(Boolean);
 
       setFormData((prev) => {
@@ -1075,7 +1083,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
         return prev;
       });
     }
-  }, [formData.dataEntitlements, dataEntitlementOptions]);
+  }, [formData.dataEntitlements, entitlementLookup]);
 
   //const [activeTab, setActiveTab] = useState("personal");
   useEffect(() => {
@@ -1386,18 +1394,18 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     fetchDataEntitlements();
   }, []);
 
-  const showMessage = (text, type = "success") => {
+  const showMessage = useCallback((text, type = "success") => {
     const id = Date.now();
     const newMessage = { id, text, type };
     setMessages((prev) => [...prev, newMessage]);
     setTimeout(() => {
       setMessages((prev) => prev.filter((msg) => msg.id !== id));
     }, 5000);
-  };
+  }, []);
 
-  const removeMessage = (id) => {
+  const removeMessage = useCallback((id) => {
     setMessages((prev) => prev.filter((msg) => msg.id !== id));
-  };
+  }, []);
 
   const handlePrimaryRoleChange = (e) => {
     const selectedRoleCode = e.target.value;
@@ -2345,6 +2353,7 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
           <Card>
             <CardHeader>
               <CardTitle>
+                <User size={26} style={{ flexShrink: 0 }} />
                 {isEditing ? `Edit Employee Profile - ${formData.employeeName}` : "Create Employee Profile"}
               </CardTitle>
               <CardSubtitle>
@@ -2492,8 +2501,8 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                         aria-label="Employee ID"
                         style={{
                           borderColor:
-                            employeeIdStatus === 'exists' ? '#ef4444' :
-                            employeeIdStatus === 'available' ? '#22c55e' :
+                            employeeIdStatus === 'exists' ? theme.colors.error.main :
+                            employeeIdStatus === 'available' ? theme.colors.success.main :
                             undefined,
                           outline: 'none',
                         }}
@@ -2507,12 +2516,12 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
                           alignItems: 'center',
                           gap: '5px',
                           color:
-                            employeeIdStatus === 'checking' ? '#6b7280' :
-                            employeeIdStatus === 'exists' ? '#ef4444' : '#22c55e',
+                            employeeIdStatus === 'checking' ? theme.colors.text.secondary :
+                            employeeIdStatus === 'exists' ? theme.colors.error.main : theme.colors.success.main,
                         }}>
                           {employeeIdStatus === 'checking' && (
                             <>
-                              <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid #6b7280', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                              <span style={{ display: 'inline-block', width: 12, height: 12, border: `2px solid ${theme.colors.text.secondary}`, borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
                               Checking...
                             </>
                           )}

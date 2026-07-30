@@ -1,19 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, lazy, Suspense, useMemo } from "react"
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import styled, { createGlobalStyle } from "styled-components"
 import Sidebar from "./Components/Sidebar"
-import Header from "./Components/Header"
 import { theme } from "./Components/Colors"
 
-// Import your page components directly
-import Admin from "./Components/Admin"
-import Profile from "./Components/Profile"
-import EmployeeList from "./Components/EmployeeList"
-import Performance from "./Components/Performance"
-import EmployeeData from "./Components/EmployeeData"
-import EmployeeBirthdayPage from './Components/EmployeeBirthdayPage'
+const Admin = lazy(() => import("./Components/Admin"))
+const Profile = lazy(() => import("./Components/Profile"))
+const EmployeeList = lazy(() => import("./Components/EmployeeList"))
+const Performance = lazy(() => import("./Components/Performance"))
+const EmployeeData = lazy(() => import("./Components/EmployeeData"))
+const EmployeeBirthdayPage = lazy(() => import("./Components/EmployeeBirthdayPage"))
 
 
 // Global styles with gradient theme
@@ -76,6 +74,32 @@ const MainContent = styled.main`
   }
 `
 
+const LoadingState = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  gap: 12px;
+  color: ${theme.colors.primary.main};
+`
+
+const Spinner = styled.div`
+  width: 32px;
+  height: 32px;
+  border: 3px solid ${theme.colors.neutral[200]};
+  border-top-color: ${theme.colors.primary.main};
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+`
+
+const PageLoader = () => (
+  <LoadingState role="status" aria-live="polite">
+    <Spinner />
+    <span>Loading page...</span>
+  </LoadingState>
+)
+
 // Default placeholder component for missing pages
 const DefaultPage = ({ pageName }) => (
   <div style={{ 
@@ -110,7 +134,8 @@ function App() {
   }, [])
 
   // Calculate sidebar width based on state
-  const sidebarWidth = isMobile ? "0px" : isCollapsed ? "64px" : "280px"
+  const sidebarWidth = useMemo(() => (isMobile ? "0px" : isCollapsed ? "64px" : "280px"), [isCollapsed, isMobile])
+  const basePath = import.meta.env.BASE_URL || ""
 
   return (
     <>
@@ -120,27 +145,29 @@ function App() {
         <Content $sidebarWidth={sidebarWidth}>
           {/* <Header /> */}
           <MainContent>
-            <Routes>
-              {/* Define all routes directly */}
-              <Route path="/" element={<Profile />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/employee-list" element={<EmployeeList />} />
-              <Route path="/EmployeeList" element={<EmployeeList />} />
-              <Route path="/employee-data" element={<EmployeeData />} />
-              <Route path="/EmployeeData" element={<EmployeeData />} />
-              <Route path="/performance" element={<Performance />} />
-              <Route path="/reports" element={<DefaultPage pageName="Reports" />} />
-              <Route path="/dashboard" element={<DefaultPage pageName="Dashboard" />} />
-              <Route path="/birthdays" element={<EmployeeBirthdayPage />} />
-              
-              {/* Handle base URL routes if needed */}
-              <Route path={`${import.meta.env.BASE_URL || ""}/`} element={<Profile />} />
-              <Route path={`${import.meta.env.BASE_URL || ""}/admin`} element={<Admin />} />
-              <Route path={`${import.meta.env.BASE_URL || ""}/EmployeeList`} element={<EmployeeList />} />
-              <Route path={`${import.meta.env.BASE_URL || ""}/EmployeeData`} element={<EmployeeData />} />
-              <Route path={`${import.meta.env.BASE_URL || ""}/performance`} element={<Performance />} />
-              <Route path={`${import.meta.env.BASE_URL || ""}/birthdays`} element={<EmployeeBirthdayPage />} />
-            </Routes>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* Define all routes directly */}
+                <Route path="/" element={<Profile />} />
+                <Route path="/admin" element={<Admin />} />
+                <Route path="/employee-list" element={<EmployeeList />} />
+                <Route path="/EmployeeList" element={<EmployeeList />} />
+                <Route path="/employee-data" element={<EmployeeData />} />
+                <Route path="/EmployeeData" element={<EmployeeData />} />
+                <Route path="/performance" element={<Performance />} />
+                <Route path="/reports" element={<DefaultPage pageName="Reports" />} />
+                <Route path="/dashboard" element={<DefaultPage pageName="Dashboard" />} />
+                <Route path="/birthdays" element={<EmployeeBirthdayPage />} />
+                
+                {/* Handle base URL routes if needed */}
+                <Route path={`${basePath}/`} element={<Profile />} />
+                <Route path={`${basePath}/admin`} element={<Admin />} />
+                <Route path={`${basePath}/EmployeeList`} element={<EmployeeList />} />
+                <Route path={`${basePath}/EmployeeData`} element={<EmployeeData />} />
+                <Route path={`${basePath}/performance`} element={<Performance />} />
+                <Route path={`${basePath}/birthdays`} element={<EmployeeBirthdayPage />} />
+              </Routes>
+            </Suspense>
           </MainContent>
         </Content>
       </Router>

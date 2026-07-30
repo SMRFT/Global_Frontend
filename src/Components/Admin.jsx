@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import axios from "axios"
 import { Users, Briefcase, Search, Filter, RefreshCw, Plus, Edit, Eye } from "lucide-react"
 import styled, { createGlobalStyle, keyframes } from "styled-components"
@@ -620,7 +620,7 @@ function Admin() {
 
   const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setIsRefreshing(true)
 
     const fetchDepartments = async () => {
@@ -643,11 +643,11 @@ function Admin() {
 
     await Promise.all([fetchDepartments(), fetchDesignations()])
     setIsRefreshing(false)
-  }
+  }, [GlobalBaseUrl])
 
   useEffect(() => {
     fetchData()
-  }, [])
+  }, [fetchData])
 
   const handleStatusToggle = async (item, type) => {
     const id = type === "department" ? item.department_code : item.Designation_code
@@ -693,16 +693,28 @@ function Admin() {
     }
   }
 
-  const filteredDepartments = departments.filter(
-    (dept) =>
-      dept.department_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      dept.department_code.toLowerCase().includes(searchTerm.toLowerCase()),
+  const normalizedSearchTerm = useMemo(() => searchTerm.trim().toLowerCase(), [searchTerm])
+
+  const filteredDepartments = useMemo(
+    () =>
+      departments.filter(
+        (dept) =>
+          !normalizedSearchTerm ||
+          dept.department_name.toLowerCase().includes(normalizedSearchTerm) ||
+          dept.department_code.toLowerCase().includes(normalizedSearchTerm),
+      ),
+    [departments, normalizedSearchTerm],
   )
 
-  const filteredDesignations = designations.filter(
-    (desig) =>
-      desig.designation.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      desig.Designation_code.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredDesignations = useMemo(
+    () =>
+      designations.filter(
+        (desig) =>
+          !normalizedSearchTerm ||
+          desig.designation.toLowerCase().includes(normalizedSearchTerm) ||
+          desig.Designation_code.toLowerCase().includes(normalizedSearchTerm),
+      ),
+    [designations, normalizedSearchTerm],
   )
 
   const currentData = activeTab === "departments" ? filteredDepartments : filteredDesignations

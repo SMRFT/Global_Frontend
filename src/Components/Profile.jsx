@@ -50,6 +50,9 @@ const GlobalStyle = createGlobalStyle`
   .react-datepicker__input-container {
     width: 100%;
   }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
 `;
 
 // Modal components
@@ -974,6 +977,9 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
   const [departmentModalLoading, setDepartmentModalLoading] = useState(false);
   const [designationModalLoading, setDesignationModalLoading] = useState(false);
 
+  // Real-time employee ID availability check state
+  const [employeeIdStatus, setEmployeeIdStatus] = useState(null); // null | 'checking' | 'available' | 'exists'
+
   const [qualifications, setQualifications] = useState([
     {
       id: 1,
@@ -1003,6 +1009,34 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
     accountNumber: "",
     branch: "",
   });
+
+  // Real-time employee ID availability check (debounced 500ms)
+  useEffect(() => {
+    // Only check when creating (not editing) and ID has content
+    if (isEditing || !formData.employeeId.trim()) {
+      setEmployeeIdStatus(null);
+      return;
+    }
+    setEmployeeIdStatus('checking');
+    const timer = setTimeout(async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const branch_code = localStorage.getItem('selected_branch');
+        const res = await axios.get(
+          `${GlobalBaseUrl}check_employee_id/?employeeId=${encodeURIComponent(formData.employeeId.trim())}`,
+          { headers: { Authorization: token, 'branch-code': branch_code }, validateStatus: () => true }
+        );
+        if (res.status === 200) {
+          setEmployeeIdStatus(res.data.exists ? 'exists' : 'available');
+        } else {
+          setEmployeeIdStatus(null);
+        }
+      } catch {
+        setEmployeeIdStatus(null);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [formData.employeeId, isEditing]);
 
   // 3. NEW: Sync Effect to populate Additional Role Names for UI Chips
   useEffect(() => {
@@ -1044,20 +1078,20 @@ function Profile({ employeeData, isEditing = false, onSaveSuccess, onCancel, upd
   }, [formData.dataEntitlements, dataEntitlementOptions]);
 
   //const [activeTab, setActiveTab] = useState("personal");
-useEffect(() => {
-  setFormData((prev) => ({
-    ...prev,
-    additionalRoles: prev.additionalRoles.includes("GP-R-GP")
-      ? prev.additionalRoles
-      : [...prev.additionalRoles, "GP-R-GP"],
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      additionalRoles: prev.additionalRoles.includes("GP-R-GP")
+        ? prev.additionalRoles
+        : [...prev.additionalRoles, "GP-R-GP"],
 
-    additionalRoleNames: prev.additionalRoleNames.includes("Profile")
-      ? prev.additionalRoleNames
-      : [...prev.additionalRoleNames, "Profile"],
-  }));
-}, []);
+      additionalRoleNames: prev.additionalRoleNames.includes("Profile")
+        ? prev.additionalRoleNames
+        : [...prev.additionalRoleNames, "Profile"],
+    }));
+  }, []);
 
- // 1. NEW: Helper function to parse Python-style list strings "['A', 'B']"
+  // 1. NEW: Helper function to parse Python-style list strings "['A', 'B']"
   const parseStringList = (str) => {
     if (!str) return [];
     if (Array.isArray(str)) return str;
@@ -1100,15 +1134,15 @@ useEffect(() => {
           department: employeeData.department || "",
           designation: employeeData.designation || "",
           primaryRole: employeeData.primaryRole || "",
-          
+
           // UPDATED: Use the parsed arrays
           additionalRoles: finalAdditionalRoles,
           // We initialize names as empty; the Sync Effect (below) will populate them
-          additionalRoleNames: [], 
-          
+          additionalRoleNames: [],
+
           dataEntitlements: parsedEntitlements,
-          dataEntitlementNames: [], 
-          
+          dataEntitlementNames: [],
+
           employmentStatus: employeeData.employmentStatus || "",
           registrationNumber: employeeData.registrationNumber || "",
           validityDate: employeeData.validityDate ? moment(employeeData.validityDate).format("YYYY-MM-DD") : null,
@@ -1147,9 +1181,9 @@ useEffect(() => {
               : null,
             kidsDetails: employeeData.familyDetails.kidsDetails
               ? employeeData.familyDetails.kidsDetails.map((kid) => ({
-                  ...kid,
-                  dob: kid.dob ? (moment(kid.dob).isValid() ? moment(kid.dob).toDate() : null) : null,
-                }))
+                ...kid,
+                dob: kid.dob ? (moment(kid.dob).isValid() ? moment(kid.dob).toDate() : null) : null,
+              }))
               : [{ name: "", aadhaar: "", dob: null }],
           });
         }
@@ -1206,40 +1240,40 @@ useEffect(() => {
           setProfileImage(employeeData.profileImage);
         }
 
-setUploadedFileIds(prev => ({
-  ...prev,
+        setUploadedFileIds(prev => ({
+          ...prev,
 
-  // Profile files
-  profileImage: employeeData.profileImage || null,
-  signature: employeeData.signatureFileId || null,
+          // Profile files
+          profileImage: employeeData.profileImage || null,
+          signature: employeeData.signatureFileId || null,
 
-  // KYC files
-  aadhaar: employeeData.kycDetails?.aadhaarFileId || null,
-  pan: employeeData.kycDetails?.panFileId || null,
+          // KYC files
+          aadhaar: employeeData.kycDetails?.aadhaarFileId || null,
+          pan: employeeData.kycDetails?.panFileId || null,
 
-  // Family Aadhaar files
-  fatherAadhaar: employeeData.familyDetails?.fatherAadhaarFileId || null,
-  motherAadhaar: employeeData.familyDetails?.motherAadhaarFileId || null,
-  spouseAadhaar: employeeData.familyDetails?.spouseAadhaarFileId || null,
+          // Family Aadhaar files
+          fatherAadhaar: employeeData.familyDetails?.fatherAadhaarFileId || null,
+          motherAadhaar: employeeData.familyDetails?.motherAadhaarFileId || null,
+          spouseAadhaar: employeeData.familyDetails?.spouseAadhaarFileId || null,
 
-  // Qualifications certificates
-  qualifications: (employeeData.qualifications || []).reduce((acc, q, idx) => {
-    if (q.certificateFileId) acc[idx + 1] = q.certificateFileId;
-    return acc;
-  }, {}),
+          // Qualifications certificates
+          qualifications: (employeeData.qualifications || []).reduce((acc, q, idx) => {
+            if (q.certificateFileId) acc[idx + 1] = q.certificateFileId;
+            return acc;
+          }, {}),
 
-  // Experience certificates
-  experiences: (employeeData.experiences || []).reduce((acc, e, idx) => {
-    if (e.certificateFileId) acc[idx + 1] = e.certificateFileId;
-    return acc;
-  }, {}),
+          // Experience certificates
+          experiences: (employeeData.experiences || []).reduce((acc, e, idx) => {
+            if (e.certificateFileId) acc[idx + 1] = e.certificateFileId;
+            return acc;
+          }, {}),
 
-  // Kids Aadhaar
-  kidsAadhaar: (employeeData.familyDetails?.kidsDetails || []).reduce((acc, kid, idx) => {
-    if (kid.aadhaarFileId) acc[idx] = kid.aadhaarFileId;
-    return acc;
-  }, {}),
-}));
+          // Kids Aadhaar
+          kidsAadhaar: (employeeData.familyDetails?.kidsDetails || []).reduce((acc, kid, idx) => {
+            if (kid.aadhaarFileId) acc[idx] = kid.aadhaarFileId;
+            return acc;
+          }, {}),
+        }));
 
         // Reset changes flag
         setHasChanges(false);
@@ -1378,46 +1412,46 @@ setUploadedFileIds(prev => ({
     }
   };
 
-const handleAdditionalRoleToggle = (roleCode, roleName) => {
-  // Prevent deselecting the default assigned "Profile" role
-  if (roleCode === "GP-R-GP") {
-    return; // Do nothing
-  }
-
-  setFormData((prev) => {
-    const isSelected = prev.additionalRoles.includes(roleCode);
-
-    if (isSelected) {
-      return {
-        ...prev,
-        additionalRoles: prev.additionalRoles.filter((code) => code !== roleCode),
-        additionalRoleNames: prev.additionalRoleNames.filter((name) => name !== roleName),
-      };
-    } else {
-      return {
-        ...prev,
-        additionalRoles: [...prev.additionalRoles, roleCode],
-        additionalRoleNames: [...prev.additionalRoleNames, roleName],
-      };
+  const handleAdditionalRoleToggle = (roleCode, roleName) => {
+    // Prevent deselecting the default assigned "Profile" role
+    if (roleCode === "GP-R-GP") {
+      return; // Do nothing
     }
-  });
 
-  trackChanges();
-};
+    setFormData((prev) => {
+      const isSelected = prev.additionalRoles.includes(roleCode);
 
-const handleRemoveAdditionalRole = (roleName) => {
-  if (roleName === "Profile") return; // prevent removal
+      if (isSelected) {
+        return {
+          ...prev,
+          additionalRoles: prev.additionalRoles.filter((code) => code !== roleCode),
+          additionalRoleNames: prev.additionalRoleNames.filter((name) => name !== roleName),
+        };
+      } else {
+        return {
+          ...prev,
+          additionalRoles: [...prev.additionalRoles, roleCode],
+          additionalRoleNames: [...prev.additionalRoleNames, roleName],
+        };
+      }
+    });
 
-  setFormData((prev) => ({
-    ...prev,
-    additionalRoles: prev.additionalRoles.filter(
-      (code) => code !== "GP-R-GP" && code !== roleName
-    ),
-    additionalRoleNames: prev.additionalRoleNames.filter((name) => name !== roleName),
-  }));
+    trackChanges();
+  };
 
-  trackChanges();
-};
+  const handleRemoveAdditionalRole = (roleName) => {
+    if (roleName === "Profile") return; // prevent removal
+
+    setFormData((prev) => ({
+      ...prev,
+      additionalRoles: prev.additionalRoles.filter(
+        (code) => code !== "GP-R-GP" && code !== roleName
+      ),
+      additionalRoleNames: prev.additionalRoleNames.filter((name) => name !== roleName),
+    }));
+
+    trackChanges();
+  };
 
 
   const handleDataEntitlementToggle = (entitlementCode, entitlementName) => {
@@ -1783,302 +1817,302 @@ const handleRemoveAdditionalRole = (roleName) => {
   const SIGNATURE_ALLOWED_CODES = ["DESIG094"]; // Doctor, Surgeon, Consultant (example)
 
 
-// const isSignatureAllowed = () => {
-//   return SIGNATURE_ALLOWED_CODES.includes((formData.designation || "").trim());
-// };
+  // const isSignatureAllowed = () => {
+  //   return SIGNATURE_ALLOWED_CODES.includes((formData.designation || "").trim());
+  // };
 
-const isSignatureAllowed = () => true;
+  const isSignatureAllowed = () => true;
 
   const handleSignatureUpload = async (e) => {
-  const file = e.target.files?.[0];
-  if (file) {
-    setIsUploading(true);
-    const uploadResult = await uploadToGridFS(file, "signature");
-    if (uploadResult.success) {
-      setUploadedFileIds((prev) => ({
-        ...prev,
-        signature: uploadResult.fileId,
-      }));
-      showMessage("Signature uploaded successfully", "success");
-      trackChanges();
-    } else {
-      showMessage(`Failed to upload signature: ${uploadResult.error}`, "error");
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsUploading(true);
+      const uploadResult = await uploadToGridFS(file, "signature");
+      if (uploadResult.success) {
+        setUploadedFileIds((prev) => ({
+          ...prev,
+          signature: uploadResult.fileId,
+        }));
+        showMessage("Signature uploaded successfully", "success");
+        trackChanges();
+      } else {
+        showMessage(`Failed to upload signature: ${uploadResult.error}`, "error");
+      }
+      setIsUploading(false);
     }
-    setIsUploading(false);
-  }
-};
+  };
 
-const handleDeleteSignature = () => {
-  setUploadedFileIds((prev) => ({
-    ...prev,
-    signature: null,
-  }));
-  showMessage("Signature removed", "success");
-  trackChanges();
-};
+  const handleDeleteSignature = () => {
+    setUploadedFileIds((prev) => ({
+      ...prev,
+      signature: null,
+    }));
+    showMessage("Signature removed", "success");
+    trackChanges();
+  };
 
   const triggerFileInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
-const [departmentModalData1, setDepartmentModalData1] = useState({
-  department_code: "",
-});
-// --- Common fetch function ---
-const fetchNextCode = async (type) => {
-  try {
-    const endpoint =
-      type === "department"
-        ? "get_next_department_code/"
-        : "get_next_designation_code/";
+  const [departmentModalData1, setDepartmentModalData1] = useState({
+    department_code: "",
+  });
+  // --- Common fetch function ---
+  const fetchNextCode = async (type) => {
+    try {
+      const endpoint =
+        type === "department"
+          ? "get_next_department_code/"
+          : "get_next_designation_code/";
 
-    const result = await apiRequest(`${GlobalBaseUrl}${endpoint}`, "GET");
-    console.log("Raw API result:", result);
+      const result = await apiRequest(`${GlobalBaseUrl}${endpoint}`, "GET");
+      console.log("Raw API result:", result);
 
-    const key =
-      type === "department" ? "department_code" : "Designation_code";
+      const key =
+        type === "department" ? "department_code" : "Designation_code";
 
-    // ✅ handle nested data structure safely
-    const value = result?.data?.data?.[key];
+      // ✅ handle nested data structure safely
+      const value = result?.data?.data?.[key];
 
-    if (result.success && value) {
-      return value;
+      if (result.success && value) {
+        return value;
+      }
+
+      throw new Error(`No ${type} code returned`);
+    } catch (err) {
+      console.error(`Error fetching next ${type} code:`, err);
+      showMessage(
+        `Failed to fetch next ${type} code. Please try again.`,
+        "error"
+      );
+      return null;
     }
-
-    throw new Error(`No ${type} code returned`);
-  } catch (err) {
-    console.error(`Error fetching next ${type} code:`, err);
-    showMessage(
-      `Failed to fetch next ${type} code. Please try again.`,
-      "error"
-    );
-    return null;
-  }
-};
+  };
 
 
 
-// when modal opens, fetch and set code
-useEffect(() => {
-  const loadNextCode = async () => {
+  // when modal opens, fetch and set code
+  useEffect(() => {
+    const loadNextCode = async () => {
+      const nextCode = await fetchNextCode("department");
+      if (nextCode) {
+        setDepartmentModalData1((prev) => ({
+          ...prev,
+          department_code: nextCode,
+        }));
+      }
+    };
+
+    loadNextCode();
+  }, []); // 👈 run only once when modal mounts (or change dependency if needed)
+
+  // --- Open Department Modal ---
+  const openDepartmentModal = async () => {
+    setDepartmentModalLoading(true);
     const nextCode = await fetchNextCode("department");
-    if (nextCode) {
-      setDepartmentModalData1((prev) => ({
-        ...prev,
-        department_code: nextCode,
-      }));
-    }
-  };
 
-  loadNextCode();
-}, []); // 👈 run only once when modal mounts (or change dependency if needed)
-
-// --- Open Department Modal ---
-const openDepartmentModal = async () => {
-  setDepartmentModalLoading(true);
-  const nextCode = await fetchNextCode("department");
-
-  setDepartmentModalData({
-    code: nextCode,
-    name: "",
-    description: "",
-  });
-console.log("hhh",departmentModalData)
-  setDepartmentModalError(nextCode ? "" : "Failed to fetch next department code");
-  setDepartmentModalLoading(false);
-  setShowDepartmentModal(true);
-};
-
-// --- Open Designation Modal ---
-const openDesignationModal = async () => {
-  setDesignationModalLoading(true);
-  const nextCode = await fetchNextCode("designation");
-
-  setDesignationModalData({
-    code: nextCode,
-    name: "",
-    description: "",
-  });
-
-  setDesignationModalError(nextCode ? "" : "Failed to fetch next designation code");
-  setDesignationModalLoading(false);
-  setShowDesignationModal(true);
-};
-
-
-// Department Submit
-const handleDepartmentModalSubmit = async (e) => {
-  e.preventDefault();
-  if (!departmentModalData.name.trim()) {
-    setDepartmentModalError("Please enter a department name");
-    return;
-  }
-
-  setDepartmentModalLoading(true);
-  setDepartmentModalError("");
-
-  try {
-    const payload = {
-      department_code: departmentModalData1.department_code,
-      department_name: departmentModalData.name.trim(),
-      description: departmentModalData.description.trim() || departmentModalData.name.trim(),
-      is_active: true,
-      created_by: "system",
-      lastmodified_by: "system",
-    };
-
-    const result = await apiRequest(`${GlobalBaseUrl}addnew_department/`, "POST", payload);
-
-if (result.success) {
-  // ✅ Manually refresh list after adding
-  const refreshed = await apiRequest(GlobalBaseUrl + "get_data_departments/");
-  if (refreshed.success) {
-    const activeDepartments = refreshed.data.departments.filter((item) => item.is_active);
-    setDepartmentsData(activeDepartments);
-    setCachedData("departments_data", activeDepartments);
-  }
-
-  // ✅ Auto-select the new department
-  setFormData((prev) => ({
-    ...prev,
-    department: result.data.department_code,
-    departmentName: result.data.department_name,
-  }));
-
-  // ✅ Fetch next department_code again (refresh like your useEffect)
-  const nextCode = await fetchNextCode("department");
-  if (nextCode) {
-    setDepartmentModalData1({ department_code: nextCode });
-  }
-
-  setShowDepartmentModal(false);
-  setDepartmentModalData({ code: "", name: "", description: "" });
-  setHasChanges(true);
-
-  showMessage("✅ Department added successfully", "success");
-}
- else {
-      setDepartmentModalError(`Failed to add department: ${result.error}`);
-    }
-  } catch (err) {
-    console.error("Error adding department:", err);
-    setDepartmentModalError("An unexpected error occurred while adding department");
-  } finally {
+    setDepartmentModalData({
+      code: nextCode,
+      name: "",
+      description: "",
+    });
+    console.log("hhh", departmentModalData)
+    setDepartmentModalError(nextCode ? "" : "Failed to fetch next department code");
     setDepartmentModalLoading(false);
-  }
-};
+    setShowDepartmentModal(true);
+  };
 
-// state for designation modal
-const [designationModalData1, setDesignationModalData1] = useState({
-  code: "",
-  name: "",
-  description: "",
-});
-
-// when modal opens, fetch next designation code
-useEffect(() => {
-  const loadNextCode = async () => {
+  // --- Open Designation Modal ---
+  const openDesignationModal = async () => {
+    setDesignationModalLoading(true);
     const nextCode = await fetchNextCode("designation");
-    if (nextCode) {
-      setDesignationModalData1((prev) => ({
-        ...prev,
-        designation_code: nextCode,  // ✅ matches backend key
-      }));
+
+    setDesignationModalData({
+      code: nextCode,
+      name: "",
+      description: "",
+    });
+
+    setDesignationModalError(nextCode ? "" : "Failed to fetch next designation code");
+    setDesignationModalLoading(false);
+    setShowDesignationModal(true);
+  };
+
+
+  // Department Submit
+  const handleDepartmentModalSubmit = async (e) => {
+    e.preventDefault();
+    if (!departmentModalData.name.trim()) {
+      setDepartmentModalError("Please enter a department name");
+      return;
+    }
+
+    setDepartmentModalLoading(true);
+    setDepartmentModalError("");
+
+    try {
+      const payload = {
+        department_code: departmentModalData1.department_code,
+        department_name: departmentModalData.name.trim(),
+        description: departmentModalData.description.trim() || departmentModalData.name.trim(),
+        is_active: true,
+        created_by: "system",
+        lastmodified_by: "system",
+      };
+
+      const result = await apiRequest(`${GlobalBaseUrl}addnew_department/`, "POST", payload);
+
+      if (result.success) {
+        // ✅ Manually refresh list after adding
+        const refreshed = await apiRequest(GlobalBaseUrl + "get_data_departments/");
+        if (refreshed.success) {
+          const activeDepartments = refreshed.data.departments.filter((item) => item.is_active);
+          setDepartmentsData(activeDepartments);
+          setCachedData("departments_data", activeDepartments);
+        }
+
+        // ✅ Auto-select the new department
+        setFormData((prev) => ({
+          ...prev,
+          department: result.data.department_code,
+          departmentName: result.data.department_name,
+        }));
+
+        // ✅ Fetch next department_code again (refresh like your useEffect)
+        const nextCode = await fetchNextCode("department");
+        if (nextCode) {
+          setDepartmentModalData1({ department_code: nextCode });
+        }
+
+        setShowDepartmentModal(false);
+        setDepartmentModalData({ code: "", name: "", description: "" });
+        setHasChanges(true);
+
+        showMessage("✅ Department added successfully", "success");
+      }
+      else {
+        setDepartmentModalError(`Failed to add department: ${result.error}`);
+      }
+    } catch (err) {
+      console.error("Error adding department:", err);
+      setDepartmentModalError("An unexpected error occurred while adding department");
+    } finally {
+      setDepartmentModalLoading(false);
     }
   };
 
-  loadNextCode();
-}, []);
- // 👈 only runs once when component mounts
+  // state for designation modal
+  const [designationModalData1, setDesignationModalData1] = useState({
+    code: "",
+    name: "",
+    description: "",
+  });
 
-
-// Designation Submit
-const handleDesignationModalSubmit = async (e) => {
-  e.preventDefault();
-  if (!designationModalData.name.trim()) {
-    setDesignationModalError("Please enter a designation name");
-    return;
-  }
-
-  setDesignationModalLoading(true);
-  setDesignationModalError("");
-
-  try {
-    const payload = {
-      Designation_code: designationModalData.code, // ✅ use only "Designation_code"
-      designation: designationModalData.name.trim(),
-      description: designationModalData.description.trim() || designationModalData.name.trim(),
-      is_active: true,
-      created_by: "system",
-      lastmodified_by: "system",
+  // when modal opens, fetch next designation code
+  useEffect(() => {
+    const loadNextCode = async () => {
+      const nextCode = await fetchNextCode("designation");
+      if (nextCode) {
+        setDesignationModalData1((prev) => ({
+          ...prev,
+          designation_code: nextCode,  // ✅ matches backend key
+        }));
+      }
     };
 
-    const result = await apiRequest(`${GlobalBaseUrl}addnew_designation/`, "POST", payload);
+    loadNextCode();
+  }, []);
+  // 👈 only runs once when component mounts
 
-if (result.success) {
-  const refreshed = await apiRequest(GlobalBaseUrl + "get_data_designation/");
-  if (refreshed.success) {
-    const activeDesignations = refreshed.data.designations.filter((item) => item.is_active);
-    setDesignationsData(activeDesignations);
-    setCachedData("designations_data", activeDesignations);
-  }
 
-  setFormData((prev) => ({
-    ...prev,
-    designation: result.data.Designation_code,
-    designationName: result.data.designation,
-  }));
-
-  // ✅ Fetch next designation_code again
-  const nextCode = await fetchNextCode("designation");
-  if (nextCode) {
-    setDesignationModalData1({ designation_code: nextCode });
-  }
-
-  setShowDesignationModal(false);
-  setDesignationModalData({ code: "", name: "", description: "" });
-  setHasChanges(true);
-
-  showMessage("✅ Designation added successfully", "success");
-}
-else {
-      setDesignationModalError(`Failed to add designation: ${result.error}`);
+  // Designation Submit
+  const handleDesignationModalSubmit = async (e) => {
+    e.preventDefault();
+    if (!designationModalData.name.trim()) {
+      setDesignationModalError("Please enter a designation name");
+      return;
     }
-  } catch (err) {
-    console.error("Error adding designation:", err);
-    setDesignationModalError("An unexpected error occurred while adding designation");
-  } finally {
-    setDesignationModalLoading(false);
-  }
-};
+
+    setDesignationModalLoading(true);
+    setDesignationModalError("");
+
+    try {
+      const payload = {
+        Designation_code: designationModalData.code, // ✅ use only "Designation_code"
+        designation: designationModalData.name.trim(),
+        description: designationModalData.description.trim() || designationModalData.name.trim(),
+        is_active: true,
+        created_by: "system",
+        lastmodified_by: "system",
+      };
+
+      const result = await apiRequest(`${GlobalBaseUrl}addnew_designation/`, "POST", payload);
+
+      if (result.success) {
+        const refreshed = await apiRequest(GlobalBaseUrl + "get_data_designation/");
+        if (refreshed.success) {
+          const activeDesignations = refreshed.data.designations.filter((item) => item.is_active);
+          setDesignationsData(activeDesignations);
+          setCachedData("designations_data", activeDesignations);
+        }
+
+        setFormData((prev) => ({
+          ...prev,
+          designation: result.data.Designation_code,
+          designationName: result.data.designation,
+        }));
+
+        // ✅ Fetch next designation_code again
+        const nextCode = await fetchNextCode("designation");
+        if (nextCode) {
+          setDesignationModalData1({ designation_code: nextCode });
+        }
+
+        setShowDesignationModal(false);
+        setDesignationModalData({ code: "", name: "", description: "" });
+        setHasChanges(true);
+
+        showMessage("✅ Designation added successfully", "success");
+      }
+      else {
+        setDesignationModalError(`Failed to add designation: ${result.error}`);
+      }
+    } catch (err) {
+      console.error("Error adding designation:", err);
+      setDesignationModalError("An unexpected error occurred while adding designation");
+    } finally {
+      setDesignationModalLoading(false);
+    }
+  };
 
 
-// Department Change
-const handleDepartmentChange = (e) => {
-  const selectedDept = departmentsData.find(
-    (dept) => dept.department_code === e.target.value
-  );
-  setFormData((prev) => ({
-    ...prev,
-    department: selectedDept?.department_code || "",
-    departmentName: selectedDept?.department_name || "",
-  }));
-  trackChanges();
-};
+  // Department Change
+  const handleDepartmentChange = (e) => {
+    const selectedDept = departmentsData.find(
+      (dept) => dept.department_code === e.target.value
+    );
+    setFormData((prev) => ({
+      ...prev,
+      department: selectedDept?.department_code || "",
+      departmentName: selectedDept?.department_name || "",
+    }));
+    trackChanges();
+  };
 
-// Designation Change
-const handleDesignationChange = (e) => {
-  const selectedDesig = designationsData.find(
-    (desig) => desig.Designation_code === e.target.value // ✅ lowercase
-  );
-  setFormData((prev) => ({
-    ...prev,
-    designation: selectedDesig?.Designation_code || "",
-    designationName: selectedDesig?.designation || "",
-  }));
-  trackChanges();
-};
+  // Designation Change
+  const handleDesignationChange = (e) => {
+    const selectedDesig = designationsData.find(
+      (desig) => desig.Designation_code === e.target.value // ✅ lowercase
+    );
+    setFormData((prev) => ({
+      ...prev,
+      designation: selectedDesig?.Designation_code || "",
+      designationName: selectedDesig?.designation || "",
+    }));
+    trackChanges();
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -2092,9 +2126,9 @@ const handleDesignationChange = (e) => {
         "employeeId",
         "employeeName",
         // "email",
-        "dateOfBirth",
+        // "dateOfBirth",
         "gender",
-        "mobileNumber",
+        // "mobileNumber",
         // "department",
         // "designation",
         // "aadhaarNumber",
@@ -2110,6 +2144,18 @@ const handleDesignationChange = (e) => {
       });
       if (missingFields.length > 0) {
         showMessage(`Please fill in required fields: ${missingFields.join(", ")}`, "error");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Block submission if employee ID is already taken or still being validated
+      if (!isEditing && employeeIdStatus === 'exists') {
+        showMessage("Employee ID already exists. Please use a different Employee ID.", "error");
+        setIsSubmitting(false);
+        return;
+      }
+      if (!isEditing && employeeIdStatus === 'checking') {
+        showMessage("Please wait while we verify the Employee ID.", "error");
         setIsSubmitting(false);
         return;
       }
@@ -2269,7 +2315,12 @@ const handleDesignationChange = (e) => {
           onSaveSuccess(result.data?.employee || result.data);
         }
       } else {
-        if (result.status === 400) {
+        if (result.status === 409) {
+          showMessage(
+            result.data?.error || `Employee ID '${formData.employeeId}' already exists. Please use a different Employee ID.`,
+            "error"
+          );
+        } else if (result.status === 400) {
           showMessage("Invalid profile data. Please check your inputs and try again.", "error");
           console.error("Validation errors:", result.data);
         } else if (result.status === 401) {
@@ -2280,7 +2331,7 @@ const handleDesignationChange = (e) => {
       }
     } catch (error) {
       console.error("Submit error:", error);
-      showMessage(error.message ||"An unexpected error occurred. Please try again.", "error");
+      showMessage(error.message || "An unexpected error occurred. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -2439,7 +2490,36 @@ const handleDesignationChange = (e) => {
                         required
                         disabled={isEditing}
                         aria-label="Employee ID"
+                        style={{
+                          borderColor:
+                            employeeIdStatus === 'exists' ? '#ef4444' :
+                            employeeIdStatus === 'available' ? '#22c55e' :
+                            undefined,
+                          outline: 'none',
+                        }}
                       />
+                      {!isEditing && employeeIdStatus && (
+                        <div style={{
+                          marginTop: '4px',
+                          fontSize: '0.78rem',
+                          fontWeight: 500,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          color:
+                            employeeIdStatus === 'checking' ? '#6b7280' :
+                            employeeIdStatus === 'exists' ? '#ef4444' : '#22c55e',
+                        }}>
+                          {employeeIdStatus === 'checking' && (
+                            <>
+                              <span style={{ display: 'inline-block', width: 12, height: 12, border: '2px solid #6b7280', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                              Checking...
+                            </>
+                          )}
+                          {employeeIdStatus === 'exists' && <>✗ Employee ID already exists</>}
+                          {employeeIdStatus === 'available' && <>✓ Available</>}
+                        </div>
+                      )}
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor="employeeName">Employee Name*</Label>
@@ -2467,7 +2547,7 @@ const handleDesignationChange = (e) => {
                           value={formData.email}
                           onChange={handleChange}
                           placeholder="Enter email address"
-                  
+
                           aria-label="Email Address"
                         />
                       </InputGroup>
@@ -2475,22 +2555,22 @@ const handleDesignationChange = (e) => {
                     <FormGroup>
                       <Label htmlFor="dateOfBirth">Date of Birth*</Label>
                       {/* <InputGroup> */}
-                        {/* <InputAddon>
+                      {/* <InputAddon>
                           <Calendar size={16} />
                         </InputAddon> */}
-                        <StyledDatePicker
+                      <StyledDatePicker
 
-                          selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : null}
-                          onChange={(date) => handleDateChange(date, "dateOfBirth")}
-                          dateFormat="dd/MM/yyyy"
-                          placeholderText="Select date of birth"
-                          showMonthDropdown
-                          showYearDropdown
-                          dropdownMode="select"
-                          maxDate={new Date()}
-                          // required
-                          aria-label="Date of Birth"
-                        />
+                        selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : null}
+                        onChange={(date) => handleDateChange(date, "dateOfBirth")}
+                        dateFormat="dd/MM/yyyy"
+                        placeholderText="Select date of birth"
+                        showMonthDropdown
+                        showYearDropdown
+                        dropdownMode="select"
+                        maxDate={new Date()}
+                        // required
+                        aria-label="Date of Birth"
+                      />
                       {/* </InputGroup> */}
                     </FormGroup>
                     <FormGroup>
@@ -2552,32 +2632,32 @@ const handleDesignationChange = (e) => {
                         />
                       </InputGroup>
                     </FormGroup>
-                    
+
                     <FormGroup>
                       <Label htmlFor="department">Department*</Label>
                       <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                         <Select
-  id="department"
-  name="department"
-  value={formData.department}   // ✅ will now point to new department_code
-  onChange={handleDepartmentChange}
-  // required
-style={{ border: "none", borderRadius: 0 }}
+                          id="department"
+                          name="department"
+                          value={formData.department}   // ✅ will now point to new department_code
+                          onChange={handleDepartmentChange}
+                          // required
+                          style={{ border: "none", borderRadius: 0 }}
                           aria-label="Department"
->
-  <option value="">Select department</option>
-  {departmentsData.map((dept) => (
-    <option key={dept.department_code} value={dept.department_code}>
-      {dept.department_name}
-    </option>
-  ))}
-</Select>
+                        >
+                          <option value="">Select department</option>
+                          {departmentsData.map((dept) => (
+                            <option key={dept.department_code} value={dept.department_code}>
+                              {dept.department_name}
+                            </option>
+                          ))}
+                        </Select>
 
                         <AddButton type="button" onClick={openDepartmentModal}>
-                       
-                            <Plus size={16} />
-                          
-                      
+
+                          <Plus size={16} />
+
+
                         </AddButton>
                       </div>
                     </FormGroup>
@@ -2601,10 +2681,10 @@ style={{ border: "none", borderRadius: 0 }}
                           ))}
                         </Select>
                         <AddButton type="button" onClick={openDesignationModal}>
-                        
-                            <Plus size={16} />
-    
-                        
+
+                          <Plus size={16} />
+
+
                         </AddButton>
                       </div>
                     </FormGroup>
@@ -2644,9 +2724,10 @@ style={{ border: "none", borderRadius: 0 }}
                               {additionalRoleOptions.map((role) => (
                                 <MultiSelectOption
                                   key={role.role_code}
-                                  onClick={() =>{ handleAdditionalRoleToggle(role.role_code, role.role_name)
+                                  onClick={() => {
+                                    handleAdditionalRoleToggle(role.role_code, role.role_name)
                                     // ✅ close dropdown after selecting
-      setShowAdditionalRoles(false);
+                                    setShowAdditionalRoles(false);
                                   }}
                                   className={formData.additionalRoles.includes(role.role_code) ? "selected" : ""}
                                 >
@@ -2674,7 +2755,7 @@ style={{ border: "none", borderRadius: 0 }}
                     <FormGroup>
                       <Label htmlFor="dataEntitlements">Business Unit</Label>
                       <MultiSelectContainer>
-                        
+
                         <MultiSelectButton
                           type="button"
                           onClick={() => setShowDataEntitlements(!showDataEntitlements)}
@@ -2691,13 +2772,14 @@ style={{ border: "none", borderRadius: 0 }}
                               {dataEntitlementOptions.map((entitlement) => (
                                 <MultiSelectOption
                                   key={entitlement.DataEntitlementsCode}
-                                  onClick={() =>{
+                                  onClick={() => {
                                     handleDataEntitlementToggle(
                                       entitlement.DataEntitlementsCode,
                                       entitlement.DataEntitlements,
                                     )
                                     // ✅ close after selecting
-      setShowDataEntitlements(false);}
+                                    setShowDataEntitlements(false);
+                                  }
                                   }
                                   className={
                                     formData.dataEntitlements.includes(entitlement.DataEntitlementsCode)
@@ -2745,7 +2827,7 @@ style={{ border: "none", borderRadius: 0 }}
                         <option value="temporary">Temporary</option>
                         <option value="contract">Contract</option>
                         <option value="internship">Internship</option>
-                        </Select>
+                      </Select>
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor="registrationNumber">Registration Number</Label>
@@ -2774,23 +2856,23 @@ style={{ border: "none", borderRadius: 0 }}
                         <InputAddon>
                           <Heart size={16} />
                         </InputAddon>
-                      <Select
-                        id="bloodGroup"
-                        name="bloodGroup"
-                        value={formData.bloodGroup}
-                        onChange={handleChange}
-                        aria-label="Blood Group"
-                      >
-                        <option value="">Select blood group</option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
-                      </Select>
+                        <Select
+                          id="bloodGroup"
+                          name="bloodGroup"
+                          value={formData.bloodGroup}
+                          onChange={handleChange}
+                          aria-label="Blood Group"
+                        >
+                          <option value="">Select blood group</option>
+                          <option value="A+">A+</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>
+                          <option value="B-">B-</option>
+                          <option value="AB+">AB+</option>
+                          <option value="AB-">AB-</option>
+                          <option value="O+">O+</option>
+                          <option value="O-">O-</option>
+                        </Select>
                       </InputGroup>
                     </FormGroup>
                     <FormGroup>
@@ -2826,51 +2908,51 @@ style={{ border: "none", borderRadius: 0 }}
                         />
                       </InputGroup>
                     </FormGroup>
-{isSignatureAllowed() && (
-<FormGroup style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "1.5rem" }}>
-  <Label>Signature (Optional)</Label>
+                    {isSignatureAllowed() && (
+                      <FormGroup style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "1.5rem" }}>
+                        <Label>Signature (Optional)</Label>
 
-  {!uploadedFileIds.signature ? (
-    <UploadButton htmlFor="signature-upload" style={{ justifyContent: "center" }}>
-      <UploadIcon>
-        <Upload size={16} />
-      </UploadIcon>
-      <UploadText>Upload Signature</UploadText>
-      <input
-        id="signature-upload"
-        type="file"
-        style={{ display: "none" }}
-        accept=".png,.jpg,.jpeg"
-        onChange={handleSignatureUpload}
-        aria-label="Upload signature"
-      />
-    </UploadButton>
-  ) : (
-    <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
-      {/* View */}
-      <AddButton
-        type="button"
-        onClick={() =>
-          window.open(
-            `${GlobalBaseUrl}download-gridfs/${uploadedFileIds.signature}`,
-            "_blank"
-          )
-        }
-      >
-        <AddButtonIcon>
-          <FileText size={16} />
-        </AddButtonIcon>
-        View Signature
-      </AddButton>
+                        {!uploadedFileIds.signature ? (
+                          <UploadButton htmlFor="signature-upload" style={{ justifyContent: "center" }}>
+                            <UploadIcon>
+                              <Upload size={16} />
+                            </UploadIcon>
+                            <UploadText>Upload Signature</UploadText>
+                            <input
+                              id="signature-upload"
+                              type="file"
+                              style={{ display: "none" }}
+                              accept=".png,.jpg,.jpeg"
+                              onChange={handleSignatureUpload}
+                              aria-label="Upload signature"
+                            />
+                          </UploadButton>
+                        ) : (
+                          <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
+                            {/* View */}
+                            <AddButton
+                              type="button"
+                              onClick={() =>
+                                window.open(
+                                  `${GlobalBaseUrl}download-gridfs/${uploadedFileIds.signature}`,
+                                  "_blank"
+                                )
+                              }
+                            >
+                              <AddButtonIcon>
+                                <FileText size={16} />
+                              </AddButtonIcon>
+                              View Signature
+                            </AddButton>
 
-      {/* Delete */}
-      <RemoveButton type="button" onClick={handleDeleteSignature}>
-        <Trash2 size={16} />
-      </RemoveButton>
-    </div>
-  )}
-</FormGroup>
-)}
+                            {/* Delete */}
+                            <RemoveButton type="button" onClick={handleDeleteSignature}>
+                              <Trash2 size={16} />
+                            </RemoveButton>
+                          </div>
+                        )}
+                      </FormGroup>
+                    )}
                   </FormGrid>
                 </>
               )}
@@ -3010,7 +3092,7 @@ style={{ border: "none", borderRadius: 0 }}
                 </>
               )}
 
-{/* Experience Tab */}
+              {/* Experience Tab */}
               {activeTab === "experience" && (
                 <>
                   <SectionTitle>
@@ -3077,7 +3159,7 @@ style={{ border: "none", borderRadius: 0 }}
                             dateFormat="MM/yyyy"
                             showMonthYearPicker
                             placeholderText="Start date"
-                            // required
+                          // required
                           />
                         </FormGroup>
                         <FormGroup>
@@ -3134,7 +3216,7 @@ style={{ border: "none", borderRadius: 0 }}
                 </>
               )}
 
-{/* FIXED: KYC Details Tab with UAN number */}
+              {/* FIXED: KYC Details Tab with UAN number */}
               {activeTab === "kyc" && (
                 <>
                   <SectionTitle>
@@ -3510,13 +3592,13 @@ style={{ border: "none", borderRadius: 0 }}
                         <FormGroup>
                           <Label htmlFor={`kidDob-${index}`}>Date of Birth</Label>
                           <StyledDatePicker
-                              selected={kid.dob}
-                              onChange={(date) => handleKidsChange(index, "dob", date)}
-                              dateFormat="dd/MM/yyyy"
-                              placeholderText="Select child DOB"
-                              showYearDropdown
-                              dropdownMode="select"
-                            />
+                            selected={kid.dob}
+                            onChange={(date) => handleKidsChange(index, "dob", date)}
+                            dateFormat="dd/MM/yyyy"
+                            placeholderText="Select child DOB"
+                            showYearDropdown
+                            dropdownMode="select"
+                          />
                         </FormGroup>
                         <FormGroup>
                           <Label htmlFor={`kid-aadhaar-upload-${index}`}>Upload Child Aadhaar</Label>
@@ -3562,7 +3644,7 @@ style={{ border: "none", borderRadius: 0 }}
                 </>
               )}
 
-{/* Salary Details Tab */}
+              {/* Salary Details Tab */}
               {activeTab === "salary" && (
                 <>
                   <SectionTitle>
@@ -3585,10 +3667,10 @@ style={{ border: "none", borderRadius: 0 }}
                           placeholder="Enter net salary"
                         />
                       </InputGroup>
-                      </FormGroup>
+                    </FormGroup>
                     <FormGroup>
                       <Label htmlFor="grossSalary">Gross Salary</Label>
-                    <InputGroup>
+                      <InputGroup>
                         <InputAddon>₹</InputAddon>
                         <InputWithAddon
                           type="text"
@@ -3599,7 +3681,7 @@ style={{ border: "none", borderRadius: 0 }}
                           placeholder="Enter gross salary"
                         />
                       </InputGroup>
-                      </FormGroup>
+                    </FormGroup>
                     <FormGroup>
                       <Label htmlFor="ctc">CTC (Cost to Company)</Label>
                       <InputGroup>
@@ -3738,8 +3820,8 @@ style={{ border: "none", borderRadius: 0 }}
                   {isUploading || isSubmitting || saving
                     ? "Processing..."
                     : isEditing
-                    ? "Update Profile"
-                    : "Save Profile"}
+                      ? "Update Profile"
+                      : "Save Profile"}
                 </SubmitButton>
               </SubmitButtonContainer>
             </FormContainer>
@@ -3764,18 +3846,18 @@ style={{ border: "none", borderRadius: 0 }}
               {departmentModalError && <ErrorMessage>{departmentModalError}</ErrorMessage>}
               <form onSubmit={handleDepartmentModalSubmit}>
                 <FormGrid>
-                 
-                  
-  <FormGroup style={{ gridColumn: "span 6" }}>
-    <Label htmlFor="departmentCode">Department Code</Label>
-    <Input
-      type="text"
-      id="departmentCode"
-      value={departmentModalData1.department_code || ""}
-      disabled
-      aria-label="Department Code"
-    />
-  </FormGroup>
+
+
+                  <FormGroup style={{ gridColumn: "span 6" }}>
+                    <Label htmlFor="departmentCode">Department Code</Label>
+                    <Input
+                      type="text"
+                      id="departmentCode"
+                      value={departmentModalData1.department_code || ""}
+                      disabled
+                      aria-label="Department Code"
+                    />
+                  </FormGroup>
 
                   <FormGroup style={{ gridColumn: "span 6" }}>
                     <Label htmlFor="departmentName">Department Name*</Label>
@@ -3791,7 +3873,7 @@ style={{ border: "none", borderRadius: 0 }}
                       aria-label="Department Name"
                     />
                   </FormGroup>
-              
+
                   <FormGroup style={{ gridColumn: "1 / -1" }}>
                     <Label htmlFor="departmentDescription">Description</Label>
                     <Textarea
@@ -3840,16 +3922,16 @@ style={{ border: "none", borderRadius: 0 }}
               {designationModalError && <ErrorMessage>{designationModalError}</ErrorMessage>}
               <form onSubmit={handleDesignationModalSubmit}>
                 <FormGrid>
-<FormGroup style={{ gridColumn: "span 6" }}>
-  <Label htmlFor="designationCode">Designation Code</Label>
-  <Input
-    type="text"
-    id="designationCode"
-    value={designationModalData.code || ""}
-    disabled
-    aria-label="Designation Code"
-  />
-</FormGroup>
+                  <FormGroup style={{ gridColumn: "span 6" }}>
+                    <Label htmlFor="designationCode">Designation Code</Label>
+                    <Input
+                      type="text"
+                      id="designationCode"
+                      value={designationModalData.code || ""}
+                      disabled
+                      aria-label="Designation Code"
+                    />
+                  </FormGroup>
                   <FormGroup style={{ gridColumn: "span 6" }}>
                     <Label htmlFor="designationName">Designation Name*</Label>
                     <Input
@@ -3913,4 +3995,3 @@ style={{ border: "none", borderRadius: 0 }}
 }
 
 export default Profile;
-                        

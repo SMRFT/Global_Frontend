@@ -33,21 +33,17 @@ export const Container = styled.div`
 `
 
 export const Header = styled.div`
-  background: ${theme.colors.primary.gradient};
-  padding: ${theme.spacing.xl};
-  border-radius: ${theme.borderRadius.xl};
-  margin-bottom: ${theme.spacing.xl};
-  box-shadow: ${theme.shadows.lg};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: ${theme.spacing.md};
+  margin-bottom: ${theme.spacing.lg};
+  padding: ${theme.spacing.md} 0;
+  border-bottom: 1px solid ${theme.colors.border.main};
 `
 
 export const Title = styled.h1`
-  color: ${theme.colors.white};
-  font-size: ${theme.typography.fontSize["3xl"]};
+  color: ${theme.colors.text.primary};
+  font-size: ${theme.typography.fontSize["2xl"]};
   font-weight: ${theme.typography.fontWeight.bold};
   margin: 0;
 `
@@ -56,205 +52,144 @@ export const AddButton = styled.button`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.sm};
-  padding: ${theme.spacing.md} ${theme.spacing.lg};
-  background: ${theme.colors.white};
-  color: ${theme.colors.primary.main};
+  padding: ${theme.spacing.sm} ${theme.spacing.md};
+  background: ${theme.colors.primary.main};
+  color: ${theme.colors.white};
   border: none;
-  border-radius: ${theme.borderRadius.lg};
+  border-radius: ${theme.borderRadius.md};
   font-weight: ${theme.typography.fontWeight.semibold};
   cursor: pointer;
   transition: all ${theme.animation.normal} ${theme.animation.easing.ease};
-  box-shadow: ${theme.shadows.md};
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${theme.shadows.lg};
-    background: ${theme.colors.neutral[50]};
+    background: ${theme.colors.primary.dark};
+    transform: translateY(-1px);
   }
 `
 
 export const FilterSection = styled.div`
   display: flex;
   gap: ${theme.spacing.md};
-  margin-bottom: ${theme.spacing.xl};
+  margin-bottom: ${theme.spacing.lg};
   flex-wrap: wrap;
   align-items: center;
   background: ${theme.colors.white};
-  padding: ${theme.spacing.lg};
-  border-radius: ${theme.borderRadius.lg};
-  box-shadow: ${theme.shadows.card};
+  padding: ${theme.spacing.md};
+  border-radius: ${theme.borderRadius.md};
+  border: 1px solid ${theme.colors.border.main};
 `
 
 export const SearchInput = styled.input`
   flex: 1;
   min-width: 300px;
-  padding: ${theme.spacing.sm} ${theme.spacing.md};
-  border: 2px solid ${theme.colors.border.main};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.base};
-  transition: all ${theme.animation.normal} ${theme.animation.easing.ease};
+  padding: ${theme.spacing.xs} ${theme.spacing.md};
+  border: 1px solid ${theme.colors.border.main};
+  border-radius: ${theme.borderRadius.sm};
+  font-size: ${theme.typography.fontSize.sm};
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary.main};
-    box-shadow: ${theme.shadows.focus};
-  }
-  &::placeholder {
-    color: ${theme.colors.text.tertiary};
   }
 `
 
 export const Select = styled.select`
-  padding: ${theme.spacing.sm} ${theme.spacing.md};
-  border: 2px solid ${theme.colors.border.main};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.typography.fontSize.base};
+  padding: ${theme.spacing.xs} ${theme.spacing.md};
+  border: 1px solid ${theme.colors.border.main};
+  border-radius: ${theme.borderRadius.sm};
+  font-size: ${theme.typography.fontSize.sm};
   background: ${theme.colors.white};
-  color: ${theme.colors.text.primary};
   cursor: pointer;
-  transition: all ${theme.animation.normal} ${theme.animation.easing.ease};
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary.main};
-    box-shadow: ${theme.shadows.focus};
-  }
 `
 
-export const CardsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: ${theme.spacing.lg};
+export const TableContainer = styled.div`
+  background: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.md};
+  border: 1px solid ${theme.colors.border.main};
+  overflow: hidden;
   margin-bottom: ${theme.spacing.xl};
-  @media (max-width: ${theme.breakpoints.md}) {
-    grid-template-columns: 1fr;
-  }
 `
 
-// Enhanced Employee Card with Profile Image
-export const EmployeeCard = styled.div`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.xl};
-  padding: 0;
-  box-shadow: ${theme.shadows.card};
-  transition: all ${theme.animation.normal} ${theme.animation.easing.ease};
-  border: 1px solid ${theme.colors.border.light};
-  position: relative;
-  overflow: hidden;
-  &:hover {
-    transform: translateY(-6px);
-    box-shadow: ${theme.shadows.hover};
-  }
+export const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
 `
 
-export const CardImageSection = styled.div`
-  position: relative;
-  height: 120px;
-  background: ${theme.colors.primary.gradientHorizontal};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-`
-
-export const CardProfileImage = styled.img`
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  margin-bottom: 40px;
-  object-fit: cover;
-  border: 4px solid ${theme.colors.white};
-  box-shadow: ${theme.shadows.md};
-  position: absolute;
-  bottom: -40px;
-  background: ${theme.colors.white};
-`
-
-export const CardProfilePlaceholder = styled.div`
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: ${theme.colors.white};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.primary.main};
-  font-size: ${theme.typography.fontSize.xl};
-  border: 4px solid ${theme.colors.white};
-  box-shadow: ${theme.shadows.md};
-  position: absolute;
-  bottom: -40px;
-`
-
-export const CardContent = styled.div`
-  padding: ${theme.spacing.xl} ${theme.spacing.lg} ${theme.spacing.lg};
-  margin-top: 0px;7
-`
-
-export const CardHeader = styled.div`
-  text-align: center;
-  margin-bottom: ${theme.spacing.lg};
-`
-
-export const EmployeeName = styled.h3`
-  color: ${theme.colors.text.primary};
-  font-size: ${theme.typography.fontSize.xl};
+export const Th = styled.th`
+  padding: ${theme.spacing.md};
+  background: ${theme.colors.background.tertiary};
+  color: ${theme.colors.text.secondary};
+  font-size: ${theme.typography.fontSize.xs};
   font-weight: ${theme.typography.fontWeight.bold};
-  margin: 0 0 ${theme.spacing.xs} 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid ${theme.colors.border.main};
 `
 
-export const EmployeeId = styled.p`
-  color: ${theme.colors.text.secondary};
+export const Td = styled.td`
+  padding: ${theme.spacing.md};
+  color: ${theme.colors.text.primary};
   font-size: ${theme.typography.fontSize.sm};
-  margin: 0 0 ${theme.spacing.xs} 0;
-  font-weight: ${theme.typography.fontWeight.medium};
+  border-bottom: 1px solid ${theme.colors.border.light};
+  vertical-align: middle;
 `
 
-export const EmployeeRole = styled.p`
+export const Tr = styled.tr`
+  transition: background ${theme.animation.fast};
+  &:hover {
+    background: ${theme.colors.neutral[50]};
+  }
+  &:last-child td {
+    border-bottom: none;
+  }
+`
+
+export const AvatarCell = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.md};
+`
+
+export const Avatar = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: ${theme.colors.primary.light};
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: ${theme.colors.primary.main};
-  font-size: ${theme.typography.fontSize.sm};
-  margin: 0;
+  font-weight: ${theme.typography.fontWeight.bold};
+  overflow: hidden;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`
+
+export const NameText = styled.div`
   font-weight: ${theme.typography.fontWeight.semibold};
+  color: ${theme.colors.text.primary};
 `
 
-export const CardBody = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing.sm};
-  margin-bottom: ${theme.spacing.lg};
-`
-
-export const CardInfoRow = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing.sm};
-  padding: ${theme.spacing.xs} 0;
-`
-
-export const CardIcon = styled.div`
-  color: ${theme.colors.primary.main};
-  display: flex;
-  align-items: center;
-  min-width: 20px;
-`
-
-export const CardInfoText = styled.span`
-  color: ${theme.colors.text.secondary};
-  font-size: ${theme.typography.fontSize.sm};
-  flex: 1;
+export const IdText = styled.div`
+  font-size: ${theme.typography.fontSize.xs};
+  color: ${theme.colors.text.tertiary};
 `
 
 export const ActionButtons = styled.div`
   display: flex;
-  gap: ${theme.spacing.sm};
-  justify-content: center;
+  gap: ${theme.spacing.xs};
 `
 
 export const IconButton = styled.button`
-  background: ${(props) => (props.variant === "view" ? theme.colors.info.light : theme.colors.warning.light)};
-  color: ${(props) => (props.variant === "view" ? theme.colors.info.dark : theme.colors.warning.dark)};
-  border: none;
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing.sm} ${theme.spacing.md};
+  background: ${(props) => (props.variant === "view" ? theme.colors.background.tertiary : theme.colors.background.tertiary)};
+  color: ${(props) => (props.variant === "view" ? theme.colors.primary.main : theme.colors.warning.dark)};
+  border: 1px solid ${theme.colors.border.main};
+  border-radius: ${theme.borderRadius.sm};
+  padding: ${theme.spacing.xs} ${theme.spacing.sm};
   cursor: pointer;
-  transition: all ${theme.animation.normal} ${theme.animation.easing.ease};
+  transition: all ${theme.animation.fast};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -262,18 +197,15 @@ export const IconButton = styled.button`
   font-size: ${theme.typography.fontSize.xs};
   font-weight: ${theme.typography.fontWeight.medium};
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${theme.shadows.sm};
-  }
-  &:active {
-    transform: translateY(0);
+    background: ${theme.colors.border.light};
+    border-color: ${theme.colors.border.dark};
   }
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
-    transform: none;
   }
 `
+
 
 export const StatusBadge = styled.span`
   display: inline-block;
@@ -337,15 +269,16 @@ export const ModalContent = styled.div`
 `
 
 export const ModalHeader = styled.div`
-  background: ${theme.colors.primary.gradient};
-  padding: ${theme.spacing.xl};
+  background: ${theme.colors.white};
+  padding: ${theme.spacing.lg} ${theme.spacing.xl};
   border-radius: ${theme.borderRadius.xl} ${theme.borderRadius.xl} 0 0;
-  color: ${theme.colors.white};
+  color: ${theme.colors.text.primary};
   position: relative;
+  border-bottom: 1px solid ${theme.colors.border.main};
 `
 
 export const ModalTitle = styled.h2`
-  font-size: ${theme.typography.fontSize["2xl"]};
+  font-size: ${theme.typography.fontSize.xl};
   font-weight: ${theme.typography.fontWeight.bold};
   margin: 0;
   text-align: center;
@@ -353,20 +286,22 @@ export const ModalTitle = styled.h2`
 
 export const CloseButton = styled.button`
   position: absolute;
-  top: ${theme.spacing.lg};
-  right: ${theme.spacing.lg};
-  background: rgba(255, 255, 255, 0.2);
+  top: ${theme.spacing.md};
+  right: ${theme.spacing.md};
+  background: none;
   border: none;
-  color: ${theme.colors.white};
+  color: ${theme.colors.text.secondary};
   font-size: ${theme.typography.fontSize.xl};
   cursor: pointer;
-  padding: ${theme.spacing.sm};
-  border-radius: ${theme.borderRadius.md};
-  transition: all ${theme.animation.normal} ${theme.animation.easing.ease};
+  padding: ${theme.spacing.xs};
+  border-radius: ${theme.borderRadius.sm};
+  transition: all ${theme.animation.fast};
   &:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: ${theme.colors.neutral[100]};
+    color: ${theme.colors.text.primary};
   }
 `
+
 
 export const ModalBody = styled.div`
   padding: ${theme.spacing.xl};
@@ -579,34 +514,35 @@ export const EditContainer = styled.div`
 `
 
 export const EditHeader = styled.div`
-  background: ${theme.colors.primary.gradient};
-  padding: ${theme.spacing.lg} ${theme.spacing.xl};
+  background: ${theme.colors.white};
+  padding: ${theme.spacing.md} ${theme.spacing.xl};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: ${theme.shadows.md};
+  border-bottom: 1px solid ${theme.colors.border.main};
   position: sticky;
   top: 0;
   z-index: 10;
 `
 
+
 export const BackButton = styled.button`
   display: flex;
   align-items: center;
   gap: ${theme.spacing.sm};
-  padding: ${theme.spacing.sm} ${theme.spacing.md};
+  padding: ${theme.spacing.xs} ${theme.spacing.sm};
   background: ${theme.colors.white};
   color: ${theme.colors.primary.main};
-  border: none;
-  border-radius: ${theme.borderRadius.md};
+  border: 1px solid ${theme.colors.border.main};
+  border-radius: ${theme.borderRadius.sm};
   font-weight: ${theme.typography.fontWeight.semibold};
   cursor: pointer;
-  transition: all ${theme.animation.normal} ${theme.animation.easing.ease};
+  transition: all ${theme.animation.fast};
   &:hover {
     background: ${theme.colors.neutral[50]};
-    transform: translateX(-2px);
   }
 `
+
 // Add these to your styled-components definition section
 
 export const StatusRadioContainer = styled.div`
@@ -975,7 +911,7 @@ const EmployeeManagement = () => {
   const [saving, setSaving] = useState(false)
   const [fetchingEmployee, setFetchingEmployee] = useState(false)
   const [activeTab, setActiveTab] = useState("personal")
-  
+
   const [updatingStatusId, setUpdatingStatusId] = useState(null)
 
   // 1. Add Toast State
@@ -990,15 +926,51 @@ const EmployeeManagement = () => {
   const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
 
   // Fetch employees data
-useEffect(() => {
-  const fetchEmployees = async () => {
-    try {
-      setLoading(true)
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        setLoading(true)
 
-      const token = localStorage.getItem("access_token") // Or sessionStorage
+        const token = localStorage.getItem("access_token") // Or sessionStorage
+        const branchCode = localStorage.getItem("selected_branch")
+
+        const response = await fetch(GlobalBaseUrl + "get_employees_with_labels/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+            "Branch-Code": branchCode,
+          },
+        })
+
+        const data = await response.json()
+        if (!response.ok) {
+          throw new Error(data.message || "Something went wrong.")
+        }
+
+        setEmployees(data.employees || [])
+        setError(null)
+      } catch (err) {
+        setError("Failed to fetch employee data. Please try again.")
+        console.error("Fetch error:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEmployees()
+  }, [])
+
+
+  // Fetch individual employee data by ID
+  const fetchEmployeeById = async (employeeId) => {
+    try {
+      setFetchingEmployee(true)
+
+      const token = localStorage.getItem("access_token")
       const branchCode = localStorage.getItem("selected_branch")
 
-      const response = await fetch(GlobalBaseUrl + "get_employees_with_labels/", {
+      const response = await fetch(`${GlobalBaseUrl}get_employee_by_id/${employeeId}/`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -1008,99 +980,63 @@ useEffect(() => {
       })
 
       const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data.message || "Something went wrong.")
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to fetch employee details.")
       }
 
-      setEmployees(data.employees || [])
-      setError(null)
+      return data.employee
     } catch (err) {
-      setError("Failed to fetch employee data. Please try again.")
-      console.error("Fetch error:", err)
+      console.error("Fetch employee by ID error:", err)
+      setError("Failed to fetch employee details. Please try again.")
+      return null
     } finally {
-      setLoading(false)
+      setFetchingEmployee(false)
     }
   }
-
-  fetchEmployees()
-}, [])
-
-
-  // Fetch individual employee data by ID
-const fetchEmployeeById = async (employeeId) => {
-  try {
-    setFetchingEmployee(true)
-
-    const token = localStorage.getItem("access_token")
-    const branchCode = localStorage.getItem("selected_branch")
-
-    const response = await fetch(`${GlobalBaseUrl}get_employee_by_id/${employeeId}/`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token,
-        "Branch-Code": branchCode,
-      },
-    })
-
-    const data = await response.json()
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || "Failed to fetch employee details.")
-    }
-
-    return data.employee
-  } catch (err) {
-    console.error("Fetch employee by ID error:", err)
-    setError("Failed to fetch employee details. Please try again.")
-    return null
-  } finally {
-    setFetchingEmployee(false)
-  }
-}
 
   // Update employee data
 
-// In EmployeeData.jsx
+  // In EmployeeData.jsx
 
-const updateEmployee = async (employeeId, formData) => {
-  try {
-    setSaving(true);
+  const updateEmployee = async (employeeId, formData) => {
+    try {
+      setSaving(true);
 
-    const token = localStorage.getItem("access_token");
-    const branchCode = localStorage.getItem("selected_branch");
+      const token = localStorage.getItem("access_token");
+      const branchCode = localStorage.getItem("selected_branch");
 
-    const response = await fetch(`${GlobalBaseUrl}update_employee/${employeeId}/`, {
-      method: "PUT",
-      headers: {
-        Authorization: token,
-        "Branch-Code": branchCode,
-        // Do NOT set Content-Type for FormData
-      },
-      body: formData,
-    });
+      const response = await fetch(`${GlobalBaseUrl}update_employee/${employeeId}/`, {
+        method: "PUT",
+        headers: {
+          Authorization: token,
+          "Branch-Code": branchCode,
+          // Do NOT set Content-Type for FormData
+        },
+        body: formData,
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    // ✅ FIX: Check for success:false and read 'details' (where your specific error lives)
-    if (!response.ok || data.success === false) {
-      // Prioritize 'details' because that's where the "get() returned 2" message is
-      const errorText = data.details || data.error || data.message || "Failed to update employee.";
-      throw new Error(errorText);
+      // ✅ FIX: Check for success:false and read 'details' (where your specific error lives)
+      if (!response.ok || data.success === false) {
+        // Prioritize 'details' because that's where the "get() returned 2" message is
+        const errorText = data.details || data.error || data.message || "Failed to update employee.";
+        throw new Error(errorText);
+      }
+
+      // Success case
+      alert("Employee updated successfully!");
+      window.location.reload();
+
+      return data;
+    } catch (err) {
+      console.error("Update employee error:", err);
+      // Throw the error so Profile.jsx can catch it
+      throw err;
+    } finally {
+      setSaving(false);
     }
-
-    // Success case
-    alert("Employee updated successfully!");
-    window.location.reload(); 
-
-    return data;
-  } catch (err) {
-    console.error("Update employee error:", err);
-    // Throw the error so Profile.jsx can catch it
-    throw err; 
-  } finally {
-    setSaving(false);
-  }
-};
+  };
   // Get unique departments for filter
   const departments = useMemo(() => {
     const deptSet = new Set(employees.map((emp) => emp.department_name).filter(Boolean))
@@ -1191,11 +1127,11 @@ const updateEmployee = async (employeeId, formData) => {
   }
 
   // NEW: Handle Deactivate Logic
-// 3. Update Status Handler to use Toast
+  // 3. Update Status Handler to use Toast
   const handleStatusUpdate = async (employeeId, newIsActiveStatus) => {
     // Determine labels
     const actionLabel = newIsActiveStatus ? "reactivate" : "deactivate"
-    
+
     // Optional: Keep confirm dialog or remove it for smoother toggle action
     // if (!window.confirm(`Are you sure you want to ${actionLabel} this employee?`)) return;
 
@@ -1211,9 +1147,9 @@ const updateEmployee = async (employeeId, formData) => {
           Authorization: token,
           "Branch-Code": branchCode,
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           is_active: newIsActiveStatus,
-          employment_status: newIsActiveStatus ? "Active" : "Inactive" 
+          employment_status: newIsActiveStatus ? "Active" : "Inactive"
         }),
       })
 
@@ -1232,7 +1168,7 @@ const updateEmployee = async (employeeId, formData) => {
             return {
               ...emp,
               is_active: newIsActiveStatus,
-              employmentStatus: newIsActiveStatus ? "Active" : "Inactive" 
+              employmentStatus: newIsActiveStatus ? "Active" : "Inactive"
             }
           }
           return emp
@@ -1257,14 +1193,14 @@ const updateEmployee = async (employeeId, formData) => {
           prev.map((emp) =>
             emp.employeeId === savedEmployee.employeeId
               ? {
-                  ...emp,
-                  ...savedEmployee,
-                  department_name: savedEmployee.department_name || emp.department_name,
-                  designation_name: savedEmployee.designation_name || emp.designation_name,
-                  primary_role_name: savedEmployee.primary_role_name || emp.primary_role_name,
-                  additional_role_names: savedEmployee.additional_role_names || emp.additional_role_names,
-                  data_entitlement_names: savedEmployee.data_entitlement_names || emp.data_entitlement_names,
-                }
+                ...emp,
+                ...savedEmployee,
+                department_name: savedEmployee.department_name || emp.department_name,
+                designation_name: savedEmployee.designation_name || emp.designation_name,
+                primary_role_name: savedEmployee.primary_role_name || emp.primary_role_name,
+                additional_role_names: savedEmployee.additional_role_names || emp.additional_role_names,
+                data_entitlement_names: savedEmployee.data_entitlement_names || emp.data_entitlement_names,
+              }
               : emp,
           ),
         )
@@ -1443,108 +1379,105 @@ const updateEmployee = async (employeeId, formData) => {
         </Select>
       </FilterSection>
 
- <CardsGrid>
-        {filteredEmployees.map((employee) => {
-          // ✅ FIX: Define the variable INSIDE the loop
-const isActive = employee.is_active;
-  
-// ✅ FIX: Define the missing 'isUpdating' variable here
-    const isUpdating = updatingStatusId === employee.employeeId;
-          // ✅ FIX: Use 'return' explicitly
-          return (
-            <EmployeeCard key={employee.employeeId}>
-              <CardImageSection>
-                {employee.profileImage ? (
-                  <CardProfileImage
-                    src={`${GlobalBaseUrl}serve_file/${employee.profileImage}/`}
-                    alt={`${employee.employeeName} Profile`}
-                    onError={(e) => {
-                      e.target.style.display = "none"
-                      e.target.nextSibling.style.display = "flex"
-                    }}
-                  />
-                ) : (
-                  <CardProfilePlaceholder>
-                    <User size={32} />
-                  </CardProfilePlaceholder>
-                )}
-              </CardImageSection>
+      <TableContainer>
+        <Table>
+          <thead>
+            <tr>
+              <Th>Employee</Th>
+              <Th>Designation & Dept</Th>
+              <Th>Contact Information</Th>
+              <Th>Employment</Th>
+              <Th>Status</Th>
+              <Th style={{ textAlign: "right" }}>Actions</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredEmployees.map((employee) => {
+              const isActive = employee.is_active
+              const isUpdating = updatingStatusId === employee.employeeId
 
-              <CardContent>
-                <CardHeader>
-                  <EmployeeName>{employee.employeeName}</EmployeeName>
-                  <EmployeeId>ID: {employee.employeeId}</EmployeeId>
-                  <EmployeeRole>{employee.designation_name || "N/A"}</EmployeeRole>
-                </CardHeader>
+              return (
+                <Tr key={employee.employeeId}>
+                  <Td>
+                    <AvatarCell>
+                      <Avatar>
+                        {employee.profileImage ? (
+                          <img
+                            src={`${GlobalBaseUrl}serve_file/${employee.profileImage}/`}
+                            alt={employee.employeeName}
+                            onError={(e) => {
+                              e.target.style.display = "none"
+                            }}
+                          />
+                        ) : (
+                          <User size={20} />
+                        )}
+                      </Avatar>
+                      <div>
+                        <NameText>{employee.employeeName}</NameText>
+                        <IdText>ID: {employee.employeeId}</IdText>
+                      </div>
+                    </AvatarCell>
+                  </Td>
+                  <Td>
+                    <div style={{ fontWeight: theme.typography.fontWeight.medium }}>{employee.designation_name || "N/A"}</div>
+                    <div style={{ fontSize: theme.typography.fontSize.xs, color: theme.colors.text.secondary }}>
+                      {employee.department_name || "N/A"}
+                    </div>
+                  </Td>
+                  <Td>
+                    <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                      <Mail size={12} color={theme.colors.text.tertiary} />
+                      <span>{employee.email || "N/A"}</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                      <Phone size={12} color={theme.colors.text.tertiary} />
+                      <span>{employee.mobileNumber || "N/A"}</span>
+                    </div>
+                  </Td>
+                  <Td>
+                    <StatusBadge status={employee.employmentStatus}>
+                      {employee.employmentStatus || "N/A"}
+                    </StatusBadge>
+                  </Td>
+                  <Td>
+                    <div style={{ display: "flex", alignItems: "center", gap: theme.spacing.sm }}>
+                      <SwitchLabel>
+                        <HiddenCheckbox
+                          type="checkbox"
+                          checked={isActive}
+                          disabled={isUpdating}
+                          onChange={(e) => handleStatusUpdate(employee.employeeId, e.target.checked)}
+                        />
+                        <Slider disabled={isUpdating} />
+                      </SwitchLabel>
+                      <StatusText active={isActive} style={{ fontSize: "11px", minWidth: "50px" }}>
+                        {isUpdating ? "..." : isActive ? "Active" : "Inactive"}
+                      </StatusText>
+                    </div>
+                  </Td>
+                  <Td style={{ textAlign: "right" }}>
+                    <ActionButtons style={{ justifyContent: "flex-end" }}>
+                      <IconButton variant="view" onClick={() => handleViewDetails(employee)} title="View Details">
+                        <Eye size={14} />
+                      </IconButton>
+                      <IconButton
+                        variant="edit"
+                        onClick={() => handleEdit(employee)}
+                        disabled={fetchingEmployee}
+                        title="Edit Employee"
+                      >
+                        <Edit size={14} />
+                      </IconButton>
+                    </ActionButtons>
+                  </Td>
+                </Tr>
+              )
+            })}
+          </tbody>
+        </Table>
+      </TableContainer>
 
-                <CardBody>
-                  <CardInfoRow>
-                    <CardIcon>
-                      <Mail size={16} />
-                    </CardIcon>
-                    <CardInfoText>{employee.email || "N/A"}</CardInfoText>
-                  </CardInfoRow>
-                  <CardInfoRow>
-                    <CardIcon>
-                      <Phone size={16} />
-                    </CardIcon>
-                    <CardInfoText>{employee.mobileNumber || "N/A"}</CardInfoText>
-                  </CardInfoRow>
-                  <CardInfoRow>
-                    <CardIcon>
-                      <Building size={16} />
-                    </CardIcon>
-                    <CardInfoText>{employee.department_name || "N/A"}</CardInfoText>
-                  </CardInfoRow>
-                  <CardInfoRow>
-                    <CardIcon>
-                      <Award size={16} />
-                    </CardIcon>
-                    <CardInfoText>
-                      <StatusBadge status={employee.employmentStatus}>
-                        {employee.employmentStatus || "N/A"}
-                      </StatusBadge>
-                    </CardInfoText>
-                  </CardInfoRow>
-                </CardBody>
-{/* --- MODIFIED ACTION AREA --- */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing.sm }}>
-            <ActionButtons>
-              <IconButton variant="view" onClick={() => handleViewDetails(employee)}>
-                <Eye size={16} /> View
-              </IconButton>
-              <IconButton 
-                variant="edit" 
-                onClick={() => handleEdit(employee)} 
-                disabled={fetchingEmployee}
-              >
-                <Edit size={16} /> Edit
-              </IconButton>
-            </ActionButtons>
-
-            {/* TOGGLE SWITCH - Uses isUpdating */}
-
-            <ToggleContainer>
-              <SwitchLabel>
-                <HiddenCheckbox
-                  type="checkbox"
-                  checked={isActive} // Now uses the correct boolean
-                  disabled={isUpdating}
-                  onChange={(e) => handleStatusUpdate(employee.employeeId, e.target.checked)}
-                />
-                <Slider disabled={isUpdating} />
-              </SwitchLabel>
-
-              <StatusText active={isActive}>
-                {isUpdating ? "Updating..." : isActive ? "Active" : "Inactive"}
-              </StatusText>
-            </ToggleContainer>
-          </div>
-              </CardContent>
-            </EmployeeCard>
-          );
-        })}
-      </CardsGrid>
       {filteredEmployees.length === 0 && <ErrorMessage>No employees found matching your search criteria.</ErrorMessage>}
 
       {/* Enhanced Modal for viewing employee details */}
@@ -1704,24 +1637,24 @@ const isActive = employee.is_active;
                         />
                       </FileGrid>
                     </InfoItem>
-                  
-  <SectionTitle>
-    <FileText size={18} />
-    Signature
-  </SectionTitle>
 
-  <InfoItem>
-    <InfoLabel>Signature</InfoLabel>
-    {selectedEmployee.signatureFileId ? (
-      <FileLinkComponent
-        fileId={selectedEmployee.signatureFileId}
-        fileName="Signature"
-        label="Signature"
-      />
-    ) : (
-      <NoFileText>No signature uploaded</NoFileText>
-    )}
-  </InfoItem>
+                    <SectionTitle>
+                      <FileText size={18} />
+                      Signature
+                    </SectionTitle>
+
+                    <InfoItem>
+                      <InfoLabel>Signature</InfoLabel>
+                      {selectedEmployee.signatureFileId ? (
+                        <FileLinkComponent
+                          fileId={selectedEmployee.signatureFileId}
+                          fileName="Signature"
+                          label="Signature"
+                        />
+                      ) : (
+                        <NoFileText>No signature uploaded</NoFileText>
+                      )}
+                    </InfoItem>
 
 
                   </DetailSection>

@@ -697,6 +697,108 @@ export const StatusText = styled.span`
   color: ${(props) => (props.active ? theme.colors.success.dark : theme.colors.error.dark)};
 `
 
+// --- Dashboard Styled Components ---
+export const DashboardGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: ${theme.spacing.lg};
+  margin-bottom: ${theme.spacing.xl};
+`
+
+export const DashboardCard = styled.div`
+  background: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.xl};
+  padding: ${theme.spacing.lg};
+  box-shadow: ${theme.shadows.card};
+  border: 1px solid ${theme.colors.border.light};
+  border-left: 5px solid ${props => props.borderColor || theme.colors.primary.main};
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: ${theme.shadows.hover};
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05));
+    pointer-events: none;
+  }
+`
+
+export const DashboardCardContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing.xs};
+`
+
+export const DashboardCardTitle = styled.span`
+  color: ${theme.colors.text.secondary};
+  font-size: ${theme.typography.fontSize.xs};
+  font-weight: ${theme.typography.fontWeight.semibold};
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+`
+
+export const DashboardCardValue = styled.div`
+  color: ${theme.colors.text.primary};
+  font-size: ${theme.typography.fontSize["3xl"]};
+  font-weight: ${theme.typography.fontWeight.bold};
+  line-height: 1;
+  display: flex;
+  align-items: center;
+`
+
+export const DashboardCardSubtext = styled.span`
+  color: ${theme.colors.text.tertiary};
+  font-size: ${theme.typography.fontSize.xs};
+  font-weight: ${theme.typography.fontWeight.medium};
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+`
+
+export const DashboardIconWrapper = styled.div`
+  width: 52px;
+  height: 52px;
+  border-radius: ${theme.borderRadius.lg};
+  background: ${props => props.bgColor || theme.colors.primary.light};
+  color: ${props => props.iconColor || theme.colors.primary.main};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  
+  ${DashboardCard}:hover & {
+    transform: scale(1.1) rotate(5deg);
+  }
+`
+
+export const StatBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: ${theme.borderRadius.full};
+  font-size: 10px;
+  font-weight: ${theme.typography.fontWeight.bold};
+  background: ${props => props.bgColor || theme.colors.neutral[100]};
+  color: ${props => props.color || theme.colors.neutral[600]};
+  margin-left: 8px;
+  text-transform: uppercase;
+`
+
+
 // File Link Component
 const FileLinkComponent = ({ fileId, fileName, label }) => {
   const GlobalBaseUrl = import.meta.env.VITE_BACKEND_GLOBAL_BASE_URL
@@ -953,6 +1055,37 @@ const EmployeeManagement = () => {
     })
   }, [employees, searchTerm, selectedDepartment])
 
+  // Calculate stats for the dashboard (with department filter awareness)
+  const stats = useMemo(() => {
+    const activeEmployeesCount = employees.filter(emp => emp.is_active === true || emp.is_active === 'true').length
+    const inactiveEmployeesCount = employees.filter(emp => emp.is_active !== true && emp.is_active !== 'true').length
+    const totalEmployeesCount = employees.length
+
+    let filteredActiveCount = activeEmployeesCount
+    let filteredInactiveCount = inactiveEmployeesCount
+    let filteredTotalCount = totalEmployeesCount
+
+    if (selectedDepartment) {
+      const deptEmployees = employees.filter(emp => emp.department_name === selectedDepartment)
+      filteredActiveCount = deptEmployees.filter(emp => emp.is_active === true || emp.is_active === 'true').length
+      filteredInactiveCount = deptEmployees.filter(emp => emp.is_active !== true && emp.is_active !== 'true').length
+      filteredTotalCount = deptEmployees.length
+    }
+
+    const activeRate = filteredTotalCount > 0 ? Math.round((filteredActiveCount / filteredTotalCount) * 100) : 0
+
+    return {
+      activeCount: filteredActiveCount,
+      inactiveCount: filteredInactiveCount,
+      totalCount: filteredTotalCount,
+      activeRate,
+      overallActive: activeEmployeesCount,
+      overallInactive: inactiveEmployeesCount,
+      overallTotal: totalEmployeesCount
+    }
+  }, [employees, selectedDepartment])
+
+
   const handleViewDetails = (employee) => {
     setSelectedEmployee(employee)
     setIsModalOpen(true)
@@ -1154,6 +1287,80 @@ const EmployeeManagement = () => {
           Add New Employee
         </AddButton>
       </Header>
+
+      <DashboardGrid>
+        <DashboardCard borderColor={theme.colors.success.main}>
+          <DashboardCardContent>
+            <DashboardCardTitle>Active Employees</DashboardCardTitle>
+            <DashboardCardValue>
+              {stats.activeCount}
+              {selectedDepartment && (
+                <StatBadge bgColor={theme.colors.success.light} color={theme.colors.success.dark}>
+                  Filtered
+                </StatBadge>
+              )}
+            </DashboardCardValue>
+            <DashboardCardSubtext>
+              {selectedDepartment ? (
+                <>Active in <strong>{selectedDepartment}</strong></>
+              ) : (
+                "Across all departments"
+              )}
+            </DashboardCardSubtext>
+          </DashboardCardContent>
+          <DashboardIconWrapper bgColor={theme.colors.success.light} iconColor={theme.colors.success.dark}>
+            <UserCheck size={24} />
+          </DashboardIconWrapper>
+        </DashboardCard>
+
+        <DashboardCard borderColor={theme.colors.error.main}>
+          <DashboardCardContent>
+            <DashboardCardTitle>Inactive Employees</DashboardCardTitle>
+            <DashboardCardValue>
+              {stats.inactiveCount}
+              {selectedDepartment && (
+                <StatBadge bgColor={theme.colors.error.light} color={theme.colors.error.dark}>
+                  Filtered
+                </StatBadge>
+              )}
+            </DashboardCardValue>
+            <DashboardCardSubtext>
+              {selectedDepartment ? (
+                <>Inactive in <strong>{selectedDepartment}</strong></>
+              ) : (
+                "Across all departments"
+              )}
+            </DashboardCardSubtext>
+          </DashboardCardContent>
+          <DashboardIconWrapper bgColor={theme.colors.error.light} iconColor={theme.colors.error.dark}>
+            <UserX size={24} />
+          </DashboardIconWrapper>
+        </DashboardCard>
+
+        <DashboardCard borderColor={theme.colors.primary.main}>
+          <DashboardCardContent>
+            <DashboardCardTitle>
+              {selectedDepartment ? "Department Overview" : "Total Departments"}
+            </DashboardCardTitle>
+            <DashboardCardValue>
+              {selectedDepartment ? stats.totalCount : departments.length}
+              <StatBadge bgColor={theme.colors.primary.light} color={theme.colors.primary.dark}>
+                {stats.activeRate}% Active
+              </StatBadge>
+            </DashboardCardValue>
+            <DashboardCardSubtext>
+              {selectedDepartment ? (
+                <>Total employees in <strong>{selectedDepartment}</strong></>
+              ) : (
+                "Active departments registered"
+              )}
+            </DashboardCardSubtext>
+          </DashboardCardContent>
+          <DashboardIconWrapper bgColor={theme.colors.primary.light} iconColor={theme.colors.primary.main}>
+            <Building size={24} />
+          </DashboardIconWrapper>
+        </DashboardCard>
+      </DashboardGrid>
 
       <FilterSection>
         <SearchInput
